@@ -31,6 +31,7 @@ class _MushafScreenState extends State<MushafScreen> {
 
   @override
   void initState() {
+    debugPrint('initState: initialPage=${widget.initialPage}, highlightedVerseKey=${widget.highlightedVerseKey}');
     super.initState();
     _pageController = PageController(initialPage: widget.initialPage - 1);
 
@@ -45,16 +46,20 @@ class _MushafScreenState extends State<MushafScreen> {
 
   @override
   void dispose() {
+    debugPrint('dispose');
     _positionSubscription?.cancel();
     _pageController.dispose();
     super.dispose();
   }
 
   String _pageNumber(int page) {
-    return page.toString().padLeft(3, '0');
+    final result = page.toString().padLeft(3, '0');
+    debugPrint('_pageNumber: $page -> $result');
+    return result;
   }
 
   Future<void> _loadPage(int page) async {
+    debugPrint('_loadPage: page=$page, cached=${_pagesCache.containsKey(page)}');
     if (page < 1 || page > 604) return;
     if (_pagesCache.containsKey(page)) return;
     try {
@@ -82,6 +87,7 @@ class _MushafScreenState extends State<MushafScreen> {
     final page = index + 1;
     setState(() {
       currentPage = page;
+      debugPrint('setState: currentPage=$page');
       // selectedVerseKey = null;
     });
     _preloadPages(page);
@@ -93,10 +99,12 @@ class _MushafScreenState extends State<MushafScreen> {
     if (verseKey == null) return;
     setState(() {
       selectedVerseKey = selectedVerseKey == verseKey ? null : verseKey;
+      debugPrint('setState: selectedVerseKey=${selectedVerseKey ?? "null"} (${selectedVerseKey == verseKey ? "deselect" : "select"})');
     });
   }
 
   Future<void> _onPlayTap() async {
+    debugPrint('_onPlayTap: isPlaying=$_isPlaying, selectedVerseKey=$selectedVerseKey');
     if (selectedVerseKey == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -139,6 +147,7 @@ class _MushafScreenState extends State<MushafScreen> {
       );
     }
 
+    debugPrint('_onPlayTap: playing verse=$selectedVerseKey, timings loaded=${_verseTimings.length}');
     await _audioManager.playVerse(selectedVerseKey!);
 
     // ✅ نتتبع الموضع مع debugPrint لنشوف المشكلة
@@ -168,6 +177,7 @@ class _MushafScreenState extends State<MushafScreen> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('build: currentPage=$currentPage, selectedVerseKey=$selectedVerseKey');
     return Scaffold(
       backgroundColor: const Color(0xfff8f3e8),
       body: SafeArea(
@@ -249,6 +259,7 @@ class _MushafScreenState extends State<MushafScreen> {
   }
 
   Widget _buildPage(int page, Map<String, dynamic> pageData) {
+    debugPrint('_buildPage: page=$page, lines count=${(pageData['lines'] as List?)?.length ?? 0}');
     final lines = pageData['lines'] as List<dynamic>? ?? [];
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
