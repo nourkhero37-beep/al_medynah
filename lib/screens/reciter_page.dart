@@ -32,15 +32,13 @@ class _RecitersScreenState extends State<ReciterPage> {
     await _audioManager.loadSelectedReciter();
     setState(() => _selectedReciterId = _audioManager.currentReciterId);
 
-    // ✅ نجيب القراء من Quran.com مباشرة
     final reciters = await _audioManager.fetchReciters();
 
     for (final r in reciters) {
-      final downloaded = await _audioManager.isSurahDownloaded(
-        r.id.toString(),
-        1,
-      );
-      _isDownloaded[r.id.toString()] = downloaded;
+      final rid = r.id.toString();
+      final first = await _audioManager.isSurahDownloaded(rid, 1);
+      final last = await _audioManager.isSurahDownloaded(rid, 114);
+      _isDownloaded[rid] = first && last;
     }
 
     if (mounted) {
@@ -56,14 +54,32 @@ class _RecitersScreenState extends State<ReciterPage> {
     setState(() => _downloadProgress[rid] = 0.0);
 
     try {
-      await _audioManager.downloadSurah(
-        rid,
-        1,
-        reciter.serverUrl,
-        onProgress: (p) {
-          if (mounted) setState(() => _downloadProgress[rid] = p);
-        },
-      );
+      const total = 114;
+
+      // نحسب كم سورة محملة مسبقاً
+      int completed = 0;
+      for (int s = 1; s <= total; s++) {
+        final downloaded = await _audioManager.isSurahDownloaded(rid, s);
+        if (downloaded) {
+          completed++;
+        } else {
+          break;
+        }
+      }
+
+      if (mounted) {
+        setState(() => _downloadProgress[rid] = completed / total);
+      }
+
+      // نكمل من حيث توقفنا
+      for (int surah = completed + 1; surah <= total; surah++) {
+        // ✅ بدون onProgress
+        await _audioManager.downloadSurah(rid, surah, reciter.serverUrl);
+        completed++;
+        if (mounted) {
+          setState(() => _downloadProgress[rid] = completed / total);
+        }
+      }
 
       if (mounted) {
         setState(() {
@@ -72,7 +88,7 @@ class _RecitersScreenState extends State<ReciterPage> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('تم تحميل ${reciter.nameArabic}'),
+            content: Text('تم تحميل ${reciter.nameArabic} كاملاً ✓'),
             backgroundColor: Colors.green,
           ),
         );
@@ -122,7 +138,7 @@ class _RecitersScreenState extends State<ReciterPage> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('حذف القارئ'),
-        content: Text('هل تريد حذف تحميل ${reciter.nameArabic}؟'),
+        content: Text('هل تريد حذف تحميل ${reciter.nameArabic} كاملاً؟'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -291,7 +307,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                                   Icons.download_rounded,
                                   color: Color(0xFF2E86AB),
                                 ),
-                                tooltip: 'تحميل',
+                                tooltip: 'تحميل القرآن كامل',
                               )
                             else if (isDownloading)
                               SizedBox(
@@ -344,7 +360,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${(progress * 100).toInt()}%',
+                                'سورة ${(progress! * 114).toInt()} / 114',
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: darkBrown.withOpacity(0.5),

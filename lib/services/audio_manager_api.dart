@@ -27,7 +27,7 @@ class AudioManager {
   String? get currentReciterName => _currentReciterName;
   String? get currentServerUrl => _currentServerUrl;
 
-  // ── جلب قائمة القراء من Quran.com مباشرة ──
+  // ── جلب قائمة القراء ──
   Future<List<RecitersModel>> fetchReciters() async {
     try {
       final response = await _dio.get(
@@ -43,21 +43,15 @@ class AudioManager {
       final List<RecitersModel> result = [];
 
       for (final r in reciters) {
-        debugPrint(
-          'id: ${r['id']} | relative_path: ${r['relative_path']} | name: ${r['name']}',
-        );
         final id = r['id'] as int;
 
-        // ✅ الاسم العربي في translated_name.name
         final translatedName = r['translated_name'] as Map<String, dynamic>?;
         final nameArabic =
             translatedName?['name'] as String? ?? r['name'] as String;
 
-        // ✅ الرواية في style.name
         final style = r['style'] as Map<String, dynamic>?;
         final rewaya = style?['name'] as String? ?? 'Murattal';
 
-        // ✅ رابط التحميل
         final serverUrl =
             'https://download.quranicaudio.com/quran/${r['relative_path'] ?? id}/';
 
@@ -78,23 +72,18 @@ class AudioManager {
     }
   }
 
-  // ── جلب رابط الصوت من Quran.com ──
+  // ── جلب رابط الصوت ──
   Future<String?> fetchAudioUrl(int reciterId, int surahNumber) async {
     try {
       final response = await _dio.get(
         'https://api.qurancdn.com/api/qdc/audio/reciters/$reciterId/audio_files',
-        queryParameters: {'chapter_number': surahNumber, 'segments': true},
+        queryParameters: {'chapter_number': surahNumber, 'segments': false},
       );
 
       final audioFiles = response.data['audio_files'] as List<dynamic>;
       if (audioFiles.isEmpty) return null;
 
-      // ✅ نشوف كل المفاتيح
-      debugPrint('audio_file: ${audioFiles[0]}');
-
-      // ✅ الرابط في audio_url
       final audioUrl = audioFiles[0]['audio_url'] as String?;
-      debugPrint('audio_url: $audioUrl');
       return audioUrl;
     } catch (e) {
       debugPrint('Error fetching audio url: $e');
@@ -102,7 +91,7 @@ class AudioManager {
     }
   }
 
-  // ── جلب timestamps الآيات من Quran.com ──
+  // ── جلب timestamps الآيات ──
   Future<Map<String, List<int>>> fetchVerseTimings(
     int reciterId,
     int surahNumber,
@@ -156,40 +145,35 @@ class AudioManager {
     return File(path).existsSync();
   }
 
-  // ── تحميل سورة من Quran.com ──
+  // ── تحميل سورة ──
   Future<void> downloadSurah(
     String reciterId,
     int surahNumber,
-    String serverUrl, {
-    Function(double)? onProgress,
-  }) async {
+    String serverUrl,
+  ) async {
     final path = await _getSurahPath(reciterId, surahNumber);
     if (File(path).existsSync()) return;
 
-    // ✅ نجيب الرابط الصحيح من API
     final audioUrl = await fetchAudioUrl(
       int.tryParse(reciterId) ?? 0,
       surahNumber,
     );
 
     if (audioUrl == null) {
-      throw Exception('لم يتم إيجاد رابط الصوت');
+      throw Exception('لم يتم إيجاد رابط الصوت للسورة $surahNumber');
     }
 
-    debugPrint('تحميل من: $audioUrl');
+    // ✅ إصلاح // المزدوج
+    final cleanUrl = audioUrl.replaceAll(RegExp(r'(?<!:)//'), '/');
+    debugPrint('تحميل سورة $surahNumber من: $cleanUrl');
 
     try {
-      await _dio.download(
-        audioUrl,
-        path,
-        onReceiveProgress: (received, total) {
-          if (total > 0 && onProgress != null) {
-            onProgress(received / total);
-          }
-        },
-      );
+      await _dio.download(cleanUrl, path);
     } catch (e) {
-      debugPrint('خطأ التحميل: $e');
+      // ✅ نحذف الملف الناقص إذا فشل التحميل
+      final file = File(path);
+      if (file.existsSync()) file.deleteSync();
+      debugPrint('خطأ تحميل سورة $surahNumber: $e');
       rethrow;
     }
   }
@@ -242,6 +226,7 @@ class AudioManager {
     await _player.play();
   }
 
+  // ── إيقاف ──
   Future<void> stop() async {
     await _player.stop();
     _currentVerseKey = null;

@@ -1,10 +1,11 @@
-import 'dart:async';
-import 'dart:convert';
-import 'package:al_medynah/services/audio_manager_api.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'repository/mushaf_repository.dart';
+import 'bloc/mushaf_bloc.dart';
+import 'bloc/mushaf_event.dart';
+import 'bloc/mushaf_state.dart';
 
-class MushafScreen extends StatefulWidget {
+class MushafScreen extends StatelessWidget {
   final int initialPage;
   final String? highlightedVerseKey;
 
@@ -15,251 +16,223 @@ class MushafScreen extends StatefulWidget {
   });
 
   @override
-  State<MushafScreen> createState() => _MushafScreenState();
+  Widget build(BuildContext context) {
+    return RepositoryProvider(
+      create: (_) => MushafRepository(),
+      child: BlocProvider(
+        create: (context) =>
+            MushafBloc(repository: context.read<MushafRepository>())..add(
+              MushafInitialLoad(
+                initialPage: initialPage,
+                highlightedVerseKey: highlightedVerseKey,
+              ),
+            ),
+        child: _MushafView(initialPage: initialPage),
+      ),
+    );
+  }
 }
 
-class _MushafScreenState extends State<MushafScreen> {
-  late PageController _pageController;
-  final Map<int, Map<String, dynamic>> _pagesCache = {};
-  String? selectedVerseKey;
-  int currentPage = 1;
+class _MushafView extends StatefulWidget {
+  final int initialPage;
 
-  final AudioManager _audioManager = AudioManager();
-  bool _isPlaying = false;
-  Map<String, List<int>> _verseTimings = {};
-  StreamSubscription? _positionSubscription;
+  const _MushafView({this.initialPage = 1});
+
+  @override
+  State<_MushafView> createState() => _MushafViewState();
+}
+
+class _MushafViewState extends State<_MushafView> {
+  late PageController _pageController;
 
   @override
   void initState() {
-    debugPrint('initState: initialPage=${widget.initialPage}, highlightedVerseKey=${widget.highlightedVerseKey}');
     super.initState();
     _pageController = PageController(initialPage: widget.initialPage - 1);
-
-    currentPage = widget.initialPage;
-    selectedVerseKey = widget.highlightedVerseKey;
-    _preloadPages(widget.initialPage);
-
-    _audioManager.player.playerStateStream.listen((state) {
-      if (mounted) setState(() => _isPlaying = state.playing);
-    });
   }
 
   @override
   void dispose() {
-    debugPrint('dispose');
-    _positionSubscription?.cancel();
     _pageController.dispose();
     super.dispose();
   }
 
-  String _pageNumber(int page) {
-    final result = page.toString().padLeft(3, '0');
-    debugPrint('_pageNumber: $page -> $result');
-    return result;
-  }
-
-  Future<void> _loadPage(int page) async {
-    debugPrint('_loadPage: page=$page, cached=${_pagesCache.containsKey(page)}');
-    if (page < 1 || page > 604) return;
-    if (_pagesCache.containsKey(page)) return;
-    try {
-      final jsonString = await rootBundle.loadString(
-        'assets/quran_data/pages/${_pageNumber(page)}.json',
-      );
-      _pagesCache[page] = jsonDecode(jsonString);
-      if (mounted) setState(() {});
-    } catch (e) {
-      debugPrint('Error loading page $page : $e');
-    }
-  }
-
-  void _preloadPages(int page) {
-    debugPrint('_preloadPages $page');
-    _loadPage(page);
-    if (page + 1 <= 604) _loadPage(page + 1);
-    if (page + 2 <= 604) _loadPage(page + 2);
-    if (page - 1 >= 1) _loadPage(page - 1);
-  }
-
-  void _onPageChanged(int index) {
-    debugPrint('_onPageChanged $index');
-
-    final page = index + 1;
-    setState(() {
-      currentPage = page;
-      debugPrint('setState: currentPage=$page');
-      // selectedVerseKey = null;
-    });
-    _preloadPages(page);
-  }
-
-  void _onWordTap(String? verseKey) {
-    debugPrint('_onWordTap $verseKey');
-
-    if (verseKey == null) return;
-    setState(() {
-      selectedVerseKey = selectedVerseKey == verseKey ? null : verseKey;
-      debugPrint('setState: selectedVerseKey=${selectedVerseKey ?? "null"} (${selectedVerseKey == verseKey ? "deselect" : "select"})');
-    });
-  }
-
-  Future<void> _onPlayTap() async {
-    debugPrint('_onPlayTap: isPlaying=$_isPlaying, selectedVerseKey=$selectedVerseKey');
-    if (selectedVerseKey == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('اضغط على آية أولاً لتشغيلها'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
-    if (_isPlaying) {
-      await _audioManager.stop();
-      _positionSubscription?.cancel();
-      return;
-    }
-
-    final surahNumber = int.tryParse(selectedVerseKey!.split(':')[0]) ?? 1;
-
-    final downloaded = await _audioManager.isSurahDownloaded(
-      _audioManager.currentReciterId ?? '',
-      surahNumber,
-    );
-
-    if (!downloaded) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('يجب تحميل القارئ أولاً من صفحة القراء'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-      return;
-    }
-
-    if (_audioManager.currentReciterId != null) {
-      _verseTimings = await _audioManager.fetchVerseTimings(
-        int.tryParse(_audioManager.currentReciterId!) ?? 0,
-        surahNumber,
-      );
-    }
-
-    debugPrint('_onPlayTap: playing verse=$selectedVerseKey, timings loaded=${_verseTimings.length}');
-    await _audioManager.playVerse(selectedVerseKey!);
-
-    // ✅ نتتبع الموضع مع debugPrint لنشوف المشكلة
-    _positionSubscription?.cancel();
-    _positionSubscription = _audioManager.player.positionStream.listen((
-      position,
-    ) {
-      final ms = position.inMilliseconds;
-
-      // ✅ أضفنا debugPrint لنشوف الموضع والآيات
-      debugPrint('position: $ms ms | timings count: ${_verseTimings.length}');
-
-      for (final entry in _verseTimings.entries) {
-        final start = entry.value[0];
-        final end = entry.value[1];
-        if (ms >= start && ms < end) {
-          // ✅ أضفنا debugPrint لنشوف الآية الحالية
-          debugPrint('الآية الحالية: ${entry.key}');
-          if (mounted && selectedVerseKey != entry.key) {
-            setState(() => selectedVerseKey = entry.key);
-          }
-          break;
-        }
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    debugPrint('build: currentPage=$currentPage, selectedVerseKey=$selectedVerseKey');
-    return Scaffold(
-      backgroundColor: const Color(0xfff8f3e8),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            PageView.builder(
-              controller: _pageController,
-              itemCount: 604,
-              reverse: true,
-              onPageChanged: _onPageChanged,
-              itemBuilder: (context, index) {
-                final page = index + 1;
-                final pageData = _pagesCache[page];
-                if (pageData == null) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return _buildPage(page, pageData);
-              },
+    return BlocListener<MushafBloc, MushafState>(
+      listener: (context, state) {
+        if (state.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage!),
+              backgroundColor:
+                  state.errorMessage == 'يجب تحميل القارئ أولاً من صفحة القراء'
+                  ? Colors.red
+                  : Colors.orange,
             ),
-
-            // رقم الصفحة
-            Positioned(
-              bottom: 8,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '$currentPage / 604',
-                    style: const TextStyle(fontSize: 12, color: Colors.black54),
-                  ),
-                ),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xfff8f3e8),
+        body: SafeArea(
+          child: Stack(
+            children: [
+              BlocBuilder<MushafBloc, MushafState>(
+                builder: (context, state) {
+                  return PageView.builder(
+                    controller: _pageController,
+                    itemCount: 604,
+                    reverse: true,
+                    onPageChanged: (index) {
+                      final page = index + 1;
+                      context.read<MushafBloc>().add(MushafPageChanged(page));
+                    },
+                    itemBuilder: (context, index) {
+                      final page = index + 1;
+                      final pageData = state.pagesCache[page];
+                      if (pageData == null) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      return _MushafPageView(
+                        page: page,
+                        pageData: pageData,
+                        selectedVerseKey: state.selectedVerseKey,
+                      );
+                    },
+                  );
+                },
               ),
-            ),
-
-            // زر التشغيل
-            Positioned(
-              bottom: 40,
-              left: 16,
-              child: GestureDetector(
-                onTap: _onPlayTap,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: _isPlaying
-                        ? const Color(0xFF2E7D32)
-                        : const Color(0xFF8B6914),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
+              Positioned(
+                bottom: 8,
+                left: 0,
+                right: 0,
+                child: BlocBuilder<MushafBloc, MushafState>(
+                  builder: (context, state) {
+                    return Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${state.currentPage} / 604',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black54,
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                  child: Icon(
-                    _isPlaying ? Icons.stop_rounded : Icons.play_arrow_rounded,
-                    color: Colors.white,
-                    size: 28,
-                  ),
+                    );
+                  },
                 ),
               ),
-            ),
-          ],
+              Positioned(
+                bottom: 50,
+                left: 0,
+                right: 0,
+                child: Builder(
+                  builder: (context) {
+                    return BlocBuilder<MushafBloc, MushafState>(
+                      builder: (context, state) {
+                        debugPrint('=== isPlaying: ${state.isPlaying} ===');
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                debugPrint('=== Play button tapped ===');
+                                context.read<MushafBloc>().add(
+                                  const MushafPlayTapped(),
+                                );
+                              },
+                              child: Container(
+                                width: 52,
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  color: state.isPlaying
+                                      ? const Color(0xFF2E7D32)
+                                      : const Color(0xFF8B6914),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  state.isPlaying
+                                      ? Icons.pause_rounded
+                                      : Icons.play_arrow_rounded,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
+                              ),
+                            ),
+                            if (state.isPlaying) ...[
+                              const SizedBox(width: 12),
+                              GestureDetector(
+                                onTap: () {
+                                  context.read<MushafBloc>().add(
+                                    const MushafStopTapped(),
+                                  );
+                                },
+                                child: Container(
+                                  width: 52,
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFB71C1C),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.stop_rounded,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildPage(int page, Map<String, dynamic> pageData) {
-    debugPrint('_buildPage: page=$page, lines count=${(pageData['lines'] as List?)?.length ?? 0}');
+class _MushafPageView extends StatelessWidget {
+  final int page;
+  final Map<String, dynamic> pageData;
+  final String? selectedVerseKey;
+
+  const _MushafPageView({
+    required this.page,
+    required this.pageData,
+    this.selectedVerseKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final lines = pageData['lines'] as List<dynamic>? ?? [];
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
@@ -325,7 +298,11 @@ class _MushafScreenState extends State<MushafScreen> {
                             verseKey != null && verseKey == selectedVerseKey;
 
                         return GestureDetector(
-                          onTap: () => _onWordTap(verseKey),
+                          onTap: () {
+                            context.read<MushafBloc>().add(
+                              MushafWordTapped(verseKey),
+                            );
+                          },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             decoration: BoxDecoration(
