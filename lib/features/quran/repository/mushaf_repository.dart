@@ -60,8 +60,8 @@ class MushafRepository {
     );
   }
 
-  Future<void> playVerse(String verseKey) async {
-    await _audioManager.playVerse(verseKey);
+  Future<void> playVerse(String verseKey, {int? seekToMs}) async {
+    await _audioManager.playVerse(verseKey, seekToMs: seekToMs);
   }
 
   Future<void> stopAudio() async {

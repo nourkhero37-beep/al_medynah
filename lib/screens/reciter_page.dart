@@ -360,7 +360,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'سورة ${(progress! * 114).toInt()} / 114',
+                                'سورة ${(progress * 114).toInt()} / 114',
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: darkBrown.withOpacity(0.5),

@@ -209,7 +209,7 @@ class AudioManager {
   }
 
   // ── تشغيل سورة ──
-  Future<void> playVerse(String verseKey) async {
+  Future<void> playVerse(String verseKey, {int? seekToMs}) async {
     if (_currentReciterId == null) return;
 
     final parts = verseKey.split(':');
@@ -223,6 +223,12 @@ class AudioManager {
 
     await _player.stop();
     await _player.setFilePath(path);
+
+    // ✅ seek للآية المحددة
+    if (seekToMs != null && seekToMs > 0) {
+      await _player.seek(Duration(milliseconds: seekToMs));
+    }
+
     await _player.play();
   }
 

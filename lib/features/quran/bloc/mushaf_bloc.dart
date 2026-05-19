@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import '../repository/mushaf_repository.dart';
@@ -82,9 +82,6 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     MushafPlayTapped event,
     Emitter<MushafState> emit,
   ) async {
-    debugPrint(
-      '=== Play tapped | isPlaying: ${state.isPlaying} | verseKey: ${state.selectedVerseKey} ===',
-    );
     if (state.selectedVerseKey == null) {
       emit(state.copyWith(errorMessage: 'اضغط على آية أولاً لتشغيلها'));
       return;
@@ -111,7 +108,9 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     final timings = await repository.fetchVerseTimings(surahNumber);
     emit(state.copyWith(verseTimings: timings));
 
-    // ✅ ابدأ الـ subscription قبل التشغيل
+    // ✅ نجيب وقت بداية الآية المحددة
+    final seekToMs = timings[state.selectedVerseKey]?[0];
+
     _positionSubscription?.cancel();
     _positionSubscription = repository.positionStream.listen((position) {
       if (!isClosed) {
@@ -119,11 +118,9 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
       }
     });
 
-    // ✅ ثم شغّل
-    await repository.playVerse(state.selectedVerseKey!);
-    debugPrint('=== Before emit isPlaying: true ===');
+    // ✅ نمرر وقت البداية
+    await repository.playVerse(state.selectedVerseKey!, seekToMs: seekToMs);
     emit(state.copyWith(isPlaying: true));
-    debugPrint('=== After emit isPlaying: true ===');
   }
 
   void _onPositionUpdated(
