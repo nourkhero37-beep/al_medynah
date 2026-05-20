@@ -12,12 +12,9 @@ class MushafRepository {
   Map<int, Map<String, dynamic>> get pagesCache => _pagesCache;
 
   Future<Map<String, dynamic>> loadPage(int page) async {
-    if (page < 1 || page > 604) {
+    if (page < 1 || page > 604)
       throw ArgumentError('Page must be between 1 and 604');
-    }
-    if (_pagesCache.containsKey(page)) {
-      return _pagesCache[page]!;
-    }
+    if (_pagesCache.containsKey(page)) return _pagesCache[page]!;
     final jsonString = await rootBundle.loadString(
       'assets/quran_data/pages/${page.toString().padLeft(3, '0')}.json',
     );
@@ -28,18 +25,14 @@ class MushafRepository {
 
   Future<void> preloadPages(int page) async {
     final pagesToLoad = <int>[];
-    if (page >= 1 && page <= 604) pagesToLoad.add(page);
-    if (page + 1 >= 1 && page + 1 <= 604) pagesToLoad.add(page + 1);
-    if (page + 2 >= 1 && page + 2 <= 604) pagesToLoad.add(page + 2);
-    if (page - 1 >= 1 && page - 1 <= 604) pagesToLoad.add(page - 1);
-
+    for (final p in [page, page + 1, page + 2, page - 1]) {
+      if (p >= 1 && p <= 604) pagesToLoad.add(p);
+    }
     for (final p in pagesToLoad) {
       if (!_pagesCache.containsKey(p)) {
         try {
           await loadPage(p);
-        } catch (e) {
-          // Ignore errors for preloading
-        }
+        } catch (_) {}
       }
     }
   }
@@ -70,10 +63,23 @@ class MushafRepository {
     _positionSubscription = null;
   }
 
+  // ✅ جديد: إيقاف مؤقت
+  Future<void> pauseAudio() async {
+    await _audioManager.player.pause();
+  }
+
+  // ✅ جديد: استئناف
+  Future<void> resumeAudio() async {
+    await _audioManager.player.play();
+  }
+
   Stream<PlayerState> get playerStateStream =>
       _audioManager.player.playerStateStream;
 
   Stream<Duration> get positionStream => _audioManager.player.positionStream;
+
+  // ✅ جديد: stream لمدة الملف الصوتي
+  Stream<Duration?> get durationStream => _audioManager.player.durationStream;
 
   void cancelPositionSubscription() {
     _positionSubscription?.cancel();

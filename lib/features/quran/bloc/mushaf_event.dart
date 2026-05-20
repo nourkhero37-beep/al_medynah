@@ -22,7 +22,6 @@ class MushafInitialLoad extends MushafEvent {
 
 class MushafPageChanged extends MushafEvent {
   final int page;
-
   const MushafPageChanged(this.page);
 
   @override
@@ -31,7 +30,6 @@ class MushafPageChanged extends MushafEvent {
 
 class MushafWordTapped extends MushafEvent {
   final String? verseKey;
-
   const MushafWordTapped(this.verseKey);
 
   @override
@@ -40,6 +38,10 @@ class MushafWordTapped extends MushafEvent {
 
 class MushafPlayTapped extends MushafEvent {
   const MushafPlayTapped();
+}
+
+class MushafPauseTapped extends MushafEvent {
+  const MushafPauseTapped();
 }
 
 class MushafStopTapped extends MushafEvent {
@@ -57,4 +59,12 @@ class MushafPositionUpdated extends MushafEvent {
 
   @override
   List<Object?> get props => [position, verseTimings];
+}
+
+class MushafDurationUpdated extends MushafEvent {
+  final Duration duration;
+  const MushafDurationUpdated(this.duration);
+
+  @override
+  List<Object?> get props => [duration];
 }

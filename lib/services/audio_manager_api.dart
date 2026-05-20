@@ -221,7 +221,6 @@ class AudioManager {
     final path = await _getSurahPath(_currentReciterId!, surahNumber);
     _currentVerseKey = verseKey;
 
-    await _player.stop();
     await _player.setFilePath(path);
 
     // ✅ seek للآية المحددة
@@ -234,8 +233,8 @@ class AudioManager {
 
   // ── إيقاف ──
   Future<void> stop() async {
-    await _player.stop();
     _currentVerseKey = null;
+    await _player.stop();
   }
 
   void dispose() {

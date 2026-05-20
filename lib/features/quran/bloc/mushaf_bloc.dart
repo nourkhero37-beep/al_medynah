@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import '../repository/mushaf_repository.dart';
@@ -10,14 +9,38 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
   final MushafRepository repository;
   StreamSubscription<PlayerState>? _playerStateSubscription;
   StreamSubscription<Duration>? _positionSubscription;
+  StreamSubscription<Duration?>? _durationSubscription;
 
   MushafBloc({required this.repository}) : super(const MushafState()) {
     on<MushafInitialLoad>(_onInitialLoad);
     on<MushafPageChanged>(_onPageChanged);
     on<MushafWordTapped>(_onWordTapped);
     on<MushafPlayTapped>(_onPlayTapped);
+    on<MushafPauseTapped>(_onPauseTapped);
     on<MushafPositionUpdated>(_onPositionUpdated);
+    on<MushafDurationUpdated>(_onDurationUpdated); // ✅ جديد
     on<MushafStopTapped>(_onStopTapped);
+  }
+
+  // ✅ جديد: handler منفصل للـ duration — بدل emit داخل listener مباشرة
+  void _onDurationUpdated(
+    MushafDurationUpdated event,
+    Emitter<MushafState> emit,
+  ) {
+    emit(state.copyWith(totalDuration: event.duration));
+  }
+
+  Future<void> _onPauseTapped(
+    MushafPauseTapped event,
+    Emitter<MushafState> emit,
+  ) async {
+    if (state.isPlaying) {
+      await repository.pauseAudio();
+      emit(state.copyWith(isPlaying: false, isPaused: true));
+    } else if (state.isPaused) {
+      await repository.resumeAudio();
+      emit(state.copyWith(isPlaying: true, isPaused: false));
+    }
   }
 
   Future<void> _onStopTapped(
@@ -26,7 +49,14 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
   ) async {
     await repository.stopAudio();
     _positionSubscription?.cancel();
-    emit(state.copyWith(isPlaying: false, selectedVerseKey: null));
+    emit(
+      state.copyWith(
+        isPlaying: false,
+        isPaused: false,
+        selectedVerseKey: null,
+        currentPosition: Duration.zero,
+      ),
+    );
   }
 
   Future<void> _onInitialLoad(
@@ -42,22 +72,29 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     );
 
     await repository.preloadPages(event.initialPage);
-
     emit(state.copyWith(pagesCache: repository.pagesCache, isLoading: false));
 
+    // ✅ playerState listener — يستخدم add() مش emit() مباشرة
     _playerStateSubscription?.cancel();
     _playerStateSubscription = repository.playerStateStream.listen((
       playerState,
     ) {
       if (!isClosed &&
           playerState.processingState == ProcessingState.completed) {
-        // ✅ فقط عند انتهاء التشغيل كاملاً
         add(
           const MushafPositionUpdated(
             position: Duration.zero,
             verseTimings: {},
           ),
         );
+      }
+    });
+
+    // ✅ مصحح: duration subscription يستخدم add() بدل emit() مباشرة
+    _durationSubscription?.cancel();
+    _durationSubscription = repository.durationStream.listen((duration) {
+      if (!isClosed && duration != null) {
+        add(MushafDurationUpdated(duration)); // ✅ add() وليس emit()
       }
     });
   }
@@ -72,10 +109,10 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
   }
 
   void _onWordTapped(MushafWordTapped event, Emitter<MushafState> emit) {
-    final newSelectedVerseKey = state.selectedVerseKey == event.verseKey
+    final newKey = state.selectedVerseKey == event.verseKey
         ? null
         : event.verseKey;
-    emit(state.copyWith(selectedVerseKey: newSelectedVerseKey));
+    emit(state.copyWith(selectedVerseKey: newKey));
   }
 
   Future<void> _onPlayTapped(
@@ -87,16 +124,8 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
       return;
     }
 
-    if (state.isPlaying) {
-      await repository.stopAudio();
-      _positionSubscription?.cancel();
-      emit(state.copyWith(isPlaying: false));
-      return;
-    }
-
     final surahNumber =
         int.tryParse(state.selectedVerseKey!.split(':')[0]) ?? 1;
-
     final downloaded = await repository.isSurahDownloaded(surahNumber);
     if (!downloaded) {
       emit(
@@ -108,7 +137,6 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     final timings = await repository.fetchVerseTimings(surahNumber);
     emit(state.copyWith(verseTimings: timings));
 
-    // ✅ نجيب وقت بداية الآية المحددة
     final seekToMs = timings[state.selectedVerseKey]?[0];
 
     _positionSubscription?.cancel();
@@ -118,9 +146,9 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
       }
     });
 
-    // ✅ نمرر وقت البداية
+    emit(state.copyWith(isPlaying: true, isPaused: false));
+
     await repository.playVerse(state.selectedVerseKey!, seekToMs: seekToMs);
-    emit(state.copyWith(isPlaying: true));
   }
 
   void _onPositionUpdated(
@@ -128,7 +156,13 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     Emitter<MushafState> emit,
   ) {
     if (event.verseTimings.isEmpty) {
-      emit(state.copyWith(isPlaying: false));
+      emit(
+        state.copyWith(
+          isPlaying: false,
+          isPaused: false,
+          currentPosition: Duration.zero,
+        ),
+      );
       return;
     }
 
@@ -145,7 +179,14 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     }
 
     if (currentVerseKey != null && state.selectedVerseKey != currentVerseKey) {
-      emit(state.copyWith(selectedVerseKey: currentVerseKey));
+      emit(
+        state.copyWith(
+          selectedVerseKey: currentVerseKey,
+          currentPosition: event.position,
+        ),
+      );
+    } else {
+      emit(state.copyWith(currentPosition: event.position));
     }
 
     if (state.errorMessage != null) {
@@ -157,6 +198,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
   Future<void> close() {
     _playerStateSubscription?.cancel();
     _positionSubscription?.cancel();
+    _durationSubscription?.cancel();
     repository.dispose();
     return super.close();
   }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+// ✅ جديد: import للـ surahList واسم السورة في المشغل
+import 'package:al_medynah/model/surah_model.dart';
+// ✅ جديد: import للـ AudioManager للـ seek
+import 'package:al_medynah/services/audio_manager_api.dart';
 import 'repository/mushaf_repository.dart';
 import 'bloc/mushaf_bloc.dart';
 import 'bloc/mushaf_event.dart';
@@ -35,7 +39,6 @@ class MushafScreen extends StatelessWidget {
 
 class _MushafView extends StatefulWidget {
   final int initialPage;
-
   const _MushafView({this.initialPage = 1});
 
   @override
@@ -75,6 +78,8 @@ class _MushafViewState extends State<_MushafView> {
       },
       child: Scaffold(
         backgroundColor: const Color(0xfff8f3e8),
+        // ✅ جديد: bottomNavigationBar بدل Positioned عشان ما يغطي المحتوى
+        bottomNavigationBar: const _AudioPlayerBar(),
         body: SafeArea(
           child: Stack(
             children: [
@@ -103,6 +108,7 @@ class _MushafViewState extends State<_MushafView> {
                   );
                 },
               ),
+              // ✅ رقم الصفحة — بقي كما هو
               Positioned(
                 bottom: 8,
                 left: 0,
@@ -131,87 +137,7 @@ class _MushafViewState extends State<_MushafView> {
                   },
                 ),
               ),
-              Positioned(
-                bottom: 50,
-                left: 0,
-                right: 0,
-                child: Builder(
-                  builder: (context) {
-                    return BlocBuilder<MushafBloc, MushafState>(
-                      builder: (context, state) {
-                        debugPrint('=== isPlaying: ${state.isPlaying} ===');
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                debugPrint('=== Play button tapped ===');
-                                context.read<MushafBloc>().add(
-                                  const MushafPlayTapped(),
-                                );
-                              },
-                              child: Container(
-                                width: 52,
-                                height: 52,
-                                decoration: BoxDecoration(
-                                  color: state.isPlaying
-                                      ? const Color(0xFF2E7D32)
-                                      : const Color(0xFF8B6914),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  state.isPlaying
-                                      ? Icons.pause_rounded
-                                      : Icons.play_arrow_rounded,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                              ),
-                            ),
-                            if (state.isPlaying) ...[
-                              const SizedBox(width: 12),
-                              GestureDetector(
-                                onTap: () {
-                                  context.read<MushafBloc>().add(
-                                    const MushafStopTapped(),
-                                  );
-                                },
-                                child: Container(
-                                  width: 52,
-                                  height: 52,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFB71C1C),
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.3),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Icon(
-                                    Icons.stop_rounded,
-                                    color: Colors.white,
-                                    size: 28,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
+              // ✅ حُذف: Positioned للأزرار القديمة (play/stop)
             ],
           ),
         ),
@@ -220,6 +146,216 @@ class _MushafViewState extends State<_MushafView> {
   }
 }
 
+// ✅ جديد: مشغل الصوت الكامل في الأسفل
+class _AudioPlayerBar extends StatelessWidget {
+  const _AudioPlayerBar();
+
+  String _formatDuration(Duration d) {
+    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<MushafBloc, MushafState>(
+      buildWhen: (prev, curr) =>
+          prev.isPlaying != curr.isPlaying ||
+          prev.isPaused != curr.isPaused ||
+          prev.selectedVerseKey != curr.selectedVerseKey ||
+          prev.currentPosition != curr.currentPosition ||
+          prev.totalDuration != curr.totalDuration,
+      builder: (context, state) {
+        final bool isActive = state.isPlaying || state.isPaused;
+
+        // ✅ نخفي المشغل لما مفيش شيء شغّال ومفيش آية مختارة
+        if (!isActive && state.selectedVerseKey == null) {
+          return const SizedBox.shrink();
+        }
+
+        final position = state.currentPosition;
+        final total = state.totalDuration;
+        final double progress = (total.inMilliseconds > 0)
+            ? (position.inMilliseconds / total.inMilliseconds).clamp(0.0, 1.0)
+            : 0.0;
+
+        // ✅ جلب اسم السورة من verseKey
+        String surahName = '';
+        String ayahNumber = '';
+        if (state.selectedVerseKey != null) {
+          final parts = state.selectedVerseKey!.split(':');
+          final surahId = int.tryParse(parts[0]) ?? 0;
+          ayahNumber = parts.length > 1 ? parts[1] : '';
+          if (surahId >= 1 && surahId <= surahList.length) {
+            surahName = surahList[surahId - 1].nameArabic;
+          }
+        }
+
+        return Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFF3E2A0F),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 12,
+                offset: Offset(0, -3),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // ✅ شريط التقدم مع إمكانية السحب
+                  SliderTheme(
+                    data: SliderThemeData(
+                      trackHeight: 2.5,
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 5,
+                      ),
+                      overlayShape: const RoundSliderOverlayShape(
+                        overlayRadius: 12,
+                      ),
+                      activeTrackColor: const Color(0xFFB8964E),
+                      inactiveTrackColor: Colors.white24,
+                      thumbColor: const Color(0xFFB8964E),
+                      overlayColor: Color(0x33B8964E),
+                    ),
+                    child: Slider(
+                      value: progress,
+                      onChanged: (val) {
+                        if (total.inMilliseconds > 0) {
+                          final seekMs = (val * total.inMilliseconds).toInt();
+                          AudioManager().player.seek(
+                            Duration(milliseconds: seekMs),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+
+                  // ✅ الصف السفلي: وقت + أزرار + اسم السورة
+                  Row(
+                    children: [
+                      // وقت الحالي
+                      SizedBox(
+                        width: 36,
+                        child: Text(
+                          _formatDuration(position),
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+
+                      const Spacer(),
+
+                      // ✅ زر الإيقاف الكامل
+                      if (isActive)
+                        GestureDetector(
+                          onTap: () => context.read<MushafBloc>().add(
+                            const MushafStopTapped(),
+                          ),
+                          child: const Icon(
+                            Icons.stop_rounded,
+                            color: Colors.white54,
+                            size: 28,
+                          ),
+                        ),
+
+                      const SizedBox(width: 16),
+
+                      // ✅ زر play / pause الرئيسي
+                      GestureDetector(
+                        onTap: () {
+                          if (!isActive) {
+                            // لا يوجد شيء شغّال، نبدأ من الآية المختارة
+                            context.read<MushafBloc>().add(
+                              const MushafPlayTapped(),
+                            );
+                          } else {
+                            // pause أو resume
+                            context.read<MushafBloc>().add(
+                              const MushafPauseTapped(),
+                            );
+                          }
+                        },
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFB8964E),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            state.isPlaying
+                                ? Icons.pause_rounded
+                                : Icons.play_arrow_rounded,
+                            color: Colors.white,
+                            size: 26,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 16),
+
+                      // ✅ اسم السورة ورقم الآية
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            surahName,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (ayahNumber.isNotEmpty)
+                            Text(
+                              'آية $ayahNumber',
+                              style: const TextStyle(
+                                color: Colors.white54,
+                                fontSize: 11,
+                              ),
+                            ),
+                        ],
+                      ),
+
+                      const Spacer(),
+
+                      // وقت الكل
+                      SizedBox(
+                        width: 36,
+                        child: Text(
+                          _formatDuration(total),
+                          textAlign: TextAlign.end,
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 4),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ✅ بقي كما هو بدون تعديل
 class _MushafPageView extends StatelessWidget {
   final int page;
   final Map<String, dynamic> pageData;
