@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
     {'title': 'الصلوات', 'image': 'assets/images/logo.jpg'},
     {'title': 'الأذكار', 'image': 'assets/images/logo.jpg'},
     {'title': 'القراء', 'image': 'assets/images/logo.jpg'},
-    {'title': 'التفسير', 'image': 'assets/images/logo.jpg'},
+    {'title': 'التفسير', 'image': 'assets/images/tafseer.png'},
     {'title': 'التسبيح', 'image': 'assets/images/logo.jpg'},
     {'title': 'الأدعية', 'image': 'assets/images/logo.jpg'},
     {'title': 'المفضلة', 'image': 'assets/images/logo.jpg'},

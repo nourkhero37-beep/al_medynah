@@ -64,6 +64,14 @@ flutter:
     - assets/images/logo.jpg
     - assets/images/ارقام الايات.png
     - assets/images/surah_header_frames.png
+    - assets/images/tafseer.png
+    - assets/images/tasbih.png
+    - assets/images/azkar.png
+    - assets/images/tv.png
+    - assets/images/Allah_names.png
+    - assets/images/hadyth.png
+    - assets/images/qublah.png
+    - assets/images/reciters.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
