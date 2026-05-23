@@ -1,3 +1,4 @@
+import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
 import 'package:al_medynah/screens/quran_search_screen.dart';
 import 'package:al_medynah/screens/reciter_page.dart';
@@ -16,12 +17,12 @@ class _HomePageState extends State<HomePage> {
   final List<Map<String, String>> gridItems = [
     {'title': 'الصلوات', 'image': 'assets/images/logo.jpg'},
     {'title': 'الأذكار', 'image': 'assets/images/logo.jpg'},
-    {'title': 'القبلة', 'image': 'assets/images/logo.jpg'},
+    {'title': 'القراء', 'image': 'assets/images/logo.jpg'},
+    {'title': 'التفسير', 'image': 'assets/images/logo.jpg'},
     {'title': 'التسبيح', 'image': 'assets/images/logo.jpg'},
     {'title': 'الأدعية', 'image': 'assets/images/logo.jpg'},
     {'title': 'المفضلة', 'image': 'assets/images/logo.jpg'},
-    {'title': 'الإعدادات', 'image': 'assets/images/logo.jpg'},
-    {'title': 'القراء', 'image': 'assets/images/logo.jpg'},
+    {'title': 'القبلة', 'image': 'assets/images/logo.jpg'},
   ];
 
   @override
@@ -245,6 +246,14 @@ class _HomePageState extends State<HomePage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => const ReciterPage(),
+                                ),
+                              );
+                            } else if (gridItems[index]['title'] == 'التفسير') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const TafseerSurahListScreen(),
                                 ),
                               );
                             }

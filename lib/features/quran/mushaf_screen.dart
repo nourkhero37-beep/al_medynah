@@ -1,3 +1,4 @@
+import 'package:al_medynah/features/quran/tafseer/tafseer_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // ✅ جديد: import للـ surahList واسم السورة في المشغل
@@ -438,6 +439,11 @@ class _MushafPageView extends StatelessWidget {
                             context.read<MushafBloc>().add(
                               MushafWordTapped(verseKey),
                             );
+                          },
+                          onLongPress: () {
+                            if (verseKey != null) {
+                              TafseerBottomSheet.show(context, verseKey);
+                            }
                           },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
