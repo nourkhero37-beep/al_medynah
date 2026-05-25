@@ -1,7 +1,9 @@
+import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
 import 'package:al_medynah/screens/quran_search_screen.dart';
 import 'package:al_medynah/screens/reciter_page.dart';
+import 'package:al_medynah/services/bookmark_service.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,11 +15,23 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isDarkMode = true;
+  Map<String, dynamic>? _bookmark;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBookmark();
+  }
+
+  Future<void> _loadBookmark() async {
+    final bookmark = await BookmarkService().getBookmark();
+    if (mounted) setState(() => _bookmark = bookmark);
+  }
 
   final List<Map<String, String>> gridItems = [
     {'title': 'الصلوات', 'image': 'assets/images/logo.jpg'},
     {'title': 'الأذكار', 'image': 'assets/images/logo.jpg'},
-    {'title': 'القراء', 'image': 'assets/images/logo.jpg'},
+    {'title': 'القراء', 'image': 'assets/images/reciters.png'},
     {'title': 'التفسير', 'image': 'assets/images/tafseer.png'},
     {'title': 'التسبيح', 'image': 'assets/images/logo.jpg'},
     {'title': 'الأدعية', 'image': 'assets/images/logo.jpg'},
@@ -60,7 +74,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          // الخلفية
+          // ✅ الخلفية
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -70,7 +84,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // طبقة شفافة
+          // ✅ طبقة شفافة
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             color: isDarkMode
@@ -83,7 +97,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // الأزرار العلوية
+                  // ✅ الأزرار العلوية
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -94,9 +108,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         child: IconButton(
                           onPressed: () {
-                            setState(() {
-                              isDarkMode = !isDarkMode;
-                            });
+                            setState(() => isDarkMode = !isDarkMode);
                           },
                           icon: Icon(
                             isDarkMode ? Icons.light_mode : Icons.dark_mode,
@@ -119,7 +131,7 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 25),
 
-                  // التاريخ
+                  // ✅ التاريخ
                   Text(
                     arabicDate,
                     style: const TextStyle(
@@ -131,13 +143,15 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 25),
 
-                  // الكونتينر الكبير (زر)
+                  // ✅ الكونتينر الكبير — القرآن الكريم
+                  // ✅ مصحح: نمرر onBookmarkSaved كـ callback لـ AyahList
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const AyahList(),
+                          builder: (context) =>
+                              AyahList(onBookmarkSaved: _loadBookmark),
                         ),
                       );
                     },
@@ -184,15 +198,93 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 12),
 
-                  // ✅  - حقل البحث عن آية
+                  // ✅ زر أكمل القراءة
+                  if (_bookmark != null)
+                    GestureDetector(
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MushafScreen(
+                              initialPage: _bookmark!['page'] as int,
+                              highlightedVerseKey:
+                                  _bookmark!['verse_key'] as String,
+                              onBookmarkSaved: _loadBookmark,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF8B6914).withOpacity(0.85),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.bookmark_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'أكمل القراءة',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'سورة ${_bookmark!['surah_name']} — آية ${_bookmark!['ayah_number']}',
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.8),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () async {
+                                await BookmarkService().clearBookmark();
+                                setState(() => _bookmark = null);
+                              },
+                              child: Icon(
+                                Icons.close_rounded,
+                                color: Colors.white.withOpacity(0.7),
+                                size: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  const SizedBox(height: 12),
+
+                  // ✅ حقل البحث
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const QuranSearchScreen(),
+                          builder: (_) =>
+                              QuranSearchScreen(onBookmarkSaved: _loadBookmark),
                         ),
                       );
                     },
@@ -225,9 +317,9 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 12),
 
-                  // الشبكة
+                  // ✅ الشبكة
                   Expanded(
                     child: GridView.builder(
                       itemCount: gridItems.length,
@@ -301,5 +393,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-// صفحة القرآن

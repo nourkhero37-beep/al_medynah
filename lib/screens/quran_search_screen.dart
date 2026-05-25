@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:al_medynah/features/quran/mushaf_screen.dart';
 
 class QuranSearchScreen extends StatefulWidget {
-  const QuranSearchScreen({super.key});
+  final VoidCallback? onBookmarkSaved;
+  const QuranSearchScreen({super.key, this.onBookmarkSaved});
 
   @override
   State<QuranSearchScreen> createState() => _QuranSearchScreenState();
@@ -183,6 +184,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                               builder: (_) => MushafScreen(
                                 initialPage: page,
                                 highlightedVerseKey: verseKey, // ← هنا السحر
+                                onBookmarkSaved: widget.onBookmarkSaved,
                               ),
                             ),
                           );

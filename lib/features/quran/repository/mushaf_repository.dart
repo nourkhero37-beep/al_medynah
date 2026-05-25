@@ -12,8 +12,9 @@ class MushafRepository {
   Map<int, Map<String, dynamic>> get pagesCache => _pagesCache;
 
   Future<Map<String, dynamic>> loadPage(int page) async {
-    if (page < 1 || page > 604)
+    if (page < 1 || page > 604) {
       throw ArgumentError('Page must be between 1 and 604');
+    }
     if (_pagesCache.containsKey(page)) return _pagesCache[page]!;
     final jsonString = await rootBundle.loadString(
       'assets/quran_data/pages/${page.toString().padLeft(3, '0')}.json',

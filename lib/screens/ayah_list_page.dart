@@ -5,7 +5,8 @@ import 'package:al_medynah/model/surah_model.dart';
 import 'package:flutter/material.dart';
 
 class AyahList extends StatefulWidget {
-  const AyahList({super.key});
+  final VoidCallback? onBookmarkSaved;
+  const AyahList({super.key, this.onBookmarkSaved});
 
   @override
   State<AyahList> createState() => _AyahListState();
@@ -106,7 +107,10 @@ class _AyahListState extends State<AyahList> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => MushafScreen(initialPage: surah.pageNumber),
+            builder: (_) => MushafScreen(
+              initialPage: surah.pageNumber,
+              onBookmarkSaved: widget.onBookmarkSaved,
+            ),
           ),
         );
       },

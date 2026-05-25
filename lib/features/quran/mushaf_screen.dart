@@ -1,9 +1,8 @@
 import 'package:al_medynah/features/quran/tafseer/tafseer_bottom_sheet.dart';
+import 'package:al_medynah/services/bookmark_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// ✅ جديد: import للـ surahList واسم السورة في المشغل
 import 'package:al_medynah/model/surah_model.dart';
-// ✅ جديد: import للـ AudioManager للـ seek
 import 'package:al_medynah/services/audio_manager_api.dart';
 import 'repository/mushaf_repository.dart';
 import 'bloc/mushaf_bloc.dart';
@@ -13,11 +12,13 @@ import 'bloc/mushaf_state.dart';
 class MushafScreen extends StatelessWidget {
   final int initialPage;
   final String? highlightedVerseKey;
+  final VoidCallback? onBookmarkSaved; // ✅ named parameter
 
   const MushafScreen({
     super.key,
     required this.initialPage,
     this.highlightedVerseKey,
+    this.onBookmarkSaved, // ✅ named
   });
 
   @override
@@ -32,7 +33,11 @@ class MushafScreen extends StatelessWidget {
                 highlightedVerseKey: highlightedVerseKey,
               ),
             ),
-        child: _MushafView(initialPage: initialPage),
+        // ✅ نمرر الـ callback لـ _MushafView
+        child: _MushafView(
+          initialPage: initialPage,
+          onBookmarkSaved: onBookmarkSaved,
+        ),
       ),
     );
   }
@@ -40,7 +45,12 @@ class MushafScreen extends StatelessWidget {
 
 class _MushafView extends StatefulWidget {
   final int initialPage;
-  const _MushafView({this.initialPage = 1});
+  final VoidCallback? onBookmarkSaved; // ✅ named parameter
+
+  const _MushafView({
+    this.initialPage = 1,
+    this.onBookmarkSaved, // ✅ named
+  });
 
   @override
   State<_MushafView> createState() => _MushafViewState();
@@ -79,11 +89,11 @@ class _MushafViewState extends State<_MushafView> {
       },
       child: Scaffold(
         backgroundColor: const Color(0xfff8f3e8),
-        // ✅ جديد: bottomNavigationBar بدل Positioned عشان ما يغطي المحتوى
         bottomNavigationBar: const _AudioPlayerBar(),
         body: SafeArea(
           child: Stack(
             children: [
+              // ✅ المصحف
               BlocBuilder<MushafBloc, MushafState>(
                 builder: (context, state) {
                   return PageView.builder(
@@ -109,7 +119,8 @@ class _MushafViewState extends State<_MushafView> {
                   );
                 },
               ),
-              // ✅ رقم الصفحة — بقي كما هو
+
+              // ✅ رقم الصفحة
               Positioned(
                 bottom: 8,
                 left: 0,
@@ -138,7 +149,22 @@ class _MushafViewState extends State<_MushafView> {
                   },
                 ),
               ),
-              // ✅ حُذف: Positioned للأزرار القديمة (play/stop)
+
+              // ✅ زر حفظ الإشارة
+              Positioned(
+                top: 8,
+                right: 12,
+                child: BlocBuilder<MushafBloc, MushafState>(
+                  builder: (context, state) {
+                    return _BookmarkButton(
+                      selectedVerseKey: state.selectedVerseKey,
+                      currentPage: state.currentPage,
+                      // ✅ نمرر الـ callback من widget
+                      onBookmarkSaved: widget.onBookmarkSaved,
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -147,7 +173,107 @@ class _MushafViewState extends State<_MushafView> {
   }
 }
 
-// ✅ جديد: مشغل الصوت الكامل في الأسفل
+// ✅ زر الإشارة المرجعية
+class _BookmarkButton extends StatefulWidget {
+  final String? selectedVerseKey;
+  final int currentPage;
+  final VoidCallback? onBookmarkSaved; // ✅ named parameter
+
+  const _BookmarkButton({
+    this.selectedVerseKey,
+    required this.currentPage,
+    this.onBookmarkSaved, // ✅ named
+  });
+
+  @override
+  State<_BookmarkButton> createState() => _BookmarkButtonState();
+}
+
+class _BookmarkButtonState extends State<_BookmarkButton> {
+  bool _isSaved = false;
+
+  Future<void> _toggleBookmark() async {
+    if (widget.selectedVerseKey == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('اضغط على آية أولاً لحفظها'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    final parts = widget.selectedVerseKey!.split(':');
+    final surahId = int.tryParse(parts[0]) ?? 1;
+    final ayahNumber = int.tryParse(parts[1]) ?? 1;
+    final surahName = surahList
+        .firstWhere((s) => s.id == surahId, orElse: () => surahList.first)
+        .nameArabic;
+
+    await BookmarkService().saveBookmark(
+      page: widget.currentPage,
+      verseKey: widget.selectedVerseKey!,
+      surahName: surahName,
+      ayahNumber: ayahNumber,
+    );
+
+    // ✅ مصحح: widget.onBookmarkSaved بدل onBookmarkSaved
+    widget.onBookmarkSaved?.call();
+
+    setState(() => _isSaved = true);
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('✅ تم حفظ الإشارة — سورة $surahName آية $ayahNumber'),
+        backgroundColor: const Color(0xFF8B6914),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) setState(() => _isSaved = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _toggleBookmark,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: _isSaved
+              ? const Color(0xFF8B6914)
+              : Colors.black.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              _isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+              color: _isSaved ? Colors.white : Colors.black54,
+              size: 18,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'حفظ',
+              style: TextStyle(
+                fontSize: 12,
+                color: _isSaved ? Colors.white : Colors.black54,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ✅ مشغل الصوت — بقي كما هو
 class _AudioPlayerBar extends StatelessWidget {
   const _AudioPlayerBar();
 
@@ -169,7 +295,6 @@ class _AudioPlayerBar extends StatelessWidget {
       builder: (context, state) {
         final bool isActive = state.isPlaying || state.isPaused;
 
-        // ✅ نخفي المشغل لما مفيش شيء شغّال ومفيش آية مختارة
         if (!isActive && state.selectedVerseKey == null) {
           return const SizedBox.shrink();
         }
@@ -180,7 +305,6 @@ class _AudioPlayerBar extends StatelessWidget {
             ? (position.inMilliseconds / total.inMilliseconds).clamp(0.0, 1.0)
             : 0.0;
 
-        // ✅ جلب اسم السورة من verseKey
         String surahName = '';
         String ayahNumber = '';
         if (state.selectedVerseKey != null) {
@@ -210,7 +334,6 @@ class _AudioPlayerBar extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // ✅ شريط التقدم مع إمكانية السحب
                   SliderTheme(
                     data: SliderThemeData(
                       trackHeight: 2.5,
@@ -223,7 +346,7 @@ class _AudioPlayerBar extends StatelessWidget {
                       activeTrackColor: const Color(0xFFB8964E),
                       inactiveTrackColor: Colors.white24,
                       thumbColor: const Color(0xFFB8964E),
-                      overlayColor: Color(0x33B8964E),
+                      overlayColor: const Color(0x33B8964E),
                     ),
                     child: Slider(
                       value: progress,
@@ -237,11 +360,8 @@ class _AudioPlayerBar extends StatelessWidget {
                       },
                     ),
                   ),
-
-                  // ✅ الصف السفلي: وقت + أزرار + اسم السورة
                   Row(
                     children: [
-                      // وقت الحالي
                       SizedBox(
                         width: 36,
                         child: Text(
@@ -252,10 +372,7 @@ class _AudioPlayerBar extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const Spacer(),
-
-                      // ✅ زر الإيقاف الكامل
                       if (isActive)
                         GestureDetector(
                           onTap: () => context.read<MushafBloc>().add(
@@ -267,19 +384,14 @@ class _AudioPlayerBar extends StatelessWidget {
                             size: 28,
                           ),
                         ),
-
                       const SizedBox(width: 16),
-
-                      // ✅ زر play / pause الرئيسي
                       GestureDetector(
                         onTap: () {
                           if (!isActive) {
-                            // لا يوجد شيء شغّال، نبدأ من الآية المختارة
                             context.read<MushafBloc>().add(
                               const MushafPlayTapped(),
                             );
                           } else {
-                            // pause أو resume
                             context.read<MushafBloc>().add(
                               const MushafPauseTapped(),
                             );
@@ -301,10 +413,7 @@ class _AudioPlayerBar extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(width: 16),
-
-                      // ✅ اسم السورة ورقم الآية
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
@@ -327,10 +436,7 @@ class _AudioPlayerBar extends StatelessWidget {
                             ),
                         ],
                       ),
-
                       const Spacer(),
-
-                      // وقت الكل
                       SizedBox(
                         width: 36,
                         child: Text(
@@ -344,7 +450,6 @@ class _AudioPlayerBar extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 4),
                 ],
               ),
@@ -356,7 +461,7 @@ class _AudioPlayerBar extends StatelessWidget {
   }
 }
 
-// ✅ بقي كما هو بدون تعديل
+// ✅ عرض صفحة المصحف — بقي كما هو
 class _MushafPageView extends StatelessWidget {
   final int page;
   final Map<String, dynamic> pageData;
