@@ -2,6 +2,7 @@ import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
 import 'package:al_medynah/screens/azkar_categories_screen.dart';
+import 'package:al_medynah/screens/prayer_time_screen.dart';
 import 'package:al_medynah/screens/quran_search_screen.dart';
 import 'package:al_medynah/screens/reciter_page.dart';
 import 'package:al_medynah/services/bookmark_service.dart';
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage> {
     {'title': 'التفسير', 'image': 'assets/images/tafseer.png'},
     {'title': 'التسبيح', 'image': 'assets/images/logo.jpg'},
     {'title': 'الأدعية', 'image': 'assets/images/logo.jpg'},
-    {'title': 'أوقات الصلاة', 'image': 'assets/images/logo.jpg'},
+    {'title': 'أوقات الصلاة', 'image': 'assets/images/prayertime.png'},
     {'title': 'القبلة', 'image': 'assets/images/logo.jpg'},
   ];
 
@@ -354,6 +355,14 @@ class _HomePageState extends State<HomePage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => const AzkarCategoriesScreen(),
+                                ),
+                              );
+                            } else if (gridItems[index]['title'] ==
+                                'أوقات الصلاة') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const PrayerTimesScreen(),
                                 ),
                               );
                             }

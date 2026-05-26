@@ -34,6 +34,7 @@ dependencies:
   muslim_data_flutter: ^1.5.0
   geolocator: ^14.0.2
   permission_handler: ^12.0.1
+  adhan: ^2.0.0+1
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +77,7 @@ flutter:
     - assets/images/hadyth.png
     - assets/images/qublah.png
     - assets/images/reciters.png
+    - assets/images/prayertime.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
