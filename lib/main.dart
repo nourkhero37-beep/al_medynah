@@ -13,7 +13,7 @@ class Almedinah extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      // ✅ حذفنا navigatorObservers — مش محتاجينه مع الـ callback
+
       home: const SplashScreen(),
     );
   }

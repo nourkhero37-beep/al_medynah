@@ -1,6 +1,7 @@
 import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
+import 'package:al_medynah/screens/azkar_categories_screen.dart';
 import 'package:al_medynah/screens/quran_search_screen.dart';
 import 'package:al_medynah/screens/reciter_page.dart';
 import 'package:al_medynah/services/bookmark_service.dart';
@@ -30,12 +31,12 @@ class _HomePageState extends State<HomePage> {
 
   final List<Map<String, String>> gridItems = [
     {'title': 'الصلوات', 'image': 'assets/images/logo.jpg'},
-    {'title': 'الأذكار', 'image': 'assets/images/logo.jpg'},
+    {'title': 'الأذكار', 'image': 'assets/images/azkar.png'},
     {'title': 'القراء', 'image': 'assets/images/reciters.png'},
     {'title': 'التفسير', 'image': 'assets/images/tafseer.png'},
     {'title': 'التسبيح', 'image': 'assets/images/logo.jpg'},
     {'title': 'الأدعية', 'image': 'assets/images/logo.jpg'},
-    {'title': 'المفضلة', 'image': 'assets/images/logo.jpg'},
+    {'title': 'أوقات الصلاة', 'image': 'assets/images/logo.jpg'},
     {'title': 'القبلة', 'image': 'assets/images/logo.jpg'},
   ];
 
@@ -346,6 +347,13 @@ class _HomePageState extends State<HomePage> {
                                 MaterialPageRoute(
                                   builder: (_) =>
                                       const TafseerSurahListScreen(),
+                                ),
+                              );
+                            } else if (gridItems[index]['title'] == 'الأذكار') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const AzkarCategoriesScreen(),
                                 ),
                               );
                             }

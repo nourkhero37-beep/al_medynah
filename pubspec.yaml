@@ -31,6 +31,9 @@ dependencies:
   flutter_bloc: ^9.1.1
   equatable: ^2.0.7
   flutter_tts: ^4.2.5
+  muslim_data_flutter: ^1.5.0
+  geolocator: ^14.0.2
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +63,7 @@ flutter:
     - assets/quran_data/pages/
     - assets/quran_data/verses.json
     - assets/images/
+    - packages/muslim_data_flutter/assets/db/muslim_db_v2.7.0.db
     - assets/images/background.png
     - assets/images/logo.jpg
     - assets/images/ارقام الايات.png
