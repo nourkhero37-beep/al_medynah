@@ -1,10 +1,11 @@
-import 'package:al_medynah/features/quran/mushaf_screen.dart';
+﻿import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
 import 'package:al_medynah/screens/azkar_categories_screen.dart';
 import 'package:al_medynah/screens/prayer_time_screen.dart';
 import 'package:al_medynah/screens/quran_search_screen.dart';
 import 'package:al_medynah/screens/reciter_page.dart';
+import 'package:al_medynah/screens/tv_screen.dart';
 import 'package:al_medynah/services/bookmark_service.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +32,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   final List<Map<String, String>> gridItems = [
-    {'title': 'الصلوات', 'image': 'assets/images/logo.jpg'},
+    {'title': 'التلفزيون', 'image': 'assets/images/tv.png'},
     {'title': 'الأذكار', 'image': 'assets/images/azkar.png'},
     {'title': 'القراء', 'image': 'assets/images/reciters.png'},
     {'title': 'التفسير', 'image': 'assets/images/tafseer.png'},
@@ -335,7 +336,14 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
-                            if (gridItems[index]['title'] == 'القراء') {
+                            if (gridItems[index]['title'] == 'التلفزيون') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const TvScreen(),
+                                ),
+                              );
+                            } else if (gridItems[index]['title'] == 'القراء') {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
