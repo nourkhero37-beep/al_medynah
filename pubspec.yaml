@@ -1,4 +1,4 @@
-name: al_medynah
+﻿name: al_medynah
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -35,6 +35,7 @@ dependencies:
   geolocator: ^14.0.2
   permission_handler: ^12.0.1
   adhan: ^2.0.0+1
+  sensors_plus: ^6.1.1
   video_player: ^2.11.1
   chewie: ^1.13.1
 
@@ -69,7 +70,7 @@ flutter:
     - packages/muslim_data_flutter/assets/db/muslim_db_v2.7.0.db
     - assets/images/background.png
     - assets/images/logo.jpg
-    - assets/images/ارقام الايات.png
+
     - assets/images/surah_header_frames.png
     - assets/images/tafseer.png
     - assets/images/tasbih.png
