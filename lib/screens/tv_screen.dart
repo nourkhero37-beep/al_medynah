@@ -2,6 +2,7 @@
 import 'package:al_medynah/screens/video_player_screen.dart';
 import 'package:al_medynah/services/tv_service.dart';
 import 'package:flutter/material.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class TvScreen extends StatefulWidget {
   const TvScreen({super.key});
@@ -80,7 +81,7 @@ class _TvScreenState extends State<TvScreen> {
       child: Scaffold(
         backgroundColor: const Color(0xFF1A1A2E),
         appBar: AppBar(
-          title: const Text('التلفزيون'),
+          title: Text(AppLocalizations.of(context).tr('tv.appBar.title')),
           backgroundColor: const Color(0xFF1A1A2E),
           foregroundColor: Colors.white,
           elevation: 0,
@@ -92,24 +93,24 @@ class _TvScreenState extends State<TvScreen> {
             : ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
-                  _buildSectionTitle('📺', 'البث المباشر'),
+                  _buildSectionTitle('📺', AppLocalizations.of(context).tr('tv.section.live')),
                   const SizedBox(height: 12),
                   _buildLiveTvRow(),
                   const SizedBox(height: 24),
                   if (_videoTypes.isNotEmpty) ...[
-                    _buildSectionTitle('📂', 'التصنيفات'),
+                    _buildSectionTitle('📂', AppLocalizations.of(context).tr('tv.section.categories')),
                     const SizedBox(height: 12),
                     _buildVideoTypeChips(),
                     const SizedBox(height: 24),
                   ],
-                  _buildSectionTitle('🎬', 'المرئيات'),
+                  _buildSectionTitle('🎬', AppLocalizations.of(context).tr('tv.section.videos')),
                   const SizedBox(height: 12),
                   if (_filteredVideos.isEmpty)
-                    const Center(
+                    Center(
                       child: Padding(
                         padding: EdgeInsets.all(32),
                         child: Text(
-                          'لا توجد فيديوهات في هذا التصنيف',
+                          AppLocalizations.of(context).tr('tv.empty.category'),
                           style: TextStyle(color: Colors.white54, fontSize: 14),
                         ),
                       ),
@@ -190,8 +191,8 @@ class _TvScreenState extends State<TvScreen> {
                       color: Colors.red.withValues(alpha: 0.8),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text(
-                      'مباشر',
+                    child: Text(
+                      AppLocalizations.of(context).tr('tv.badge.live'),
                       style: TextStyle(color: Colors.white, fontSize: 10),
                     ),
                   ),
@@ -215,7 +216,7 @@ class _TvScreenState extends State<TvScreen> {
           final isSelected = index == 0
               ? _selectedTypeId == null
               : _videoTypes[index - 1].id == _selectedTypeId;
-          final label = index == 0 ? 'الكل' : _videoTypes[index - 1].name;
+          final label = index == 0 ? AppLocalizations.of(context).tr('tv.filter.all') : _videoTypes[index - 1].name;
 
           return GestureDetector(
             onTap: () =>
@@ -321,7 +322,7 @@ class _TvScreenState extends State<TvScreen> {
                               ),
                             ),
                           ),
-                          const Center(
+                          Center(
                             child: Icon(
                               Icons.play_circle_fill,
                               color: Color(0xFFB8964E),

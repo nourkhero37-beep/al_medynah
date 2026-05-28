@@ -1,6 +1,7 @@
 ﻿import 'dart:async';
 import 'package:adhan/adhan.dart';
 import 'package:flutter/material.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class PrayerTimesScreen extends StatefulWidget {
   const PrayerTimesScreen({super.key});
@@ -33,7 +34,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPrayerTimes();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadPrayerTimes());
     // تحديث الوقت كل ثانية
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() => _now = DateTime.now());
@@ -69,7 +70,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
       });
     } catch (e) {
       setState(() {
-        _errorMessage = 'تعذر حساب أوقات الصلاة';
+        _errorMessage = AppLocalizations.of(context).tr('prayer.error.calculate');
         _isLoading = false;
       });
     }
@@ -85,17 +86,17 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     if (offset == const Duration(hours: 2)) {
       final p = CalculationMethod.egyptian.getParameters();
       p.madhab = Madhab.shafi;
-      return (latitude: 30.0444, longitude: 31.2357, params: p, name: 'مصر');
+      return (latitude: 30.0444, longitude: 31.2357, params: p, name: AppLocalizations.of(context).tr('prayer.region.egypt'));
     }
     if (offset == const Duration(hours: 3)) {
       final p = CalculationMethod.turkey.getParameters();
       p.madhab = Madhab.shafi;
-      return (latitude: 41.0082, longitude: 28.9784, params: p, name: 'تركيا');
+      return (latitude: 41.0082, longitude: 28.9784, params: p, name: AppLocalizations.of(context).tr('prayer.region.turkey'));
     }
     if (offset == const Duration(hours: 4)) {
       final p = CalculationMethod.umm_al_qura.getParameters();
       p.madhab = Madhab.shafi;
-      return (latitude: 24.4539, longitude: 54.3773, params: p, name: 'الخليج');
+      return (latitude: 24.4539, longitude: 54.3773, params: p, name: AppLocalizations.of(context).tr('prayer.region.gulf'));
     }
     if (offset == const Duration(hours: 5)) {
       final p = CalculationMethod.karachi.getParameters();
@@ -104,7 +105,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         latitude: 33.6844,
         longitude: 73.0479,
         params: p,
-        name: 'باكستان',
+        name: AppLocalizations.of(context).tr('prayer.region.pakistan'),
       );
     }
     if (offset >= const Duration(hours: -10) &&
@@ -115,7 +116,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         latitude: 40.7128,
         longitude: -74.0060,
         params: p,
-        name: 'أمريكا الشمالية',
+        name: AppLocalizations.of(context).tr('prayer.region.northAmerica'),
       );
     }
     // Europe or fallback
@@ -123,13 +124,13 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     p.madhab = Madhab.shafi;
     if (offset >= const Duration(hours: 0) &&
         offset <= const Duration(hours: 2)) {
-      return (latitude: 51.5074, longitude: -0.1278, params: p, name: 'أوروبا');
+      return (latitude: 51.5074, longitude: -0.1278, params: p, name: AppLocalizations.of(context).tr('prayer.region.europe'));
     }
     return (
       latitude: 21.4225,
       longitude: 39.8262,
       params: p,
-      name: 'منطقة أخرى',
+      name: AppLocalizations.of(context).tr('prayer.region.other'),
     );
   }
 
@@ -215,7 +216,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         ? 12
         : time.hour;
     final minute = time.minute.toString().padLeft(2, '0');
-    final period = time.hour >= 12 ? 'م' : 'ص';
+    final period = time.hour >= 12 ? AppLocalizations.of(context).tr('prayer.pm') : AppLocalizations.of(context).tr('prayer.am');
     return '$hour:$minute $period';
   }
 
@@ -229,8 +230,8 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
           backgroundColor: const Color(0xFF8B6914),
           elevation: 0,
           centerTitle: true,
-          title: const Text(
-            'أوقات الصلاة',
+          title: Text(
+            AppLocalizations.of(context).tr('prayer.appBar.title'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -283,7 +284,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
                       ),
                       onPressed: _loadPrayerTimes,
                       icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('إعادة المحاولة'),
+                      label: Text(AppLocalizations.of(context).tr('prayer.retry')),
                     ),
                   ],
                 ),
@@ -359,7 +360,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
           const SizedBox(height: 8),
           // الصلاة القادمة
           Text(
-            'الصلاة القادمة: $nextName',
+            AppLocalizations.of(context).tr('prayer.next', {'name': nextName}),
             style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 4),
@@ -371,7 +372,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              'متبقي $timeRemaining',
+              AppLocalizations.of(context).tr('prayer.remaining', {'time': timeRemaining}),
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -468,8 +469,8 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
                   color: Colors.white.withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
-                  'الآن',
+                child: Text(
+                  AppLocalizations.of(context).tr('prayer.now'),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 11,
@@ -487,8 +488,8 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
                   color: goldColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
-                  'قادمة',
+                child: Text(
+                  AppLocalizations.of(context).tr('prayer.upcoming'),
                   style: TextStyle(
                     color: Color(0xFF8B6914),
                     fontSize: 11,

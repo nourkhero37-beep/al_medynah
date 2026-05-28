@@ -1,6 +1,7 @@
-import 'package:al_medynah/model/hadith_model.dart';
+﻿import 'package:al_medynah/model/hadith_model.dart';
 import 'package:al_medynah/services/hadith_api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class HadithLibraryScreen extends StatefulWidget {
   const HadithLibraryScreen({super.key});
@@ -44,8 +45,8 @@ class _HadithLibraryScreenState extends State<HadithLibraryScreen> {
           backgroundColor: const Color(0xFF8B6914),
           elevation: 0,
           centerTitle: true,
-          title: const Text(
-            '\u0645\u0643\u062A\u0628\u0629 \u0627\u0644\u062D\u062F\u064A\u062B',
+          title: Text(
+            AppLocalizations.of(context).tr('hadith.appBar.title'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -59,9 +60,9 @@ class _HadithLibraryScreenState extends State<HadithLibraryScreen> {
                 child: CircularProgressIndicator(color: Color(0xFF8B6914)),
               )
             : _collections.isEmpty
-            ? const Center(
+            ? Center(
                 child: Text(
-                  '\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u0643\u062A\u0628\u0629',
+                  AppLocalizations.of(context).tr('hadith.error.loadLibrary'),
                 ),
               )
             : Padding(
@@ -123,7 +124,7 @@ class _HadithLibraryScreenState extends State<HadithLibraryScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${book.totalHadiths} \u062D\u062F\u064A\u062B',
+                                AppLocalizations.of(context).tr('hadith.hadithCount', {'count': book.totalHadiths.toString()}),
                                 style: const TextStyle(
                                   color: Color(0xFFB8964E),
                                   fontSize: 13,
@@ -205,16 +206,17 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
         });
         return;
       }
-      setState(() {
-        _isLoading = false;
-        _errorMessage =
-            '\u0644\u0645 \u0646\u062A\u0645\u0643\u0646 \u0645\u0646 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u062D\u062F\u064A\u062B. \u062D\u0627\u0648\u0644 \u0627\u0644\u0628\u062D\u062B \u0623\u0648 \u0625\u062F\u062E\u0627\u0644 \u0631\u0642\u0645.';
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = AppLocalizations.of(context).tr('hadith.error.notFound');
+        });
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = '\u0641\u0634\u0644 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0623\u062D\u0627\u062F\u064A\u062B';
+          _errorMessage = AppLocalizations.of(context).tr('hadith.error.loadFail');
         });
       }
     }
@@ -248,14 +250,14 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
           _currentNumber = number;
           _isLoading = false;
           _errorMessage =
-              '\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u062D\u062F\u064A\u062B \u0628\u0647\u0630\u0627 \u0627\u0644\u0631\u0642\u0645';
+          _errorMessage = AppLocalizations.of(context).tr('hadith.error.numberNotFound');
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = '\u0641\u0634\u0644 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u062D\u062F\u064A\u062B';
+          _errorMessage = AppLocalizations.of(context).tr('hadith.error.loadHadith');
         });
       }
     }
@@ -280,7 +282,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
       setState(() {
         _hadith = null;
         _errorMessage =
-            '\u0644\u0627 \u062A\u0648\u062C\u062F \u0623\u062D\u0627\u062F\u064A\u062B \u0633\u0627\u0628\u0642\u0629';
+            _errorMessage = AppLocalizations.of(context).tr('hadith.error.noPrevious');
       });
     }
   }
@@ -338,8 +340,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
               child: TextField(
                 controller: _searchCtrl,
                 decoration: InputDecoration(
-                  hintText:
-                      '\u0627\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0623\u062D\u0627\u062F\u064A\u062B...',
+                  hintText: AppLocalizations.of(context).tr('hadith.search.hint'),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
@@ -380,7 +381,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                       ),
                       child: ListTile(
                         title: Text(
-                          '\u062D\u062F\u064A\u062B \u0631\u0642\u0645 $num',
+                          AppLocalizations.of(context).tr('hadith.search.result', {'number': num.toString()}),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF3E2A0F),
@@ -447,7 +448,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                             ),
                                           ),
                                           child: Text(
-                                            '\u062D\u062F\u064A\u062B \u0631\u0642\u0645 ${_hadith!.hadithNumber}',
+                                            AppLocalizations.of(context).tr('hadith.detail.number', {'number': _hadith!.hadithNumber.toString()}),
                                             style: const TextStyle(
                                               color: Color(0xFFB8964E),
                                               fontSize: 14,
@@ -496,7 +497,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                             ),
                                           ),
                                           child: Text(
-                                            '\u0627\u0644\u062D\u0643\u0645: ',
+                                            AppLocalizations.of(context).tr('hadith.grade'),
                                             style: const TextStyle(
                                               color: Color(0xFF3E2A0F),
                                               fontSize: 13,
@@ -542,8 +543,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                       keyboardType: TextInputType.number,
                                       textAlign: TextAlign.center,
                                       decoration: InputDecoration(
-                                        hintText:
-                                            '\u0631\u0642\u0645 \u0627\u0644\u062D\u062F\u064A\u062B',
+                                        hintText: AppLocalizations.of(context).tr('hadith.input.hint'),
                                         filled: true,
                                         fillColor: Colors.white,
                                         border: OutlineInputBorder(
@@ -580,8 +580,8 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                       final n = int.tryParse(_numberCtrl.text);
                                       if (n != null && n > 0) _loadHadith(n);
                                     },
-                                    child: const Text(
-                                      '\u0627\u0630\u0647\u0628',
+                                    child: Text(
+                                      AppLocalizations.of(context).tr('hadith.button.go'),
                                     ),
                                   ),
                                 ],
@@ -593,17 +593,17 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                 children: [
                                   _navButton(
                                     Icons.skip_previous_rounded,
-                                    '\u0627\u0644\u0633\u0627\u0628\u0642',
+                                    AppLocalizations.of(context).tr('hadith.button.prev'),
                                     _goPrev,
                                   ),
                                   _navButton(
                                     Icons.shuffle_rounded,
-                                    '\u0639\u0634\u0648\u0627\u0626\u064A',
+                                    AppLocalizations.of(context).tr('hadith.button.random'),
                                     _goRandom,
                                   ),
                                   _navButton(
                                     Icons.skip_next_rounded,
-                                    '\u0627\u0644\u062A\u0627\u0644\u064A',
+                                    AppLocalizations.of(context).tr('hadith.button.next'),
                                     _goNext,
                                   ),
                                 ],

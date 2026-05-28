@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class QiblaScreen extends StatefulWidget {
   const QiblaScreen({super.key});
@@ -49,7 +50,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
             granted == LocationPermission.deniedForever) {
           setState(() {
             _errorMessage =
-                'يرجى السماح بالوصول إلى الموقع\nلتحديد اتجاه القبلة';
+                AppLocalizations.of(context).tr('qibla.error.location');
             _isLoading = false;
           });
           return;
@@ -87,7 +88,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
     } catch (e) {
       setState(() {
         _errorMessage =
-            'تعذر الوصول إلى المستشعرات\nالرجاء التحقق من الإعدادات';
+            AppLocalizations.of(context).tr('qibla.error.sensor');
         _isLoading = false;
       });
     }
@@ -139,10 +140,10 @@ class _QiblaScreenState extends State<QiblaScreen> {
   }
 
   String _directionLabel(double angle) {
-    if (angle >= 315 || angle < 45) return 'شمالاً';
-    if (angle >= 45 && angle < 135) return 'شرقاً';
-    if (angle >= 135 && angle < 225) return 'جنوباً';
-    return 'غرباً';
+    if (angle >= 315 || angle < 45) return AppLocalizations.of(context).tr('qibla.north');
+    if (angle >= 45 && angle < 135) return AppLocalizations.of(context).tr('qibla.east');
+    if (angle >= 135 && angle < 225) return AppLocalizations.of(context).tr('qibla.south');
+    return AppLocalizations.of(context).tr('qibla.west');
   }
 
   @override
@@ -155,8 +156,8 @@ class _QiblaScreenState extends State<QiblaScreen> {
           backgroundColor: const Color(0xFF8B6914),
           elevation: 0,
           centerTitle: true,
-          title: const Text(
-            'القبلة',
+          title: Text(
+            AppLocalizations.of(context).tr('qibla.appBar.title'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -215,7 +216,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                 _initSensors();
               },
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('إعادة المحاولة'),
+              label: Text(AppLocalizations.of(context).tr('qibla.retry')),
             ),
           ],
         ),
@@ -231,8 +232,8 @@ class _QiblaScreenState extends State<QiblaScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'اتجاه القبلة',
+                Text(
+                  AppLocalizations.of(context).tr('qibla.heading'),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
@@ -251,7 +252,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                     Positioned(
                       top: 10,
                       child: Text(
-                        'شمال',
+                        AppLocalizations.of(context).tr('qibla.north'),
                         style: TextStyle(
                           color: goldColor,
                           fontSize: 12,
@@ -262,7 +263,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                     Positioned(
                       bottom: 10,
                       child: Text(
-                        'جنوب',
+                        AppLocalizations.of(context).tr('qibla.south'),
                         style: TextStyle(
                           color: darkBrown.withValues(alpha: 0.4),
                           fontSize: 12,
@@ -327,7 +328,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'موقعك الحالي',
+                    AppLocalizations.of(context).tr('qibla.location'),
                     style: TextStyle(
                       color: darkBrown,
                       fontSize: 16,
@@ -355,8 +356,8 @@ class _QiblaScreenState extends State<QiblaScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _infoChip('اتجاه الجهاز', '°'),
-                  _infoChip('اتجاه القبلة', '°'),
+                  _infoChip(AppLocalizations.of(context).tr('qibla.deviceHeading'), '°'),
+                  _infoChip(AppLocalizations.of(context).tr('qibla.heading'), '°'),
                 ],
               ),
             ],

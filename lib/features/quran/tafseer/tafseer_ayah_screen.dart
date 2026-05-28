@@ -1,6 +1,7 @@
 ﻿import 'package:al_medynah/features/quran/tafseer/tafseer_service.dart';
 import 'package:flutter/material.dart';
 import 'package:al_medynah/model/surah_model.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class TafseerAyahScreen extends StatefulWidget {
   final SurahModel surah;
@@ -40,7 +41,7 @@ class _TafseerAyahScreenState extends State<TafseerAyahScreen> {
 
     setState(() {
       _tafseerCache[ayahNumber] =
-          text ?? 'تعذر تحميل التفسير، تحقق من الاتصال.';
+          text ?? AppLocalizations.of(context).tr('tafseer.error.loadCache');
       _isLoadingTafseer = false;
     });
   }
@@ -203,8 +204,8 @@ class _TafseerAyahScreenState extends State<TafseerAyahScreen> {
                                         size: 16,
                                       ),
                                       const SizedBox(width: 6),
-                                      const Text(
-                                        'تفسير الميسر',
+                                      Text(
+                                        AppLocalizations.of(context).tr('tafseer.header.title'),
                                         style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold,

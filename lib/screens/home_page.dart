@@ -9,8 +9,12 @@ import 'package:al_medynah/screens/quran_search_screen.dart';
 import 'package:al_medynah/screens/qibla_screen.dart';
 import 'package:al_medynah/screens/reciter_page.dart';
 import 'package:al_medynah/screens/tv_screen.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
+import 'package:al_medynah/main.dart';
 import 'package:al_medynah/services/bookmark_service.dart';
+import 'package:al_medynah/services/locale_service.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,47 +39,90 @@ class _HomePageState extends State<HomePage> {
   }
 
   final List<Map<String, String>> gridItems = [
-    {'title': 'التلفزيون', 'image': 'assets/images/tv.png'},
-    {'title': 'الأذكار', 'image': 'assets/images/azkar.png'},
-    {'title': 'القراء', 'image': 'assets/images/reciters.png'},
-    {'title': 'التفسير', 'image': 'assets/images/tafseer.png'},
-    {'title': 'مكتبة الحديث', 'image': 'assets/images/hadyth.png'},
-    {'title': 'أسماء الله الحسنى', 'image': 'assets/images/Allah_names.png'},
-    {'title': 'أوقات الصلاة', 'image': 'assets/images/prayertime.png'},
-    {'title': 'القبلة', 'image': 'assets/images/qublah.png'},
+    {'key': 'tv', 'image': 'assets/images/tv.png'},
+    {'key': 'azkar', 'image': 'assets/images/azkar.png'},
+    {'key': 'reciters', 'image': 'assets/images/reciters.png'},
+    {'key': 'tafseer', 'image': 'assets/images/tafseer.png'},
+    {'key': 'hadith', 'image': 'assets/images/hadyth.png'},
+    {'key': 'namesOfAllah', 'image': 'assets/images/Allah_names.png'},
+    {'key': 'prayerTimes', 'image': 'assets/images/prayertime.png'},
+    {'key': 'qibla', 'image': 'assets/images/qublah.png'},
   ];
+
+  Future<void> _showLanguageDialog() async {
+    final loc = AppLocalizations.of(context);
+    final current = appLocaleNotifier.value;
+    await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            backgroundColor: const Color(0xFFF5ECD7),
+            title: Text(
+              loc.tr('lang.title'),
+              style: const TextStyle(color: Color(0xFF3E2A0F)),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _langOption(ctx, loc, current, 'ar', 'lang.arabic'),
+                _langOption(ctx, loc, current, 'en', 'lang.english'),
+                _langOption(ctx, loc, current, 'tr', 'lang.turkish'),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _langOption(
+    BuildContext ctx,
+    AppLocalizations loc,
+    Locale current,
+    String code,
+    String labelKey,
+  ) {
+    final selected = current.languageCode == code;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: selected ? const Color(0xFF8B6914) : Colors.white,
+            foregroundColor: selected ? Colors.white : const Color(0xFF3E2A0F),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: selected
+                    ? const Color(0xFF8B6914)
+                    : const Color(0xFFB8964E).withValues(alpha: 0.3),
+              ),
+            ),
+          ),
+          onPressed: () async {
+            final newLocale = Locale(code);
+            appLocaleNotifier.value = newLocale;
+            await LocaleService.setLocale(newLocale);
+            if (ctx.mounted) Navigator.pop(ctx);
+          },
+          child: Text(
+            loc.tr(labelKey),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-
-    const days = [
-      'الأحد',
-      'الاثنين',
-      'الثلاثاء',
-      'الأربعاء',
-      'الخميس',
-      'الجمعة',
-      'السبت',
-    ];
-
-    const months = [
-      'يناير',
-      'فبراير',
-      'مارس',
-      'أبريل',
-      'مايو',
-      'يونيو',
-      'يوليو',
-      'أغسطس',
-      'سبتمبر',
-      'أكتوبر',
-      'نوفمبر',
-      'ديسمبر',
-    ];
-
-    final arabicDate =
-        '${days[now.weekday % 7]}، ${now.day} ${months[now.month - 1]} ${now.year}';
+    final localeCode = AppLocalizations.of(context).localeCode;
+    final dateStr = DateFormat.yMMMMEEEEd(localeCode).format(now);
 
     return Scaffold(
       body: Stack(
@@ -125,7 +172,7 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: _showLanguageDialog,
                           icon: const Icon(Icons.language, color: Colors.white),
                         ),
                       ),
@@ -135,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 25),
 
                   Text(
-                    arabicDate,
+                    dateStr,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -157,7 +204,7 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: Container(
                       width: double.infinity,
-                      height: 220,
+
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.12),
@@ -168,13 +215,15 @@ class _HomePageState extends State<HomePage> {
                       ),
                       child: Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'القرآن الكريم',
+                                  AppLocalizations.of(
+                                    context,
+                                  ).tr('home.hero.title'),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 34,
@@ -183,7 +232,9 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 SizedBox(height: 10),
                                 Text(
-                                  'اقرأ واستمع للقرآن الكريم\nبواجهة جميلة ومريحة',
+                                  AppLocalizations.of(
+                                    context,
+                                  ).tr('home.hero.subtitle'),
                                   style: TextStyle(
                                     color: Colors.white70,
                                     fontSize: 16,
@@ -222,7 +273,9 @@ class _HomePageState extends State<HomePage> {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF8B6914).withValues(alpha: 0.85),
+                          color: const Color(
+                            0xFF8B6914,
+                          ).withValues(alpha: 0.85),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.2),
@@ -240,8 +293,10 @@ class _HomePageState extends State<HomePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'أكمل القراءة',
+                                  Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    ).tr('home.bookmark.resume'),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 14,
@@ -249,11 +304,14 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Text(
-                                    'سورة ${_bookmark!['surah_name']} — آية ${_bookmark!['ayah_number']}',
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.8),
-                                      fontSize: 12,
-                                    ),
+                                    AppLocalizations.of(
+                                      context,
+                                    ).tr('home.bookmark.detail', {
+                                      'surah':
+                                          _bookmark!['surah_name'] as String,
+                                      'ayah': _bookmark!['ayah_number']
+                                          .toString(),
+                                    }),
                                   ),
                                 ],
                               ),
@@ -304,7 +362,7 @@ class _HomePageState extends State<HomePage> {
                           const Icon(Icons.search, color: Colors.white70),
                           const SizedBox(width: 10),
                           Text(
-                            'ابحث عن آية...',
+                            AppLocalizations.of(context).tr('home.search.hint'),
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.7),
                               fontSize: 16,
@@ -330,66 +388,65 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
-                            if (gridItems[index]['title'] == 'التلفزيون') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const TvScreen(),
-                                ),
-                              );
-                            } else if (gridItems[index]['title'] == 'القراء') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const ReciterPage(),
-                                ),
-                              );
-                            } else if (gridItems[index]['title'] == 'التفسير') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      const TafseerSurahListScreen(),
-                                ),
-                              );
-                            } else if (gridItems[index]['title'] == 'الأذكار') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const AzkarCategoriesScreen(),
-                                ),
-                              );
-                            } else if (gridItems[index]['title'] == 'القبلة') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const QiblaScreen(),
-                                ),
-                              );
-                            } else if (gridItems[index]['title'] ==
-                                'أوقات الصلاة') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const PrayerTimesScreen(),
-                                ),
-                              );
-                            } else if (gridItems[index]['title'] ==
-                                'مكتبة الحديث') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const HadithLibraryScreen(),
-                                ),
-                              );
-                            } else if (gridItems[index]['title'] ==
-                                'أسماء الله الحسنى') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const NamesOfAllahScreen(),
-                                ),
-                              );
+                            switch (gridItems[index]['key']) {
+                              case 'tv':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const TvScreen(),
+                                  ),
+                                );
+                              case 'reciters':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const ReciterPage(),
+                                  ),
+                                );
+                              case 'tafseer':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const TafseerSurahListScreen(),
+                                  ),
+                                );
+                              case 'azkar':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const AzkarCategoriesScreen(),
+                                  ),
+                                );
+                              case 'qibla':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const QiblaScreen(),
+                                  ),
+                                );
+                              case 'prayerTimes':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const PrayerTimesScreen(),
+                                  ),
+                                );
+                              case 'hadith':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const HadithLibraryScreen(),
+                                  ),
+                                );
+                              case 'namesOfAllah':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const NamesOfAllahScreen(),
+                                  ),
+                                );
                             }
                           },
                           child: Container(
@@ -411,8 +468,12 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  gridItems[index]['title']!,
+                                  AppLocalizations.of(
+                                    context,
+                                  ).tr('home.grid.${gridItems[index]['key']}'),
                                   textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 15,

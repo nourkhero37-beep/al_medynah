@@ -1,6 +1,7 @@
 ﻿import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String url;
@@ -84,8 +85,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     size: 48,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'تعذر تشغيل الفيديو',
+                  Text(
+                    AppLocalizations.of(context).tr('video.error'),
                     style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   const SizedBox(height: 8),
@@ -101,13 +102,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               )
             : _isInitialized
             ? Chewie(controller: _chewieController!)
-            : const Column(
+            : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(color: Color(0xFFB8964E)),
                   SizedBox(height: 16),
                   Text(
-                    'جاري التحميل...',
+                    AppLocalizations.of(context).tr('video.loading'),
                     style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ],

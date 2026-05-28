@@ -8,6 +8,7 @@ import 'repository/mushaf_repository.dart';
 import 'bloc/mushaf_bloc.dart';
 import 'bloc/mushaf_event.dart';
 import 'bloc/mushaf_state.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class MushafScreen extends StatelessWidget {
   final int initialPage;
@@ -80,7 +81,7 @@ class _MushafViewState extends State<_MushafView> {
             SnackBar(
               content: Text(state.errorMessage!),
               backgroundColor:
-                  state.errorMessage == 'يجب تحميل القارئ أولاً من صفحة القراء'
+                  state.errorMessage == AppLocalizations.of(context).tr('mushaf.error.noReciter')
                   ? Colors.red
                   : Colors.orange,
             ),
@@ -195,8 +196,8 @@ class _BookmarkButtonState extends State<_BookmarkButton> {
   Future<void> _toggleBookmark() async {
     if (widget.selectedVerseKey == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('اضغط على آية أولاً لحفظها'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).tr('mushaf.bookmark.error')),
           backgroundColor: Colors.orange,
         ),
       );
@@ -226,7 +227,7 @@ class _BookmarkButtonState extends State<_BookmarkButton> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('✅ تم حفظ الإشارة — سورة $surahName آية $ayahNumber'),
+        content: Text(AppLocalizations.of(context).tr('mushaf.bookmark.saved', {'surah': surahName, 'ayah': ayahNumber.toString()})),
         backgroundColor: const Color(0xFF8B6914),
         duration: const Duration(seconds: 2),
       ),
@@ -259,7 +260,7 @@ class _BookmarkButtonState extends State<_BookmarkButton> {
             ),
             const SizedBox(width: 4),
             Text(
-              'حفظ',
+              AppLocalizations.of(context).tr('mushaf.bookmark.save'),
               style: TextStyle(
                 fontSize: 12,
                 color: _isSaved ? Colors.white : Colors.black54,

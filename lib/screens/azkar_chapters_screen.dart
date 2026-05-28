@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:muslim_data_flutter/muslim_data_flutter.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class AzkarChaptersScreen extends StatefulWidget {
   final AzkarCategory category;
@@ -93,7 +94,7 @@ class _AzkarChaptersScreenState extends State<AzkarChaptersScreen> {
                 ),
               ),
               Text(
-                '${_chapters.length} باب',
+                AppLocalizations.of(context).tr('azkarChapters.count', {'count': _chapters.length.toString()}),
                 style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
             ],
@@ -394,7 +395,7 @@ class _AzkarItemCardState extends State<_AzkarItemCard> {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        isDone ? 'إعادة' : 'تم',
+                        isDone ? AppLocalizations.of(context).tr('azkarChapters.reset') : AppLocalizations.of(context).tr('azkarChapters.done'),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,

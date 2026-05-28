@@ -1,4 +1,5 @@
-﻿// ignore_for_file: curly_braces_in_flow_control_structures
+﻿import 'package:al_medynah/l10n/app_localizations.dart';
+// ignore_for_file: curly_braces_in_flow_control_structures
 
 import 'package:al_medynah/features/quran/tafseer/tafseer_service.dart';
 import 'package:flutter/material.dart';
@@ -251,8 +252,8 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text(
-                      'تفسير الميسر',
+                    Text(
+                      AppLocalizations.of(context).tr('tafseer.header.title'),
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -301,8 +302,8 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                           color: Colors.grey,
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'تعذر تحميل التفسير',
+                        Text(
+                          AppLocalizations.of(context).tr('tafseer.error.load'),
                           style: TextStyle(color: darkBrown, fontSize: 15),
                         ),
                         const SizedBox(height: 16),
@@ -315,7 +316,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                             ),
                           ),
                           onPressed: _loadTafseer,
-                          child: const Text('إعادة المحاولة'),
+                          child: Text(AppLocalizations.of(context).tr('tafseer.retry')),
                         ),
                       ],
                     ),
@@ -386,16 +387,16 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
 
                           const SizedBox(height: 16),
 
-                          const Row(
+                          Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.format_quote_rounded,
                                 color: Color(0xFF8B6914),
                                 size: 20,
                               ),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
-                                'التفسير',
+                                AppLocalizations.of(context).tr('tafseer.section.tafsir'),
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
@@ -456,7 +457,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            'التالية',
+                            AppLocalizations.of(context).tr('tafseer.button.next'),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -511,7 +512,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'السابقة',
+                            AppLocalizations.of(context).tr('tafseer.button.prev'),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,

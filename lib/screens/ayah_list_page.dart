@@ -1,4 +1,5 @@
-﻿// ignore_for_file: unused_field
+﻿import 'package:al_medynah/l10n/app_localizations.dart';
+// ignore_for_file: unused_field
 
 import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/model/surah_model.dart';
@@ -49,8 +50,8 @@ class _AyahListState extends State<AyahList> {
           backgroundColor: const Color(0xFF8B6914),
           elevation: 0,
           centerTitle: true,
-          title: const Text(
-            'فهرس السور',
+          title: Text(
+            AppLocalizations.of(context).tr('ayahList.appBar.title'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -71,7 +72,7 @@ class _AyahListState extends State<AyahList> {
                 textDirection: TextDirection.rtl,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'ابحث عن سورة...',
+                  hintText: AppLocalizations.of(context).tr('ayahList.search.hint'),
                   hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                   prefixIcon: const Icon(Icons.search, color: Colors.white),
                   filled: true,
@@ -192,7 +193,7 @@ class _AyahListState extends State<AyahList> {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: surah.revelationType == 'مكية'
+                    color: surah.revelationType == AppLocalizations.of(context).tr('ayahList.meccan')
                         ? const Color(0xFF5C8A5C).withValues(alpha: 0.15)
                         : const Color(0xFF2E86AB).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
@@ -201,7 +202,7 @@ class _AyahListState extends State<AyahList> {
                     surah.revelationType,
                     style: TextStyle(
                       fontSize: 11,
-                      color: surah.revelationType == 'مكية'
+                      color: surah.revelationType == AppLocalizations.of(context).tr('ayahList.meccan')
                           ? const Color(0xFF5C8A5C)
                           : const Color(0xFF2E86AB),
                       fontWeight: FontWeight.w600,
@@ -210,7 +211,7 @@ class _AyahListState extends State<AyahList> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${surah.versesCount} آية',
+                  AppLocalizations.of(context).tr('ayahList.verses', {'count': surah.versesCount.toString()}),
                   style: TextStyle(
                     fontSize: 12,
                     color: darkBrown.withValues(alpha: 0.5),

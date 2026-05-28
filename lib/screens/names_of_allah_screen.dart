@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:muslim_data_flutter/muslim_data_flutter.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class NamesOfAllahScreen extends StatefulWidget {
   const NamesOfAllahScreen({super.key});
@@ -47,8 +48,8 @@ class _NamesOfAllahScreenState extends State<NamesOfAllahScreen> {
           backgroundColor: const Color(0xFF8B6914),
           elevation: 0,
           centerTitle: true,
-          title: const Text(
-            'أسماء الله الحسنى',
+          title: Text(
+            AppLocalizations.of(context).tr('namesOfAllah.appBar.title'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -72,7 +73,7 @@ class _NamesOfAllahScreenState extends State<NamesOfAllahScreen> {
                       color: Colors.grey,
                     ),
                     const SizedBox(height: 12),
-                    const Text('تعذر تحميل الأسماء'),
+                    Text(AppLocalizations.of(context).tr('namesOfAllah.error.load')),
                     const SizedBox(height: 12),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -86,7 +87,7 @@ class _NamesOfAllahScreenState extends State<NamesOfAllahScreen> {
                         setState(() => _isLoading = true);
                         _loadNames();
                       },
-                      child: const Text('إعادة المحاولة'),
+                      child: Text(AppLocalizations.of(context).tr('namesOfAllah.retry')),
                     ),
                   ],
                 ),

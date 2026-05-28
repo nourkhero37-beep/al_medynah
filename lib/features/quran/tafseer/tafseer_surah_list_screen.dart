@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:al_medynah/model/surah_model.dart';
 import 'tafseer_ayah_screen.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class TafseerSurahListScreen extends StatefulWidget {
   const TafseerSurahListScreen({super.key});
@@ -46,8 +47,8 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
           backgroundColor: const Color(0xFF8B6914),
           elevation: 0,
           centerTitle: true,
-          title: const Text(
-            'تفسير القرآن الكريم',
+          title: Text(
+            AppLocalizations.of(context).tr('tafseer.appBar.title'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -65,7 +66,7 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
                 textDirection: TextDirection.rtl,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'ابحث عن سورة...',
+                  hintText: AppLocalizations.of(context).tr('tafseer.search.hint'),
                   hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                   prefixIcon: const Icon(Icons.search, color: Colors.white),
                   filled: true,
@@ -174,7 +175,7 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: surah.revelationType == 'مكية'
+                            color: surah.revelationType == AppLocalizations.of(context).tr('ayahList.meccan')
                                 ? const Color(0xFF5C8A5C).withValues(alpha: 0.15)
                                 : const Color(0xFF2E86AB).withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(8),
@@ -183,7 +184,7 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
                             surah.revelationType,
                             style: TextStyle(
                               fontSize: 11,
-                              color: surah.revelationType == 'مكية'
+                              color: surah.revelationType == AppLocalizations.of(context).tr('ayahList.meccan')
                                   ? const Color(0xFF5C8A5C)
                                   : const Color(0xFF2E86AB),
                               fontWeight: FontWeight.w600,
@@ -192,7 +193,7 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${surah.versesCount} آية',
+                          AppLocalizations.of(context).tr('tafseer.appBar.subtitle', {'count': surah.versesCount.toString()}),
                           style: TextStyle(
                             fontSize: 12,
                             color: darkBrown.withValues(alpha: 0.5),

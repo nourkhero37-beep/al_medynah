@@ -1,6 +1,7 @@
 ﻿import 'package:al_medynah/model/reciters_model.dart';
 import 'package:al_medynah/services/audio_manager_api.dart';
 import 'package:flutter/material.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class ReciterPage extends StatefulWidget {
   const ReciterPage({super.key});
@@ -97,8 +98,8 @@ class _RecitersScreenState extends State<ReciterPage> {
       if (mounted) {
         setState(() => _downloadProgress[rid] = null);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('فشل التحميل، تحقق من الاتصال'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).tr('reciter.download.fail')),
             backgroundColor: Colors.red,
           ),
         );
@@ -137,19 +138,19 @@ class _RecitersScreenState extends State<ReciterPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('حذف القارئ'),
+        title: Text(AppLocalizations.of(context).tr('reciter.delete.title')),
         content: Text('هل تريد حذف تحميل ${reciter.nameArabic} كاملاً؟'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context).tr('reciter.cancel')),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _delete(reciter);
             },
-            child: const Text('حذف', style: TextStyle(color: Colors.red)),
+            child: Text(AppLocalizations.of(context).tr('reciter.delete'), style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -164,8 +165,8 @@ class _RecitersScreenState extends State<ReciterPage> {
         backgroundColor: const Color(0xFF8B6914),
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'القراء',
+        title: Text(
+          AppLocalizations.of(context).tr('reciter.appBar.title'),
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -183,11 +184,11 @@ class _RecitersScreenState extends State<ReciterPage> {
                 children: [
                   const Icon(Icons.wifi_off, size: 48, color: Colors.grey),
                   const SizedBox(height: 12),
-                  const Text('تعذر تحميل القراء'),
+                  Text(AppLocalizations.of(context).tr('reciter.error.load')),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: _init,
-                    child: const Text('إعادة المحاولة'),
+                    child: Text(AppLocalizations.of(context).tr('reciter.retry')),
                   ),
                 ],
               ),
@@ -285,8 +286,8 @@ class _RecitersScreenState extends State<ReciterPage> {
                                   color: goldColor,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Text(
-                                  'محدد',
+                                child: Text(
+                                  AppLocalizations.of(context).tr('reciter.badge.selected'),
                                   style: TextStyle(
                                     fontSize: 11,
                                     color: Colors.white,
@@ -307,7 +308,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                                   Icons.download_rounded,
                                   color: Color(0xFF2E86AB),
                                 ),
-                                tooltip: 'تحميل القرآن كامل',
+                                tooltip: AppLocalizations.of(context).tr('reciter.action.download'),
                               )
                             else if (isDownloading)
                               SizedBox(
@@ -327,7 +328,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                                     Icons.check_circle_outline_rounded,
                                     color: Colors.green,
                                   ),
-                                  tooltip: 'اختيار',
+                                  tooltip: AppLocalizations.of(context).tr('reciter.action.select'),
                                 ),
                               IconButton(
                                 onPressed: () => _showDeleteDialog(reciter),
@@ -335,7 +336,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                                   Icons.delete_outline_rounded,
                                   color: Colors.red,
                                 ),
-                                tooltip: 'حذف',
+                                tooltip: AppLocalizations.of(context).tr('reciter.delete'),
                               ),
                             ],
                           ],

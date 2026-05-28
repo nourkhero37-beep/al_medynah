@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:al_medynah/features/quran/mushaf_screen.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class QuranSearchScreen extends StatefulWidget {
   final VoidCallback? onBookmarkSaved;
@@ -105,8 +106,8 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
         backgroundColor: const Color(0xFF8B6914),
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'البحث في القرآن',
+        title: Text(
+          AppLocalizations.of(context).tr('qsearch.appBar.title'),
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -126,7 +127,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
               style: const TextStyle(color: Colors.white),
               onSubmitted: _search,
               decoration: InputDecoration(
-                hintText: 'ابحث عن آية...',
+                hintText: AppLocalizations.of(context).tr('qsearch.hint'),
                 hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                 prefixIcon: _isLoading
                     ? const Padding(
@@ -157,7 +158,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
             child: _results.isEmpty && !_isLoading
                 ? Center(
                     child: Text(
-                      'اكتب كلمة للبحث عنها',
+                      AppLocalizations.of(context).tr('qsearch.empty'),
                       style: TextStyle(
                         color: darkBrown.withValues(alpha: 0.5),
                         fontSize: 16,

@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:muslim_data_flutter/muslim_data_flutter.dart';
 import 'azkar_chapters_screen.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 
 class AzkarCategoriesScreen extends StatefulWidget {
   const AzkarCategoriesScreen({super.key});
@@ -69,8 +70,8 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
           backgroundColor: const Color(0xFF8B6914),
           elevation: 0,
           centerTitle: true,
-          title: const Text(
-            'الأذكار',
+          title: Text(
+            AppLocalizations.of(context).tr('azkar.appBar.title'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
