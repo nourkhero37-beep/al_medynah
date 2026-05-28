@@ -192,7 +192,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
             Text(
               _errorMessage!,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15, color: darkBrown.withOpacity(0.7)),
+              style: TextStyle(fontSize: 15, color: darkBrown.withValues(alpha: 0.7)),
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
@@ -264,7 +264,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                       child: Text(
                         'جنوب',
                         style: TextStyle(
-                          color: darkBrown.withOpacity(0.4),
+                          color: darkBrown.withValues(alpha: 0.4),
                           fontSize: 12,
                         ),
                       ),
@@ -284,7 +284,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                 Text(
                   _directionLabel(_qiblaAngle),
                   style: TextStyle(
-                    color: darkBrown.withOpacity(0.6),
+                    color: darkBrown.withValues(alpha: 0.6),
                     fontSize: 16,
                   ),
                 ),
@@ -305,7 +305,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -341,7 +341,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: goldColor.withOpacity(0.12),
+                      color: goldColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -371,7 +371,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(color: darkBrown.withOpacity(0.5), fontSize: 12),
+          style: TextStyle(color: darkBrown.withValues(alpha: 0.5), fontSize: 12),
         ),
         const SizedBox(height: 2),
         Text(
@@ -404,7 +404,7 @@ class _QiblaCompassPainter extends CustomPainter {
     canvas.drawCircle(center, radius, ringPaint);
 
     final innerRingPaint = Paint()
-      ..color = const Color(0xFFB8964E).withOpacity(0.3)
+      ..color = const Color(0xFFB8964E).withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
     canvas.drawCircle(center, radius * 0.92, innerRingPaint);
@@ -426,7 +426,7 @@ class _QiblaCompassPainter extends CustomPainter {
         Paint()
           ..color = isCardinal
               ? const Color(0xFFB8964E)
-              : const Color(0xFFB8964E).withOpacity(0.4)
+              : const Color(0xFFB8964E).withValues(alpha: 0.4)
           ..strokeWidth = isCardinal ? 2.5 : 1.5,
       );
     }
@@ -438,7 +438,7 @@ class _QiblaCompassPainter extends CustomPainter {
       radius,
       90,
       'E',
-      const Color(0xFF3E2A0F).withOpacity(0.4),
+      const Color(0xFF3E2A0F).withValues(alpha: 0.4),
     );
     _drawLabel(
       canvas,
@@ -446,7 +446,7 @@ class _QiblaCompassPainter extends CustomPainter {
       radius,
       180,
       'S',
-      const Color(0xFF3E2A0F).withOpacity(0.4),
+      const Color(0xFF3E2A0F).withValues(alpha: 0.4),
     );
     _drawLabel(
       canvas,
@@ -454,7 +454,7 @@ class _QiblaCompassPainter extends CustomPainter {
       radius,
       270,
       'W',
-      const Color(0xFF3E2A0F).withOpacity(0.4),
+      const Color(0xFF3E2A0F).withValues(alpha: 0.4),
     );
 
     // Qibla arrow

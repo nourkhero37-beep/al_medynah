@@ -161,7 +161,7 @@ class _TvScreenState extends State<TvScreen> {
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: const Color(0xFFB8964E).withOpacity(0.3),
+                  color: const Color(0xFFB8964E).withValues(alpha: 0.3),
                 ),
               ),
               child: Column(
@@ -187,7 +187,7 @@ class _TvScreenState extends State<TvScreen> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.8),
+                      color: Colors.red.withValues(alpha: 0.8),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: const Text(
@@ -225,12 +225,12 @@ class _TvScreenState extends State<TvScreen> {
               decoration: BoxDecoration(
                 color: isSelected
                     ? const Color(0xFFB8964E)
-                    : Colors.white.withOpacity(0.1),
+                    : Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: isSelected
                       ? const Color(0xFFB8964E)
-                      : Colors.white.withOpacity(0.2),
+                      : Colors.white.withValues(alpha: 0.2),
                 ),
               ),
               alignment: Alignment.center,
@@ -280,7 +280,7 @@ class _TvScreenState extends State<TvScreen> {
                     width: 150,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
@@ -292,7 +292,7 @@ class _TvScreenState extends State<TvScreen> {
                             height: 110,
                             fit: BoxFit.cover,
                             errorBuilder: (_, _, _) => Container(
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                               child: const Icon(
                                 Icons.movie,
                                 color: Colors.white54,
@@ -302,7 +302,7 @@ class _TvScreenState extends State<TvScreen> {
                             loadingBuilder: (_, child, progress) {
                               if (progress == null) return child;
                               return Container(
-                                color: Colors.white.withOpacity(0.05),
+                                color: Colors.white.withValues(alpha: 0.05),
                                 child: const Center(
                                   child: CircularProgressIndicator(
                                     color: Color(0xFFB8964E),

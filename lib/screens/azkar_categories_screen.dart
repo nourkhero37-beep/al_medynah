@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:muslim_data_flutter/muslim_data_flutter.dart';
 import 'azkar_chapters_screen.dart';
 
@@ -140,7 +140,7 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
                         borderRadius: BorderRadius.circular(18),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.07),
+                            color: Colors.black.withValues(alpha: 0.07),
                             blurRadius: 10,
                             offset: const Offset(0, 3),
                           ),
@@ -153,10 +153,10 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
                             width: 56,
                             height: 56,
                             decoration: BoxDecoration(
-                              color: goldColor.withOpacity(0.12),
+                              color: goldColor.withValues(alpha: 0.12),
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: goldColor.withOpacity(0.3),
+                                color: goldColor.withValues(alpha: 0.3),
                                 width: 1.5,
                               ),
                             ),

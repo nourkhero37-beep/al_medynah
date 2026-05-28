@@ -92,7 +92,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   Text(
                     _errorMessage ?? widget.url,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 12,
                     ),
                     textAlign: TextAlign.center,

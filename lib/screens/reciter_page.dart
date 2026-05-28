@@ -1,4 +1,4 @@
-import 'package:al_medynah/model/reciters_model.dart';
+﻿import 'package:al_medynah/model/reciters_model.dart';
 import 'package:al_medynah/services/audio_manager_api.dart';
 import 'package:flutter/material.dart';
 
@@ -216,7 +216,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                         : null,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
+                        color: Colors.black.withValues(alpha: 0.06),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -234,8 +234,8 @@ class _RecitersScreenState extends State<ReciterPage> {
                           height: 48,
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? goldColor.withOpacity(0.2)
-                                : Colors.grey.withOpacity(0.1),
+                                ? goldColor.withValues(alpha: 0.2)
+                                : Colors.grey.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -262,7 +262,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: goldColor.withOpacity(0.15),
+                                color: goldColor.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -353,7 +353,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                                 borderRadius: BorderRadius.circular(4),
                                 child: LinearProgressIndicator(
                                   value: progress,
-                                  backgroundColor: Colors.grey.withOpacity(0.2),
+                                  backgroundColor: Colors.grey.withValues(alpha: 0.2),
                                   color: goldColor,
                                   minHeight: 6,
                                 ),
@@ -363,7 +363,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                                 'سورة ${(progress * 114).toInt()} / 114',
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: darkBrown.withOpacity(0.5),
+                                  color: darkBrown.withValues(alpha: 0.5),
                                 ),
                               ),
                             ],

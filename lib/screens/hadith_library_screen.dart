@@ -91,7 +91,7 @@ class _HadithLibraryScreenState extends State<HadithLibraryScreen> {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -419,7 +419,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
+                                        color: Colors.black.withValues(alpha: 0.05),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
@@ -439,7 +439,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                           decoration: BoxDecoration(
                                             color: const Color(
                                               0xFFB8964E,
-                                            ).withOpacity(0.12),
+                                            ).withValues(alpha: 0.12),
                                             borderRadius: BorderRadius.circular(
                                               8,
                                             ),
@@ -488,7 +488,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                           decoration: BoxDecoration(
                                             color: const Color(
                                               0xFF3E2A0F,
-                                            ).withOpacity(0.08),
+                                            ).withValues(alpha: 0.08),
                                             borderRadius: BorderRadius.circular(
                                               8,
                                             ),
@@ -623,7 +623,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF3E2A0F),
         elevation: 0,
-        side: BorderSide(color: const Color(0xFFB8964E).withOpacity(0.3)),
+        side: BorderSide(color: const Color(0xFFB8964E).withValues(alpha: 0.3)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       ),

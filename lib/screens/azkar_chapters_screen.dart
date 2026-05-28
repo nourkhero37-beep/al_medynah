@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:muslim_data_flutter/muslim_data_flutter.dart';
 
 class AzkarChaptersScreen extends StatefulWidget {
@@ -133,13 +133,13 @@ class _AzkarChaptersScreenState extends State<AzkarChaptersScreen> {
                         borderRadius: BorderRadius.circular(16),
                         border: isExpanded
                             ? Border.all(
-                                color: goldColor.withOpacity(0.5),
+                                color: goldColor.withValues(alpha: 0.5),
                                 width: 1,
                               )
                             : null,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
+                            color: Colors.black.withValues(alpha: 0.06),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -180,7 +180,7 @@ class _AzkarChaptersScreenState extends State<AzkarChaptersScreen> {
                                   width: 32,
                                   height: 32,
                                   decoration: BoxDecoration(
-                                    color: goldColor.withOpacity(0.12),
+                                    color: goldColor.withValues(alpha: 0.12),
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Center(
@@ -199,7 +199,7 @@ class _AzkarChaptersScreenState extends State<AzkarChaptersScreen> {
                           if (isExpanded) ...[
                             Divider(
                               height: 1,
-                              color: goldColor.withOpacity(0.3),
+                              color: goldColor.withValues(alpha: 0.3),
                               indent: 16,
                               endIndent: 16,
                             ),
@@ -281,7 +281,7 @@ class _AzkarItemCardState extends State<_AzkarItemCard> {
             ? null
             : Border(
                 bottom: BorderSide(
-                  color: goldColor.withOpacity(0.15),
+                  color: goldColor.withValues(alpha: 0.15),
                   width: 1,
                 ),
               ),
@@ -297,7 +297,7 @@ class _AzkarItemCardState extends State<_AzkarItemCard> {
                 width: 26,
                 height: 26,
                 decoration: BoxDecoration(
-                  color: goldColor.withOpacity(0.12),
+                  color: goldColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -333,9 +333,9 @@ class _AzkarItemCardState extends State<_AzkarItemCard> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: goldColor.withOpacity(0.08),
+                color: goldColor.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: goldColor.withOpacity(0.2)),
+                border: Border.all(color: goldColor.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
@@ -351,7 +351,7 @@ class _AzkarItemCardState extends State<_AzkarItemCard> {
                       textDirection: TextDirection.rtl,
                       style: TextStyle(
                         fontSize: 11,
-                        color: darkBrown.withOpacity(0.6),
+                        color: darkBrown.withValues(alpha: 0.6),
                         height: 1.5,
                       ),
                     ),
@@ -378,10 +378,10 @@ class _AzkarItemCardState extends State<_AzkarItemCard> {
                   decoration: BoxDecoration(
                     color: isDone
                         ? const Color(0xFF8B6914)
-                        : goldColor.withOpacity(0.12),
+                        : goldColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: goldColor.withOpacity(isDone ? 0 : 0.4),
+                      color: goldColor.withValues(alpha: isDone ? 0 : 0.4),
                     ),
                   ),
                   child: Row(

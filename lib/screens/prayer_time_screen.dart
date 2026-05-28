@@ -265,7 +265,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 15,
-                        color: darkBrown.withOpacity(0.7),
+                        color: darkBrown.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -321,7 +321,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF8B6914).withOpacity(0.3),
+            color: const Color(0xFF8B6914).withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -367,7 +367,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -402,15 +402,15 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
           color: isCurrent
               ? const Color(0xFF8B6914)
               : isNext
-              ? goldColor.withOpacity(0.15)
+              ? goldColor.withValues(alpha: 0.15)
               : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: isNext
-              ? Border.all(color: goldColor.withOpacity(0.5), width: 1.5)
+              ? Border.all(color: goldColor.withValues(alpha: 0.5), width: 1.5)
               : null,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -448,8 +448,8 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               height: 40,
               decoration: BoxDecoration(
                 color: isCurrent
-                    ? Colors.white.withOpacity(0.2)
-                    : goldColor.withOpacity(0.12),
+                    ? Colors.white.withValues(alpha: 0.2)
+                    : goldColor.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -465,7 +465,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.25),
+                  color: Colors.white.withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
@@ -484,7 +484,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: goldColor.withOpacity(0.2),
+                  color: goldColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(

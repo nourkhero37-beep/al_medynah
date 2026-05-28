@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:al_medynah/features/quran/mushaf_screen.dart';
@@ -127,7 +127,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
               onSubmitted: _search,
               decoration: InputDecoration(
                 hintText: 'ابحث عن آية...',
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                 prefixIcon: _isLoading
                     ? const Padding(
                         padding: EdgeInsets.all(12),
@@ -145,7 +145,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                         onPressed: () => _search(_searchController.text),
                       ),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.15),
+                fillColor: Colors.white.withValues(alpha: 0.15),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -159,7 +159,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                     child: Text(
                       'اكتب كلمة للبحث عنها',
                       style: TextStyle(
-                        color: darkBrown.withOpacity(0.5),
+                        color: darkBrown.withValues(alpha: 0.5),
                         fontSize: 16,
                       ),
                     ),
@@ -200,7 +200,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                             borderRadius: BorderRadius.circular(14),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
+                                color: Colors.black.withValues(alpha: 0.06),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -217,7 +217,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                                     'صفحة $page',
                                     style: TextStyle(
                                       fontSize: 11,
-                                      color: darkBrown.withOpacity(0.5),
+                                      color: darkBrown.withValues(alpha: 0.5),
                                     ),
                                   ),
                                   Container(
@@ -226,7 +226,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                                       vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: goldColor.withOpacity(0.15),
+                                      color: goldColor.withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
                                         color: goldColor,

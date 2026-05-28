@@ -92,8 +92,8 @@ class _HomePageState extends State<HomePage> {
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             color: isDarkMode
-                ? Colors.black.withOpacity(0.75)
-                : Colors.black.withOpacity(0.30),
+                ? Colors.black.withValues(alpha: 0.75)
+                : Colors.black.withValues(alpha: 0.30),
           ),
 
           SafeArea(
@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: IconButton(
@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: IconButton(
@@ -160,10 +160,10 @@ class _HomePageState extends State<HomePage> {
                       height: 220,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.12),
+                        color: Colors.white.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(28),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                         ),
                       ),
                       child: Row(
@@ -222,10 +222,10 @@ class _HomePageState extends State<HomePage> {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF8B6914).withOpacity(0.85),
+                          color: const Color(0xFF8B6914).withValues(alpha: 0.85),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Row(
@@ -251,7 +251,7 @@ class _HomePageState extends State<HomePage> {
                                   Text(
                                     'سورة ${_bookmark!['surah_name']} — آية ${_bookmark!['ayah_number']}',
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.8),
+                                      color: Colors.white.withValues(alpha: 0.8),
                                       fontSize: 12,
                                     ),
                                   ),
@@ -265,7 +265,7 @@ class _HomePageState extends State<HomePage> {
                               },
                               child: Icon(
                                 Icons.close_rounded,
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                                 size: 18,
                               ),
                             ),
@@ -293,10 +293,10 @@ class _HomePageState extends State<HomePage> {
                         vertical: 14,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.12),
+                        color: Colors.white.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                         ),
                       ),
                       child: Row(
@@ -306,7 +306,7 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             'ابحث عن آية...',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                               fontSize: 16,
                             ),
                           ),
@@ -394,7 +394,7 @@ class _HomePageState extends State<HomePage> {
                           },
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.12),
+                              color: Colors.white.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Column(

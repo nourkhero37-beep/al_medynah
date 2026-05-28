@@ -1,4 +1,4 @@
-// ignore_for_file: curly_braces_in_flow_control_structures
+﻿// ignore_for_file: curly_braces_in_flow_control_structures
 
 import 'package:al_medynah/features/quran/tafseer/tafseer_service.dart';
 import 'package:flutter/material.dart';
@@ -225,7 +225,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.brown.withOpacity(0.3),
+              color: Colors.brown.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -335,10 +335,10 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: goldColor.withOpacity(0.12),
+                              color: goldColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: goldColor.withOpacity(0.4),
+                                color: goldColor.withValues(alpha: 0.4),
                               ),
                             ),
                             child: Row(
@@ -354,7 +354,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                                           ? const Color(0xFF8B6914)
                                           : const Color(
                                               0xFF8B6914,
-                                            ).withOpacity(0.15),
+                                            ).withValues(alpha: 0.15),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
@@ -428,7 +428,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
             decoration: BoxDecoration(
               color: const Color(0xFFF5ECD7),
               border: Border(
-                top: BorderSide(color: goldColor.withOpacity(0.2), width: 1),
+                top: BorderSide(color: goldColor.withValues(alpha: 0.2), width: 1),
               ),
             ),
             child: Row(
@@ -443,7 +443,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                       decoration: BoxDecoration(
                         color: _hasNext
                             ? const Color(0xFF8B6914)
-                            : Colors.grey.withOpacity(0.2),
+                            : Colors.grey.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -476,9 +476,9 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: goldColor.withOpacity(0.15),
+                    color: goldColor.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
-                    border: Border.all(color: goldColor.withOpacity(0.4)),
+                    border: Border.all(color: goldColor.withValues(alpha: 0.4)),
                   ),
                   child: Center(
                     child: Text(
@@ -504,7 +504,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                       decoration: BoxDecoration(
                         color: _hasPrevious
                             ? const Color(0xFF8B6914)
-                            : Colors.grey.withOpacity(0.2),
+                            : Colors.grey.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(

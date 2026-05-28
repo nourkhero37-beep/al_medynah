@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field
+﻿// ignore_for_file: unused_field
 
 import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/model/surah_model.dart';
@@ -72,10 +72,10 @@ class _AyahListState extends State<AyahList> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: 'ابحث عن سورة...',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                   prefixIcon: const Icon(Icons.search, color: Colors.white),
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.15),
+                  fillColor: Colors.white.withValues(alpha: 0.15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -122,7 +122,7 @@ class _AyahListState extends State<AyahList> {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -175,7 +175,7 @@ class _AyahListState extends State<AyahList> {
                     surah.nameEnglish,
                     style: TextStyle(
                       fontSize: 12,
-                      color: darkBrown.withOpacity(0.5),
+                      color: darkBrown.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -193,8 +193,8 @@ class _AyahListState extends State<AyahList> {
                   ),
                   decoration: BoxDecoration(
                     color: surah.revelationType == 'مكية'
-                        ? const Color(0xFF5C8A5C).withOpacity(0.15)
-                        : const Color(0xFF2E86AB).withOpacity(0.15),
+                        ? const Color(0xFF5C8A5C).withValues(alpha: 0.15)
+                        : const Color(0xFF2E86AB).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -213,7 +213,7 @@ class _AyahListState extends State<AyahList> {
                   '${surah.versesCount} آية',
                   style: TextStyle(
                     fontSize: 12,
-                    color: darkBrown.withOpacity(0.5),
+                    color: darkBrown.withValues(alpha: 0.5),
                   ),
                 ),
               ],

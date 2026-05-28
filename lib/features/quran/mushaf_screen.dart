@@ -1,4 +1,4 @@
-import 'package:al_medynah/features/quran/tafseer/tafseer_bottom_sheet.dart';
+﻿import 'package:al_medynah/features/quran/tafseer/tafseer_bottom_sheet.dart';
 import 'package:al_medynah/services/bookmark_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -134,7 +134,7 @@ class _MushafViewState extends State<_MushafView> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -246,7 +246,7 @@ class _BookmarkButtonState extends State<_BookmarkButton> {
         decoration: BoxDecoration(
           color: _isSaved
               ? const Color(0xFF8B6914)
-              : Colors.black.withOpacity(0.15),
+              : Colors.black.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -554,7 +554,7 @@ class _MushafPageView extends StatelessWidget {
                             duration: const Duration(milliseconds: 200),
                             decoration: BoxDecoration(
                               color: isHighlighted
-                                  ? const Color(0xFFB8D4A8).withOpacity(0.6)
+                                  ? const Color(0xFFB8D4A8).withValues(alpha: 0.6)
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(4),
                             ),

@@ -1,4 +1,4 @@
-import 'package:al_medynah/features/quran/tafseer/tafseer_service.dart';
+﻿import 'package:al_medynah/features/quran/tafseer/tafseer_service.dart';
 import 'package:flutter/material.dart';
 import 'package:al_medynah/model/surah_model.dart';
 
@@ -97,11 +97,11 @@ class _TafseerAyahScreenState extends State<TafseerAyahScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   border: isExpanded
-                      ? Border.all(color: goldColor.withOpacity(0.5), width: 1)
+                      ? Border.all(color: goldColor.withValues(alpha: 0.5), width: 1)
                       : null,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -175,7 +175,7 @@ class _TafseerAyahScreenState extends State<TafseerAyahScreen> {
                     if (isExpanded) ...[
                       Divider(
                         height: 1,
-                        color: goldColor.withOpacity(0.3),
+                        color: goldColor.withValues(alpha: 0.3),
                         indent: 16,
                         endIndent: 16,
                       ),
