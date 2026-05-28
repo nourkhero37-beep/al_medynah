@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:al_medynah/model/hadith_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -21,39 +21,39 @@ class HadithApiService {
 
   Future<void> _loadCollectionEditions(String collection) async {
     if (_cachedEnglish.containsKey(collection)) {
-      debugPrint('[HadithApi] _loadCollectionEditions(' + collection + ') already cached');
+      debugPrint('[HadithApi] _loadCollectionEditions($collection) already cached');
       return;
     }
     final editionKey = _cdnEditionKey(collection);
     final engUrl = '$_cdnBase/eng-$editionKey.min.json';
     final araUrl = '$_cdnBase/ara-$editionKey.min.json';
 
-    debugPrint('[HadithApi] _loadCollectionEditions(' + collection + ') fetching ' + engUrl);
+    debugPrint('[HadithApi] _loadCollectionEditions($collection) fetching $engUrl');
     try {
       final res = await http.get(Uri.parse(engUrl));
-      debugPrint('[HadithApi] eng-' + collection + ' status=' + res.statusCode.toString() + ' bodyLen=' + res.body.length.toString());
+      debugPrint('[HadithApi] eng-$collection status=${res.statusCode} bodyLen=${res.body.length}');
       if (res.statusCode == 200) {
         final body = jsonDecode(res.body) as Map<String, dynamic>;
         final list = body['hadiths'] as List;
-        debugPrint('[HadithApi] eng-' + collection + ' parsed ' + list.length.toString() + ' entries');
+        debugPrint('[HadithApi] eng-$collection parsed ${list.length} entries');
         _cachedEnglish[collection] = list.whereType<Map<String, dynamic>>().toList();
       }
     } catch (e) {
-      debugPrint('[HadithApi] eng-' + collection + ' ERROR: ' + e.toString());
+      debugPrint('[HadithApi] eng-$collection ERROR: $e');
     }
 
-    debugPrint('[HadithApi] _loadCollectionEditions(' + collection + ') fetching ' + araUrl);
+    debugPrint('[HadithApi] _loadCollectionEditions($collection) fetching $araUrl');
     try {
       final res = await http.get(Uri.parse(araUrl));
-      debugPrint('[HadithApi] ara-' + collection + ' status=' + res.statusCode.toString() + ' bodyLen=' + res.body.length.toString());
+      debugPrint('[HadithApi] ara-$collection status=${res.statusCode} bodyLen=${res.body.length}');
       if (res.statusCode == 200) {
         final body = jsonDecode(res.body) as Map<String, dynamic>;
         final list = body['hadiths'] as List;
-        debugPrint('[HadithApi] ara-' + collection + ' parsed ' + list.length.toString() + ' entries');
+        debugPrint('[HadithApi] ara-$collection parsed ${list.length} entries');
         _cachedArabic[collection] = list.whereType<Map<String, dynamic>>().toList();
       }
     } catch (e) {
-      debugPrint('[HadithApi] ara-' + collection + ' ERROR: ' + e.toString());
+      debugPrint('[HadithApi] ara-$collection ERROR: $e');
     }
   }
 
@@ -65,10 +65,10 @@ class HadithApiService {
 
     final engOk = _cachedEnglish.containsKey(collection);
     final araOk = _cachedArabic.containsKey(collection);
-    debugPrint('[HadithApi] getValidHadithNumbers(' + collection + ') eng=' + engOk.toString() + ' ara=' + araOk.toString());
+    debugPrint('[HadithApi] getValidHadithNumbers($collection) eng=$engOk ara=$araOk');
 
     if (!engOk && !araOk) {
-      debugPrint('[HadithApi] getValidHadithNumbers(' + collection + ') returning [] - no CDN data');
+      debugPrint('[HadithApi] getValidHadithNumbers($collection) returning [] - no CDN data');
       return [];
     }
 
@@ -81,7 +81,7 @@ class HadithApiService {
           if (n is int && n > 0) numbers.add(n);
         }
       } catch (e) {
-        debugPrint('[HadithApi] eng entry error: ' + e.toString());
+        debugPrint('[HadithApi] eng entry error: $e');
       }
     }
     for (final h in _cachedArabic[collection] ?? []) {
@@ -92,12 +92,12 @@ class HadithApiService {
           if (n is int && n > 0) numbers.add(n);
         }
       } catch (e) {
-        debugPrint('[HadithApi] ara entry error: ' + e.toString());
+        debugPrint('[HadithApi] ara entry error: $e');
       }
     }
     final sorted = numbers.toList()..sort();
     _cachedNumberLists[collection] = sorted;
-    debugPrint('[HadithApi] getValidHadithNumbers(' + collection + ') returning ' + sorted.length.toString() + ' numbers');
+    debugPrint('[HadithApi] getValidHadithNumbers($collection) returning ${sorted.length} numbers');
     return sorted;
   }
 
@@ -125,11 +125,11 @@ class HadithApiService {
     }
 
     if (engEntry == null && araEntry == null) {
-      debugPrint('[HadithApi] getHadithFromCache(' + collection + ', ' + number.toString() + ') NOT FOUND');
+      debugPrint('[HadithApi] getHadithFromCache($collection, $number) NOT FOUND');
       return null;
     }
 
-    debugPrint('[HadithApi] getHadithFromCache(' + collection + ', ' + number.toString() + ') FOUND');
+    debugPrint('[HadithApi] getHadithFromCache($collection, $number) FOUND');
     return Hadith(
       id: '$collection-$number',
       collection: collection,
@@ -154,13 +154,13 @@ class HadithApiService {
   Future<Hadith?> getHadith(String collection, int number) async {
     final cached = getHadithFromCache(collection, number);
     if (cached != null) {
-      debugPrint('[HadithApi] getHadith(' + collection + ', ' + number.toString() + ') CACHE HIT');
+      debugPrint('[HadithApi] getHadith($collection, $number) CACHE HIT');
       return cached;
     }
 
-    debugPrint('[HadithApi] getHadith(' + collection + ', ' + number.toString() + ') cache miss - trying UmmahAPI');
+    debugPrint('[HadithApi] getHadith($collection, $number) cache miss - trying UmmahAPI');
     final res = await http.get(Uri.parse('$_baseUrl/$collection/$number'));
-    debugPrint('[HadithApi] UmmahAPI status=' + res.statusCode.toString() + ' for ' + collection + '/' + number.toString());
+    debugPrint('[HadithApi] UmmahAPI status=${res.statusCode} for $collection/$number');
     if (res.statusCode != 200) return null;
     final body = jsonDecode(res.body) as Map<String, dynamic>;
     return Hadith.fromJson(body['data'] as Map<String, dynamic>);
@@ -205,7 +205,7 @@ class HadithApiService {
     String keyword, {
     int limit = 50,
   }) async {
-    final url = '\/eng-\.min.json';
+    final url = '/eng-.min.json';
     final res = await http.get(Uri.parse(url));
     if (res.statusCode != 200) return [];
 

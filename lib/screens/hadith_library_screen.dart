@@ -1,4 +1,4 @@
-﻿import 'package:al_medynah/model/hadith_model.dart';
+import 'package:al_medynah/model/hadith_model.dart';
 import 'package:al_medynah/services/hadith_api_service.dart';
 import 'package:flutter/material.dart';
 
@@ -23,13 +23,14 @@ class _HadithLibraryScreenState extends State<HadithLibraryScreen> {
   Future<void> _load() async {
     try {
       final collections = await _api.getCollections();
-      if (mounted)
+      if (mounted) {
         setState(() {
           _collections = collections;
           _isLoading = false;
         });
+      }
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) { setState(() => _isLoading = false); }
     }
   }
 
@@ -287,7 +288,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
   Future<void> _goRandom() async {
     try {
       final h = await _api.getRandomHadith();
-      if (mounted) _loadHadith(h.hadithNumber);
+      if (mounted) { _loadHadith(h.hadithNumber); }
     } catch (_) {}
   }
 
@@ -299,13 +300,14 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
     });
     try {
       final results = await _api.searchHadiths(widget.collection.key, keyword);
-      if (mounted)
+      if (mounted) {
         setState(() {
           _searchResults = results;
           _isSearching = false;
         });
+      }
     } catch (e) {
-      if (mounted) setState(() => _isSearching = false);
+      if (mounted) { setState(() => _isSearching = false); }
     }
   }
 
