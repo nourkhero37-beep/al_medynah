@@ -2,6 +2,8 @@
 import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
 import 'package:al_medynah/screens/azkar_categories_screen.dart';
+import 'package:al_medynah/screens/hadith_library_screen.dart';
+import 'package:al_medynah/screens/names_of_allah_screen.dart';
 import 'package:al_medynah/screens/prayer_time_screen.dart';
 import 'package:al_medynah/screens/quran_search_screen.dart';
 import 'package:al_medynah/screens/qibla_screen.dart';
@@ -37,8 +39,8 @@ class _HomePageState extends State<HomePage> {
     {'title': 'الأذكار', 'image': 'assets/images/azkar.png'},
     {'title': 'القراء', 'image': 'assets/images/reciters.png'},
     {'title': 'التفسير', 'image': 'assets/images/tafseer.png'},
-    {'title': 'التسبيح', 'image': 'assets/images/logo.jpg'},
-    {'title': 'الأدعية', 'image': 'assets/images/logo.jpg'},
+    {'title': 'مكتبة الحديث', 'image': 'assets/images/hadyth.png'},
+    {'title': 'أسماء الله الحسنى', 'image': 'assets/images/Allah_names.png'},
     {'title': 'أوقات الصلاة', 'image': 'assets/images/prayertime.png'},
     {'title': 'القبلة', 'image': 'assets/images/qublah.png'},
   ];
@@ -78,7 +80,6 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          // ✅ الخلفية
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -88,7 +89,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // ✅ طبقة شفافة
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             color: isDarkMode
@@ -101,7 +101,6 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // ✅ الأزرار العلوية
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -135,7 +134,6 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 25),
 
-                  // ✅ التاريخ
                   Text(
                     arabicDate,
                     style: const TextStyle(
@@ -147,8 +145,6 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 25),
 
-                  // ✅ الكونتينر الكبير — القرآن الكريم
-                  // ✅ مصحح: نمرر onBookmarkSaved كـ callback لـ AyahList
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -204,7 +200,6 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 12),
 
-                  // ✅ زر أكمل القراءة
                   if (_bookmark != null)
                     GestureDetector(
                       onTap: () async {
@@ -281,7 +276,6 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 12),
 
-                  // ✅ حقل البحث
                   GestureDetector(
                     onTap: () async {
                       await Navigator.push(
@@ -323,7 +317,6 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 12),
 
-                  // ✅ الشبكة
                   Expanded(
                     child: GridView.builder(
                       itemCount: gridItems.length,
@@ -379,6 +372,22 @@ class _HomePageState extends State<HomePage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => const PrayerTimesScreen(),
+                                ),
+                              );
+                            } else if (gridItems[index]['title'] ==
+                                'مكتبة الحديث') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const HadithLibraryScreen(),
+                                ),
+                              );
+                            } else if (gridItems[index]['title'] ==
+                                'أسماء الله الحسنى') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const NamesOfAllahScreen(),
                                 ),
                               );
                             }
