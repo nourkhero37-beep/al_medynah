@@ -1,8 +1,7 @@
-﻿import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
+import 'package:al_medynah/services/quran_data_service.dart';
 
 class QuranSearchScreen extends StatefulWidget {
   final VoidCallback? onBookmarkSaved;
@@ -20,7 +19,6 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
   List<Map<String, dynamic>> _results = [];
   bool _isLoading = false;
 
-  String _pageNumber(int page) => page.toString().padLeft(3, '0');
 
   String _removeDiacritics(String text) {
     return text.replaceAll(RegExp(r'[\u064B-\u065F\u0670]'), '');
@@ -42,10 +40,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
 
     for (int page = 1; page <= 604; page++) {
       try {
-        final jsonString = await rootBundle.loadString(
-          'assets/quran_data/pages/${_pageNumber(page)}.json',
-        );
-        final data = jsonDecode(jsonString);
+        final data = await QuranDataService().loadPage(page);
         final lines = data['lines'] as List<dynamic>? ?? [];
 
         final Map<String, Map<String, dynamic>> versesMap = {};
@@ -184,7 +179,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                             MaterialPageRoute(
                               builder: (_) => MushafScreen(
                                 initialPage: page,
-                                highlightedVerseKey: verseKey, // ← هنا السحر
+                                highlightedVerseKey: verseKey,
                                 onBookmarkSaved: widget.onBookmarkSaved,
                               ),
                             ),

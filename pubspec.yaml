@@ -1,30 +1,20 @@
-﻿name: al_medynah
+name: al_medynah
 description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
   sdk: ^3.10.4
 
-# Dependencies specify other packages that your package needs in order to work.
-# To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
-# dependencies can be manually updated by changing the version numbers below to
-# the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  qcf_quran: ^0.0.5
+
   intl: ^0.20.2
   just_audio: ^0.10.5
   path_provider: ^2.1.5
@@ -41,39 +31,22 @@ dependencies:
   sensors_plus: ^6.1.1
   video_player: ^2.11.1
   chewie: ^1.13.1
+  archive: ^4.0.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^6.0.0
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter packages.
 flutter:
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/quran_data/
-    - assets/quran_data/pages/
-    - assets/quran_data/verses.json
     - assets/images/
     - packages/muslim_data_flutter/assets/db/muslim_db_v2.7.0.db
     - assets/images/background.png
     - assets/images/logo.jpg
-
     - assets/images/surah_header_frames.png
     - assets/images/tafseer.png
     - assets/images/tasbih.png
@@ -84,211 +57,3 @@ flutter:
     - assets/images/qublah.png
     - assets/images/reciters.png
     - assets/images/prayertime.png
-
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/to/resolution-aware-images
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/to/asset-from-package
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  fonts:
-    - family: QCF4_QBSML
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_QBSML.ttf
-
-    - family: QCF4_Hafs_01
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_01_W.ttf
-
-    - family: QCF4_Hafs_02
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_02_W.ttf
-
-    - family: QCF4_Hafs_03
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_03_W.ttf
-
-    - family: QCF4_Hafs_04
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_04_W.ttf
-
-    - family: QCF4_Hafs_05
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_05_W.ttf
-
-    - family: QCF4_Hafs_06
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_06_W.ttf
-
-    - family: QCF4_Hafs_07
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_07_W.ttf
-
-    - family: QCF4_Hafs_08
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_08_W.ttf
-
-    - family: QCF4_Hafs_09
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_09_W.ttf
-
-    - family: QCF4_Hafs_10
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_10_W.ttf
-
-    - family: QCF4_Hafs_11
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_11_W.ttf
-
-    - family: QCF4_Hafs_12
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_12_W.ttf
-
-    - family: QCF4_Hafs_13
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_13_W.ttf
-
-    - family: QCF4_Hafs_14
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_14_W.ttf
-
-    - family: QCF4_Hafs_15
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_15_W.ttf
-
-    - family: QCF4_Hafs_16
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_16_W.ttf
-
-    - family: QCF4_Hafs_17
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_17_W.ttf
-
-    - family: QCF4_Hafs_18
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_18_W.ttf
-
-    - family: QCF4_Hafs_19
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_19_W.ttf
-
-    - family: QCF4_Hafs_20
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_20_W.ttf
-
-    - family: QCF4_Hafs_21
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_21_W.ttf
-
-    - family: QCF4_Hafs_22
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_22_W.ttf
-
-    - family: QCF4_Hafs_23
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_23_W.ttf
-
-    - family: QCF4_Hafs_24
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_24_W.ttf
-
-    - family: QCF4_Hafs_25
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_25_W.ttf
-
-    - family: QCF4_Hafs_26
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_26_W.ttf
-
-    - family: QCF4_Hafs_27
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_27_W.ttf
-
-    - family: QCF4_Hafs_28
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_28_W.ttf
-
-    - family: QCF4_Hafs_29
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_29_W.ttf
-
-    - family: QCF4_Hafs_30
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_30_W.ttf
-
-    - family: QCF4_Hafs_31
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_31_W.ttf
-
-    - family: QCF4_Hafs_32
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_32_W.ttf
-
-    - family: QCF4_Hafs_33
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_33_W.ttf
-
-    - family: QCF4_Hafs_34
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_34_W.ttf
-
-    - family: QCF4_Hafs_35
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_35_W.ttf
-
-    - family: QCF4_Hafs_36
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_36_W.ttf
-
-    - family: QCF4_Hafs_37
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_37_W.ttf
-
-    - family: QCF4_Hafs_38
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_38_W.ttf
-
-    - family: QCF4_Hafs_39
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_39_W.ttf
-
-    - family: QCF4_Hafs_40
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_40_W.ttf
-
-    - family: QCF4_Hafs_41
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_41_W.ttf
-
-    - family: QCF4_Hafs_42
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_42_W.ttf
-
-    - family: QCF4_Hafs_43
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_43_W.ttf
-
-    - family: QCF4_Hafs_44
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_44_W.ttf
-
-    - family: QCF4_Hafs_45
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_45_W.ttf
-
-    - family: QCF4_Hafs_46
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_46_W.ttf
-
-    - family: QCF4_Hafs_47
-      fonts:
-        - asset: assets/quran_data/fonts/QCF4_Hafs_47_W.ttf
-
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package

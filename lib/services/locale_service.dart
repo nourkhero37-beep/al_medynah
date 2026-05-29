@@ -4,6 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocaleService {
   static const _key = 'app_locale';
 
+  static Future<bool> hasLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.containsKey(_key);
+  }
+
   static Future<Locale> getLocale() async {
     final prefs = await SharedPreferences.getInstance();
     final code = prefs.getString(_key) ?? 'ar';

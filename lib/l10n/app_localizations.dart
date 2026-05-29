@@ -162,6 +162,12 @@ class AppLocalizations {
       'lang.arabic': 'العربية',
       'lang.english': 'English',
       'lang.turkish': 'T\u00fcrk\u00e7e',
+
+      'data.required': 'Quran data (107 MB) is required to use the app',
+      'data.size': 'Approximately 107 MB will be downloaded',
+      'data.download': 'Download',
+      'data.retry': 'Retry',
+      'data.error': 'Download failed, check connection',
     },
 
     'ar': {
@@ -304,6 +310,12 @@ class AppLocalizations {
       'lang.arabic': '\u0627\u0644\u0639\u0631\u0628\u064A\u0629',
       'lang.english': 'English',
       'lang.turkish': 'T\u00fcrk\u00e7e',
+
+      'data.required': '\u064A\u062C\u0628 \u062A\u062D\u0645\u064A\u0644 \u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u0642\u0631\u0622\u0646 (107 \u0645\u064A\u063A\u0627\u0628\u0627\u064A\u062A) \u0644\u0627\u0633\u062A\u062E\u062F\u0627\u0645 \u0627\u0644\u062A\u0637\u0628\u064A\u0642',
+      'data.size': '\u0633\u064A\u062A\u0645 \u062A\u062D\u0645\u064A\u0644 \u062D\u0648\u0627\u0644\u064A 107 \u0645\u064A\u063A\u0627\u0628\u0627\u064A\u062A',
+      'data.download': '\u062A\u062D\u0645\u064A\u0644',
+      'data.retry': '\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629',
+      'data.error': '\u0641\u0634\u0644 \u0627\u0644\u062A\u062D\u0645\u064A\u0644\u060C \u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0627\u062A\u0635\u0627\u0644',
     },
 
     'tr': {
@@ -446,6 +458,12 @@ class AppLocalizations {
       'lang.arabic': 'العربية',
       'lang.english': 'English',
       'lang.turkish': 'T\u00fcrk\u00e7e',
+
+      'data.required': 'Kur\'an verisi (107 MB) uygulamay\u0131 kullanmak i\u00e7in gereklidir',
+      'data.size': 'Yakla\u015f\u0131k 107 MB indirilecek',
+      'data.download': '\u0130ndir',
+      'data.retry': 'Tekrar Dene',
+      'data.error': '\u0130ndirme ba\u015far\u0131s\u0131z, ba\u011flant\u0131y\u0131 kontrol edin',
     },
   };
 }

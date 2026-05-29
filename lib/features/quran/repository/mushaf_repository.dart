@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import '../../../services/audio_manager_api.dart';
+import '../../../services/quran_data_service.dart';
 
 class MushafRepository {
   final AudioManager _audioManager = AudioManager();
@@ -16,10 +15,7 @@ class MushafRepository {
       throw ArgumentError('Page must be between 1 and 604');
     }
     if (_pagesCache.containsKey(page)) return _pagesCache[page]!;
-    final jsonString = await rootBundle.loadString(
-      'assets/quran_data/pages/${page.toString().padLeft(3, '0')}.json',
-    );
-    final pageData = jsonDecode(jsonString) as Map<String, dynamic>;
+    final pageData = await QuranDataService().loadPage(page);
     _pagesCache[page] = pageData;
     return pageData;
   }
@@ -64,12 +60,10 @@ class MushafRepository {
     _positionSubscription = null;
   }
 
-  // ✅ جديد: إيقاف مؤقت
   Future<void> pauseAudio() async {
     await _audioManager.player.pause();
   }
 
-  // ✅ جديد: استئناف
   Future<void> resumeAudio() async {
     await _audioManager.player.play();
   }
@@ -79,7 +73,6 @@ class MushafRepository {
 
   Stream<Duration> get positionStream => _audioManager.player.positionStream;
 
-  // ✅ جديد: stream لمدة الملف الصوتي
   Stream<Duration?> get durationStream => _audioManager.player.durationStream;
 
   void cancelPositionSubscription() {

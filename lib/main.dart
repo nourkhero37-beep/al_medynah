@@ -1,4 +1,5 @@
-﻿import 'package:al_medynah/l10n/app_localizations.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
+import 'package:al_medynah/screens/language_selection_page.dart';
 import 'package:al_medynah/screens/splash.dart';
 import 'package:al_medynah/services/locale_service.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,8 @@ class Almedinah extends StatefulWidget {
 }
 
 class _AlmedinahState extends State<Almedinah> {
+  bool _showLanguageSelection = false;
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +35,10 @@ class _AlmedinahState extends State<Almedinah> {
   }
 
   Future<void> _initLocale() async {
+    final hasLocale = await LocaleService.hasLocale();
+    if (!hasLocale) {
+      setState(() => _showLanguageSelection = true);
+    }
     final locale = await LocaleService.getLocale();
     appLocaleNotifier.value = locale;
   }
@@ -63,7 +70,9 @@ class _AlmedinahState extends State<Almedinah> {
             }
             return const Locale('ar');
           },
-          home: const SplashScreen(),
+          home: _showLanguageSelection
+              ? const LanguageSelectionPage()
+              : const SplashScreen(),
         );
       },
     );
