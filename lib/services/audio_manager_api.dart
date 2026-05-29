@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_brace_in_string_interps
+﻿// ignore_for_file: unnecessary_brace_in_string_interps
 
 import 'dart:io';
 import 'package:al_medynah/model/reciters_model.dart';
@@ -27,7 +27,6 @@ class AudioManager {
   String? get currentReciterName => _currentReciterName;
   String? get currentServerUrl => _currentServerUrl;
 
-  // ── جلب قائمة القراء ──
   Future<List<RecitersModel>> fetchReciters() async {
     try {
       final response = await _dio.get(
@@ -72,7 +71,6 @@ class AudioManager {
     }
   }
 
-  // ── جلب رابط الصوت ──
   Future<String?> fetchAudioUrl(int reciterId, int surahNumber) async {
     try {
       final response = await _dio.get(
@@ -91,7 +89,6 @@ class AudioManager {
     }
   }
 
-  // ── جلب timestamps الآيات ──
   Future<Map<String, List<int>>> fetchVerseTimings(
     int reciterId,
     int surahNumber,
@@ -125,7 +122,6 @@ class AudioManager {
     }
   }
 
-  // ── مسار حفظ الملفات ──
   Future<String> _getAudioDir(String reciterId) async {
     final dir = await getApplicationDocumentsDirectory();
     final audioDir = Directory('${dir.path}/audio/$reciterId');
@@ -139,18 +135,17 @@ class AudioManager {
     return '$dir/$surahStr.mp3';
   }
 
-  // ── هل السورة محملة ──
   Future<bool> isSurahDownloaded(String reciterId, int surahNumber) async {
     final path = await _getSurahPath(reciterId, surahNumber);
     return File(path).existsSync();
   }
 
-  // ── تحميل سورة ──
   Future<void> downloadSurah(
     String reciterId,
     int surahNumber,
-    String serverUrl,
-  ) async {
+    String serverUrl, {
+    void Function(int received, int total)? onProgress,
+  }) async {
     final path = await _getSurahPath(reciterId, surahNumber);
     if (File(path).existsSync()) return;
 
@@ -163,14 +158,17 @@ class AudioManager {
       throw Exception('لم يتم إيجاد رابط الصوت للسورة $surahNumber');
     }
 
-    // ✅ إصلاح // المزدوج
     final cleanUrl = audioUrl.replaceAll(RegExp(r'(?<!:)//'), '/');
     debugPrint('تحميل سورة $surahNumber من: $cleanUrl');
 
     try {
-      await _dio.download(cleanUrl, path);
+      await _dio.download(
+        cleanUrl,
+        path,
+        options: Options(receiveTimeout: const Duration(seconds: 30)),
+        onReceiveProgress: onProgress,
+      );
     } catch (e) {
-      // ✅ نحذف الملف الناقص إذا فشل التحميل
       final file = File(path);
       if (file.existsSync()) file.deleteSync();
       debugPrint('خطأ تحميل سورة $surahNumber: $e');
@@ -178,14 +176,12 @@ class AudioManager {
     }
   }
 
-  // ── حذف قارئ كامل ──
   Future<void> deleteReciter(String reciterId) async {
     final dir = await getApplicationDocumentsDirectory();
     final audioDir = Directory('${dir.path}/audio/$reciterId');
     if (audioDir.existsSync()) audioDir.deleteSync(recursive: true);
   }
 
-  // ── حفظ القارئ المختار ──
   Future<void> saveSelectedReciter(
     String reciterId,
     String serverUrl,
@@ -200,7 +196,6 @@ class AudioManager {
     _currentReciterName = arabicName;
   }
 
-  // ── جلب القارئ المختار ──
   Future<void> loadSelectedReciter() async {
     final prefs = await SharedPreferences.getInstance();
     _currentReciterId = prefs.getString('selected_reciter');
@@ -208,7 +203,6 @@ class AudioManager {
     _currentReciterName = prefs.getString('selected_reciter_name');
   }
 
-  // ── تشغيل سورة ──
   Future<void> playVerse(String verseKey, {int? seekToMs}) async {
     if (_currentReciterId == null) return;
 
@@ -223,7 +217,6 @@ class AudioManager {
 
     await _player.setFilePath(path);
 
-    // ✅ seek للآية المحددة
     if (seekToMs != null && seekToMs > 0) {
       await _player.seek(Duration(milliseconds: seekToMs));
     }
@@ -231,7 +224,6 @@ class AudioManager {
     await _player.play();
   }
 
-  // ── إيقاف ──
   Future<void> stop() async {
     _currentVerseKey = null;
     await _player.stop();

@@ -22,6 +22,8 @@ class _RecitersScreenState extends State<ReciterPage> {
 
   final Map<String, double?> _downloadProgress = {};
   final Map<String, bool> _isDownloaded = {};
+  final Map<String, int?> _downloadingSurah = {};
+  final Map<String, double> _surahDownloadProgress = {};
 
   @override
   void initState() {
@@ -52,12 +54,14 @@ class _RecitersScreenState extends State<ReciterPage> {
 
   Future<void> _download(RecitersModel reciter) async {
     final rid = reciter.id.toString();
-    setState(() => _downloadProgress[rid] = 0.0);
+    setState(() {
+      _downloadProgress[rid] = 0.0;
+      _surahDownloadProgress[rid] = 0.0;
+    });
 
     try {
       const total = 114;
 
-      // نحسب كم سورة محملة مسبقاً
       int completed = 0;
       for (int s = 1; s <= total; s++) {
         final downloaded = await _audioManager.isSurahDownloaded(rid, s);
@@ -72,10 +76,23 @@ class _RecitersScreenState extends State<ReciterPage> {
         setState(() => _downloadProgress[rid] = completed / total);
       }
 
-      // نكمل من حيث توقفنا
       for (int surah = completed + 1; surah <= total; surah++) {
-        // ✅ بدون onProgress
-        await _audioManager.downloadSurah(rid, surah, reciter.serverUrl);
+        if (mounted) {
+          setState(() {
+            _downloadingSurah[rid] = surah;
+            _surahDownloadProgress[rid] = 0.0;
+          });
+        }
+        await _audioManager.downloadSurah(
+          rid,
+          surah,
+          reciter.serverUrl,
+          onProgress: (received, totalBytes) {
+            if (mounted && totalBytes > 0) {
+              setState(() => _surahDownloadProgress[rid] = received / totalBytes);
+            }
+          },
+        );
         completed++;
         if (mounted) {
           setState(() => _downloadProgress[rid] = completed / total);
@@ -85,6 +102,8 @@ class _RecitersScreenState extends State<ReciterPage> {
       if (mounted) {
         setState(() {
           _downloadProgress[rid] = null;
+          _downloadingSurah[rid] = null;
+          _surahDownloadProgress[rid] = 0.0;
           _isDownloaded[rid] = true;
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -96,7 +115,11 @@ class _RecitersScreenState extends State<ReciterPage> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _downloadProgress[rid] = null);
+        setState(() {
+          _downloadProgress[rid] = null;
+          _downloadingSurah[rid] = null;
+          _surahDownloadProgress[rid] = 0.0;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context).tr('reciter.download.fail')),
@@ -343,7 +366,6 @@ class _RecitersScreenState extends State<ReciterPage> {
                         ),
                       ),
 
-                      // شريط التقدم
                       if (isDownloading)
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -353,7 +375,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(4),
                                 child: LinearProgressIndicator(
-                                  value: progress,
+                                  value: _surahDownloadProgress[rid],
                                   backgroundColor: Colors.grey.withValues(alpha: 0.2),
                                   color: goldColor,
                                   minHeight: 6,
@@ -361,7 +383,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'سورة ${(progress * 114).toInt()} / 114',
+                                'سورة ${_downloadingSurah[rid] ?? '...'}: ${((_surahDownloadProgress[rid] ?? 0) * 100).toInt()}%',
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: darkBrown.withValues(alpha: 0.5),
