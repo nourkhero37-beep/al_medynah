@@ -68,7 +68,7 @@ class AppLocalizations {
       'reciter.action.download': 'Download full Quran',
       'reciter.action.select': 'Select',
       'reciter.action.delete': 'Delete',
-      'reciter.progress': 'Surah {current} / 114',
+      'reciter.progress': 'Surah {current}: {percent}%',
 
       'qibla.appBar.title': 'Qibla',
       'qibla.error.location': 'Please allow location access\nto determine Qibla direction',
@@ -141,6 +141,7 @@ class AppLocalizations {
       'mushaf.bookmark.saved': '\u2705 Bookmark saved \u2014 Surah {surah} Ayah {ayah}',
       'mushaf.audio.ayah': 'Ayah {number}',
       'mushaf.error.noReciter': 'Download a reciter first from the Reciters page',
+      'mushaf.error.tapFirst': 'Tap an ayah first to play it',
 
       'tafseer.appBar.title': 'Tafsir of the Holy Quran',
       'tafseer.appBar.subtitle': 'Tafsir Al-Muyassar \u2022 {count} Verse(s)',
@@ -168,6 +169,7 @@ class AppLocalizations {
       'data.download': 'Download',
       'data.retry': 'Retry',
       'data.error': 'Download failed, check connection',
+      'data.backLanguage': 'Back to Language Selection',
     },
 
     'ar': {
@@ -216,7 +218,7 @@ class AppLocalizations {
       'reciter.action.download': '\u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0642\u0631\u0622\u0646 \u0643\u0627\u0645\u0644',
       'reciter.action.select': '\u0627\u062E\u062A\u064A\u0627\u0631',
       'reciter.action.delete': '\u062D\u0630\u0641',
-      'reciter.progress': '\u0633\u0648\u0631\u0629 {current} / 114',
+      'reciter.progress': '\u0633\u0648\u0631\u0629 {current}: {percent}%',
 
       'qibla.appBar.title': '\u0627\u0644\u0642\u0628\u0644\u0629',
       'qibla.error.location': '\u064A\u0631\u062C\u0649 \u0627\u0644\u0633\u0645\u0627\u062D \u0628\u0627\u0644\u0648\u0635\u0648\u0644 \u0625\u0644\u0649 \u0627\u0644\u0645\u0648\u0642\u0639\n\u0644\u062A\u062D\u062F\u064A\u062F \u0627\u062A\u062C\u0627\u0647 \u0627\u0644\u0642\u0628\u0644\u0629',
@@ -289,6 +291,7 @@ class AppLocalizations {
       'mushaf.bookmark.saved': '\u2705 \u062A\u0645 \u062D\u0641\u0638 \u0627\u0644\u0625\u0634\u0627\u0631\u0629 \u2014 \u0633\u0648\u0631\u0629 {surah} \u0622\u064A\u0629 {ayah}',
       'mushaf.audio.ayah': '\u0622\u064A\u0629 {number}',
       'mushaf.error.noReciter': '\u064A\u062C\u0628 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0642\u0627\u0631\u0626 \u0623\u0648\u0644\u0627\u064B \u0645\u0646 \u0635\u0641\u062D\u0629 \u0627\u0644\u0642\u0631\u0627\u0621',
+      'mushaf.error.tapFirst': '\u0627\u0636\u063A\u0637 \u0639\u0644\u0649 \u0622\u064A\u0629 \u0623\u0648\u0644\u0627\u064B \u0644\u062A\u0634\u063A\u064A\u0644\u0647\u0627',
 
       'tafseer.appBar.title': '\u062A\u0641\u0633\u064A\u0631 \u0627\u0644\u0642\u0631\u0622\u0646 \u0627\u0644\u0643\u0631\u064A\u0645',
       'tafseer.appBar.subtitle': '\u062A\u0641\u0633\u064A\u0631 \u0627\u0644\u0645\u064A\u0633\u0631 \u2022 {count} \u0622\u064A\u0629',
@@ -316,6 +319,7 @@ class AppLocalizations {
       'data.download': '\u062A\u062D\u0645\u064A\u0644',
       'data.retry': '\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629',
       'data.error': '\u0641\u0634\u0644 \u0627\u0644\u062A\u062D\u0645\u064A\u0644\u060C \u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0627\u062A\u0635\u0627\u0644',
+      'data.backLanguage': '\u0627\u0644\u0639\u0648\u062F\u0629 \u0644\u0627\u062E\u062A\u064A\u0627\u0631 \u0627\u0644\u0644\u063A\u0629',
     },
 
     'tr': {
@@ -364,7 +368,7 @@ class AppLocalizations {
       'reciter.action.download': 'Kur\'an\'\u0131 Tamamen \u0130ndir',
       'reciter.action.select': 'Se\u00e7',
       'reciter.action.delete': 'Sil',
-      'reciter.progress': 'Sure {current} / 114',
+      'reciter.progress': 'Sure {current}: {percent}%',
 
       'qibla.appBar.title': 'K\u0131ble',
       'qibla.error.location': 'K\u0131ble y\u00f6n\u00fcn\u00fc belirlemek i\u00e7in\nl\u00fctfen konum izni verin',
@@ -437,6 +441,7 @@ class AppLocalizations {
       'mushaf.bookmark.saved': '\u2705 Yer imi kaydedildi \u2014 Sure {surah} Ayet {ayah}',
       'mushaf.audio.ayah': 'Ayet {number}',
       'mushaf.error.noReciter': '\u00d6nce Okuyucular sayfas\u0131ndan bir okuyucu indirin',
+      'mushaf.error.tapFirst': '\u00d6nce bir ayete dokunun',
 
       'tafseer.appBar.title': 'Kur\'\u00e2n-\u0131 Ker\u00eem Tefsiri',
       'tafseer.appBar.subtitle': 'Tefsir-i M\u00fcyesser \u2022 {count} Ayet',
@@ -464,6 +469,7 @@ class AppLocalizations {
       'data.download': '\u0130ndir',
       'data.retry': 'Tekrar Dene',
       'data.error': '\u0130ndirme ba\u015far\u0131s\u0131z, ba\u011flant\u0131y\u0131 kontrol edin',
+      'data.backLanguage': 'Dil Se\u00e7imine D\u00f6n',
     },
   };
 }
@@ -480,3 +486,6 @@ class AppLocalizationsDelegate
   @override
   bool shouldReload(AppLocalizationsDelegate old) => false;
 }
+
+
+

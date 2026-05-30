@@ -108,7 +108,7 @@ class _RecitersScreenState extends State<ReciterPage> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('تم تحميل ${reciter.nameArabic} كاملاً ✓'),
+            content: Text(AppLocalizations.of(context).tr('reciter.download.success', {'name': reciter.nameArabic})),
             backgroundColor: Colors.green,
           ),
         );
@@ -141,7 +141,7 @@ class _RecitersScreenState extends State<ReciterPage> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('تم اختيار ${reciter.nameArabic}'),
+          content: Text(AppLocalizations.of(context).tr('reciter.selected', {'name': reciter.nameArabic})),
           backgroundColor: const Color(0xFF8B6914),
         ),
       );
@@ -162,7 +162,7 @@ class _RecitersScreenState extends State<ReciterPage> {
       context: context,
       builder: (_) => AlertDialog(
         title: Text(AppLocalizations.of(context).tr('reciter.delete.title')),
-        content: Text('هل تريد حذف تحميل ${reciter.nameArabic} كاملاً؟'),
+        content: Text(AppLocalizations.of(context).tr('reciter.delete.confirm', {'name': reciter.nameArabic})),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -383,12 +383,11 @@ class _RecitersScreenState extends State<ReciterPage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'سورة ${_downloadingSurah[rid] ?? '...'}: ${((_surahDownloadProgress[rid] ?? 0) * 100).toInt()}%',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: darkBrown.withValues(alpha: 0.5),
+                                AppLocalizations.of(context).tr('reciter.progress', {
+                                  'current': '${_downloadingSurah[rid] ?? '...'}',
+                                  'percent': '${((_surahDownloadProgress[rid] ?? 0) * 100).toInt()}',
+                                }),
                                 ),
-                              ),
                             ],
                           ),
                         ),
@@ -400,3 +399,4 @@ class _RecitersScreenState extends State<ReciterPage> {
     );
   }
 }
+

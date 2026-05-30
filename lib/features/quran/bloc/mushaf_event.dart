@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+﻿import 'package:equatable/equatable.dart';
 
 abstract class MushafEvent extends Equatable {
   const MushafEvent();
@@ -67,4 +67,8 @@ class MushafDurationUpdated extends MushafEvent {
 
   @override
   List<Object?> get props => [duration];
+}
+
+class MushafCacheUpdate extends MushafEvent {
+  const MushafCacheUpdate();
 }

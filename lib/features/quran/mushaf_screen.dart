@@ -77,11 +77,12 @@ class _MushafViewState extends State<_MushafView> {
     return BlocListener<MushafBloc, MushafState>(
       listener: (context, state) {
         if (state.errorMessage != null) {
+          final tr = AppLocalizations.of(context).tr;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.errorMessage!),
+              content: Text(tr(state.errorMessage!)),
               backgroundColor:
-                  state.errorMessage == AppLocalizations.of(context).tr('mushaf.error.noReciter')
+                  state.errorMessage == 'mushaf.error.noReciter'
                   ? Colors.red
                   : Colors.orange,
             ),
@@ -97,26 +98,32 @@ class _MushafViewState extends State<_MushafView> {
               // ✅ المصحف
               BlocBuilder<MushafBloc, MushafState>(
                 builder: (context, state) {
-                  return PageView.builder(
-                    controller: _pageController,
-                    itemCount: 604,
-                    reverse: true,
-                    onPageChanged: (index) {
-                      final page = index + 1;
-                      context.read<MushafBloc>().add(MushafPageChanged(page));
-                    },
-                    itemBuilder: (context, index) {
-                      final page = index + 1;
-                      final pageData = state.pagesCache[page];
-                      if (pageData == null) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      return _MushafPageView(
-                        page: page,
-                        pageData: pageData,
-                        selectedVerseKey: state.selectedVerseKey,
-                      );
-                    },
+                  return Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: 604,
+                      pageSnapping: true,
+                      physics: const PageScrollPhysics(),
+                      onPageChanged: (index) {
+                        final page = index + 1;
+                        context.read<MushafBloc>().add(MushafPageChanged(page));
+                      },
+                      itemBuilder: (context, index) {
+                        final page = index + 1;
+                        final pageData = state.pagesCache[page];
+                        if (pageData == null) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        return RepaintBoundary(
+                          child: _MushafPageView(
+                            page: page,
+                            pageData: pageData,
+                            selectedVerseKey: state.selectedVerseKey,
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               ),
@@ -295,10 +302,7 @@ class _AudioPlayerBar extends StatelessWidget {
           prev.totalDuration != curr.totalDuration,
       builder: (context, state) {
         final bool isActive = state.isPlaying || state.isPaused;
-
-        if (!isActive && state.selectedVerseKey == null) {
-          return const SizedBox.shrink();
-        }
+        final bool show = isActive || state.selectedVerseKey != null;
 
         final position = state.currentPosition;
         final total = state.totalDuration;
@@ -317,145 +321,152 @@ class _AudioPlayerBar extends StatelessWidget {
           }
         }
 
-        return Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF3E2A0F),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 12,
-                offset: Offset(0, -3),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SliderTheme(
-                    data: SliderThemeData(
-                      trackHeight: 2.5,
-                      thumbShape: const RoundSliderThumbShape(
-                        enabledThumbRadius: 5,
-                      ),
-                      overlayShape: const RoundSliderOverlayShape(
-                        overlayRadius: 12,
-                      ),
-                      activeTrackColor: const Color(0xFFB8964E),
-                      inactiveTrackColor: Colors.white24,
-                      thumbColor: const Color(0xFFB8964E),
-                      overlayColor: const Color(0x33B8964E),
-                    ),
-                    child: Slider(
-                      value: progress,
-                      onChanged: (val) {
-                        if (total.inMilliseconds > 0) {
-                          final seekMs = (val * total.inMilliseconds).toInt();
-                          AudioManager().player.seek(
-                            Duration(milliseconds: seekMs),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 36,
-                        child: Text(
-                          _formatDuration(position),
-                          style: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 11,
-                          ),
+        return AnimatedSize(
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            height: show ? null : 0,
+            clipBehavior: Clip.hardEdge,
+            decoration: const BoxDecoration(
+              color: Color(0xFF3E2A0F),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 12,
+                  offset: Offset(0, -3),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SliderTheme(
+                      data: SliderThemeData(
+                        trackHeight: 2.5,
+                        thumbShape: const RoundSliderThumbShape(
+                          enabledThumbRadius: 5,
                         ),
-                      ),
-                      const Spacer(),
-                      if (isActive)
-                        GestureDetector(
-                          onTap: () => context.read<MushafBloc>().add(
-                            const MushafStopTapped(),
-                          ),
-                          child: const Icon(
-                            Icons.stop_rounded,
-                            color: Colors.white54,
-                            size: 28,
-                          ),
+                        overlayShape: const RoundSliderOverlayShape(
+                          overlayRadius: 12,
                         ),
-                      const SizedBox(width: 16),
-                      GestureDetector(
-                        onTap: () {
-                          if (!isActive) {
-                            context.read<MushafBloc>().add(
-                              const MushafPlayTapped(),
-                            );
-                          } else {
-                            context.read<MushafBloc>().add(
-                              const MushafPauseTapped(),
+                        activeTrackColor: const Color(0xFFB8964E),
+                        inactiveTrackColor: Colors.white24,
+                        thumbColor: const Color(0xFFB8964E),
+                        overlayColor: const Color(0x33B8964E),
+                      ),
+                      child: Slider(
+                        value: progress,
+                        onChanged: (val) {
+                          if (total.inMilliseconds > 0) {
+                            final seekMs = (val * total.inMilliseconds).toInt();
+                            AudioManager().player.seek(
+                              Duration(milliseconds: seekMs),
                             );
                           }
                         },
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFB8964E),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            state.isPlaying
-                                ? Icons.pause_rounded
-                                : Icons.play_arrow_rounded,
-                            color: Colors.white,
-                            size: 26,
-                          ),
-                        ),
                       ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            surahName,
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 36,
+                          child: Text(
+                            _formatDuration(position),
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
+                              color: Colors.white54,
+                              fontSize: 11,
                             ),
                           ),
-                          if (ayahNumber.isNotEmpty)
+                        ),
+                        const Spacer(),
+                        if (isActive)
+                          GestureDetector(
+                            onTap: () => context.read<MushafBloc>().add(
+                              const MushafStopTapped(),
+                            ),
+                            child: const Icon(
+                              Icons.stop_rounded,
+                              color: Colors.white54,
+                              size: 28,
+                            ),
+                          ),
+                        const SizedBox(width: 16),
+                        GestureDetector(
+                          onTap: () {
+                            if (!isActive) {
+                              context.read<MushafBloc>().add(
+                                const MushafPlayTapped(),
+                              );
+                            } else {
+                              context.read<MushafBloc>().add(
+                                const MushafPauseTapped(),
+                              );
+                            }
+                          },
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFB8964E),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              state.isPlaying
+                                  ? Icons.pause_rounded
+                                  : Icons.play_arrow_rounded,
+                              color: Colors.white,
+                              size: 26,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                             Text(
-                              'آية $ayahNumber',
+                              surahName,
                               style: const TextStyle(
-                                color: Colors.white54,
-                                fontSize: 11,
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                        ],
-                      ),
-                      const Spacer(),
-                      SizedBox(
-                        width: 36,
-                        child: Text(
-                          _formatDuration(total),
-                          textAlign: TextAlign.end,
-                          style: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 11,
+                            if (ayahNumber.isNotEmpty)
+                              Text(
+                                'آية $ayahNumber',
+                                style: const TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 11,
+                                ),
+                              ),
+                          ],
+                        ),
+                        const Spacer(),
+                        SizedBox(
+                          width: 36,
+                          child: Text(
+                            _formatDuration(total),
+                            textAlign: TextAlign.end,
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 11,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                  ],
+                ),
               ),
             ),
-          ),
+            ),
         );
       },
     );
@@ -587,3 +598,11 @@ class _MushafPageView extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import '../repository/mushaf_repository.dart';
@@ -18,11 +18,12 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     on<MushafPlayTapped>(_onPlayTapped);
     on<MushafPauseTapped>(_onPauseTapped);
     on<MushafPositionUpdated>(_onPositionUpdated);
-    on<MushafDurationUpdated>(_onDurationUpdated); // ✅ جديد
+    on<MushafDurationUpdated>(_onDurationUpdated); // âœ… Ø¬Ø¯ÙŠØ¯
     on<MushafStopTapped>(_onStopTapped);
+    on<MushafCacheUpdate>(_onCacheUpdate);
   }
 
-  // ✅ جديد: handler منفصل للـ duration — بدل emit داخل listener مباشرة
+  // âœ… Ø¬Ø¯ÙŠØ¯: handler Ù…Ù†ÙØµÙ„ Ù„Ù„Ù€ duration â€” Ø¨Ø¯Ù„ emit Ø¯Ø§Ø®Ù„ listener Ù…Ø¨Ø§Ø´Ø±Ø©
   void _onDurationUpdated(
     MushafDurationUpdated event,
     Emitter<MushafState> emit,
@@ -59,6 +60,13 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     );
   }
 
+  void _onCacheUpdate(
+    MushafCacheUpdate event,
+    Emitter<MushafState> emit,
+  ) {
+    emit(state.copyWith(pagesCache: repository.pagesCache));
+  }
+
   Future<void> _onInitialLoad(
     MushafInitialLoad event,
     Emitter<MushafState> emit,
@@ -74,7 +82,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     await repository.preloadPages(event.initialPage);
     emit(state.copyWith(pagesCache: repository.pagesCache, isLoading: false));
 
-    // ✅ playerState listener — يستخدم add() مش emit() مباشرة
+    // âœ… playerState listener â€” ÙŠØ³ØªØ®Ø¯Ù… add() Ù…Ø´ emit() Ù…Ø¨Ø§Ø´Ø±Ø©
     _playerStateSubscription?.cancel();
     _playerStateSubscription = repository.playerStateStream.listen((
       playerState,
@@ -90,11 +98,11 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
       }
     });
 
-    // ✅ مصحح: duration subscription يستخدم add() بدل emit() مباشرة
+    // âœ… Ù…ØµØ­Ø­: duration subscription ÙŠØ³ØªØ®Ø¯Ù… add() Ø¨Ø¯Ù„ emit() Ù…Ø¨Ø§Ø´Ø±Ø©
     _durationSubscription?.cancel();
     _durationSubscription = repository.durationStream.listen((duration) {
       if (!isClosed && duration != null) {
-        add(MushafDurationUpdated(duration)); // ✅ add() وليس emit()
+        add(MushafDurationUpdated(duration)); // âœ… add() ÙˆÙ„ÙŠØ³ emit()
       }
     });
   }
@@ -103,9 +111,10 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     MushafPageChanged event,
     Emitter<MushafState> emit,
   ) async {
-    emit(state.copyWith(currentPage: event.page));
-    await repository.preloadPages(event.page);
-    emit(state.copyWith(pagesCache: repository.pagesCache));
+    emit(state.copyWith(currentPage: event.page, pagesCache: repository.pagesCache));
+    unawaited(repository.preloadPages(event.page).then((_) {
+      if (!isClosed) add(const MushafCacheUpdate());
+    }));
   }
 
   void _onWordTapped(MushafWordTapped event, Emitter<MushafState> emit) {
@@ -120,7 +129,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     Emitter<MushafState> emit,
   ) async {
     if (state.selectedVerseKey == null) {
-      emit(state.copyWith(errorMessage: 'اضغط على آية أولاً لتشغيلها'));
+      emit(state.copyWith(errorMessage: 'mushaf.error.tapFirst'));
       return;
     }
 
@@ -129,7 +138,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     final downloaded = await repository.isSurahDownloaded(surahNumber);
     if (!downloaded) {
       emit(
-        state.copyWith(errorMessage: 'يجب تحميل القارئ أولاً من صفحة القراء'),
+        state.copyWith(errorMessage: 'mushaf.error.noReciter'),
       );
       return;
     }
@@ -203,3 +212,4 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     return super.close();
   }
 }
+

@@ -24,6 +24,9 @@ Copy-Item -Path "assets/quran_data/pages" -Destination $tempDir -Recurse -Force
 Write-Host "Copying verses.json ..." -ForegroundColor Cyan
 Copy-Item -Path "assets/quran_data/verses.json" -Destination $tempDir -Force
 
+Write-Host "Copying font-map.json ..." -ForegroundColor Cyan
+Copy-Item -Path "assets/quran_data/font-map.json" -Destination $tempDir -Force
+
 Write-Host "Copying fonts/ ..." -ForegroundColor Cyan
 Copy-Item -Path "assets/quran_data/fonts" -Destination $tempDir -Recurse -Force
 

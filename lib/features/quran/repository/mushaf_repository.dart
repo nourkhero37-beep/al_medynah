@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:just_audio/just_audio.dart';
 import '../../../services/audio_manager_api.dart';
 import '../../../services/quran_data_service.dart';
@@ -21,16 +21,11 @@ class MushafRepository {
   }
 
   Future<void> preloadPages(int page) async {
-    final pagesToLoad = <int>[];
-    for (final p in [page, page + 1, page + 2, page - 1]) {
-      if (p >= 1 && p <= 604) pagesToLoad.add(p);
-    }
-    for (final p in pagesToLoad) {
-      if (!_pagesCache.containsKey(p)) {
-        try {
-          await loadPage(p);
-        } catch (_) {}
-      }
+    final pages = [page, page + 1, page - 1]
+      .where((p) => p >= 1 && p <= 604 && !_pagesCache.containsKey(p));
+    for (final p in pages) {
+      try { await loadPage(p); } catch (_) {}
+      await Future.delayed(const Duration(milliseconds: 10));
     }
   }
 

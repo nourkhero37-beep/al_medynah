@@ -434,15 +434,15 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
             ),
             child: Row(
               children: [
-                // ✅ زر الآية التالية
+                // ✅ زر الآية السابقة
                 Expanded(
                   child: GestureDetector(
-                    onTap: _hasNext ? _goToNext : null,
+                    onTap: _hasPrevious ? _goToPrevious : null,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: _hasNext
+                        color: _hasPrevious
                             ? const Color(0xFF8B6914)
                             : Colors.grey.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
@@ -453,15 +453,15 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                           Icon(
                             Icons.arrow_back_ios_rounded,
                             size: 16,
-                            color: _hasNext ? Colors.white : Colors.grey,
+                            color: _hasPrevious ? Colors.white : Colors.grey,
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            AppLocalizations.of(context).tr('tafseer.button.next'),
+                            AppLocalizations.of(context).tr('tafseer.button.prev'),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: _hasNext ? Colors.white : Colors.grey,
+                              color: _hasPrevious ? Colors.white : Colors.grey,
                             ),
                           ),
                         ],
@@ -495,15 +495,15 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
 
                 const SizedBox(width: 12),
 
-                // ✅ زر الآية السابقة
+                // ✅ زر الآية التالية
                 Expanded(
                   child: GestureDetector(
-                    onTap: _hasPrevious ? _goToPrevious : null,
+                    onTap: _hasNext ? _goToNext : null,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: _hasPrevious
+                        color: _hasNext
                             ? const Color(0xFF8B6914)
                             : Colors.grey.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
@@ -512,18 +512,18 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            AppLocalizations.of(context).tr('tafseer.button.prev'),
+                            AppLocalizations.of(context).tr('tafseer.button.next'),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: _hasPrevious ? Colors.white : Colors.grey,
+                              color: _hasNext ? Colors.white : Colors.grey,
                             ),
                           ),
                           const SizedBox(width: 6),
                           Icon(
                             Icons.arrow_forward_ios_rounded,
                             size: 16,
-                            color: _hasPrevious ? Colors.white : Colors.grey,
+                            color: _hasNext ? Colors.white : Colors.grey,
                           ),
                         ],
                       ),

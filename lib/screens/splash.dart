@@ -1,7 +1,9 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:al_medynah/l10n/app_localizations.dart';
 import 'package:al_medynah/screens/home_page.dart';
 import 'package:al_medynah/services/quran_data_service.dart';
+import 'package:al_medynah/screens/language_selection_page.dart';
+import 'package:al_medynah/services/locale_service.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -106,9 +108,11 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             if (_needDownload || _isDownloading || _hasError)
               Container(
-                color: Colors.black54,
-                child: Center(
-                  child: SingleChildScrollView(
+                color: Colors.black.withValues(alpha: 0.8),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -186,10 +190,32 @@ class _SplashScreenState extends State<SplashScreen> {
                             label: tr.tr('data.download'),
                             onTap: _startDownload,
                           ),
+
                         ],
                       ],
                     ),
+                    ),
                   ),
+                    Positioned(
+                      top: 32,
+                      left: isRtl ? null : 16,
+                      right: isRtl ? 16 : null,
+                      child: IconButton(
+                        icon: Icon(isRtl ? Icons.arrow_forward : Icons.arrow_back, color: Colors.white70),
+                        onPressed: () async {
+                          await LocaleService.clearLocale();
+                          if (context.mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const LanguageSelectionPage(),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
           ],
@@ -223,3 +249,5 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
+
+

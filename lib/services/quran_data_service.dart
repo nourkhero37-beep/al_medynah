@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
-/// Update this URL after uploading quran_data.zip to a GitHub Release
 const String kQuranDataUrl = 'https://github.com/nourkhero37-beep/al_medynah/releases/download/v1.0.0/quran_data.zip';
+
+Map<String, dynamic> _parsePageJson(String json) => jsonDecode(json) as Map<String, dynamic>;
 
 class QuranDataService {
   static final QuranDataService _instance = QuranDataService._internal();
@@ -54,7 +56,8 @@ class QuranDataService {
 
     for (final entry in archive) {
       if (entry.isFile) {
-        final outPath = '$dir/${entry.name}';
+        final name = entry.name.replaceAll('\\', '/');
+        final outPath = '$dir/$name';
         final outFile = File(outPath);
         outFile.createSync(recursive: true);
         await outFile.writeAsBytes(entry.content);
@@ -85,7 +88,7 @@ class QuranDataService {
   Future<Map<String, dynamic>> loadPage(int page) async {
     final path = await _getPagePath(page);
     final jsonString = await File(path).readAsString();
-    return jsonDecode(jsonString) as Map<String, dynamic>;
+    return compute(_parsePageJson, jsonString);
   }
 
   Future<String> loadPageRaw(int page) async {
@@ -101,4 +104,3 @@ class QuranDataService {
     }
   }
 }
-
