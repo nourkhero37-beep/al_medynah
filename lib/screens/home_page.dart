@@ -25,7 +25,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isDarkMode = true;
-  Map<String, dynamic>? _bookmark;
+  int? _bookmarkPage;
 
   @override
   void initState() {
@@ -34,8 +34,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadBookmark() async {
-    final bookmark = await BookmarkService().getBookmark();
-    if (mounted) setState(() => _bookmark = bookmark);
+    final page = await BookmarkService().getPageBookmark();
+    if (mounted) setState(() => _bookmarkPage = page);
   }
 
   final List<Map<String, String>> gridItems = [
@@ -251,16 +251,16 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 12),
 
-                  if (_bookmark != null)
+                  if (_bookmarkPage != null)
                     GestureDetector(
                       onTap: () async {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => MushafScreen(
-                              initialPage: _bookmark!['page'] as int,
-                              highlightedVerseKey:
-                                  _bookmark!['verse_key'] as String,
+                              initialPage: _bookmarkPage!,
+                              
+                                  
                               onBookmarkSaved: _loadBookmark,
                             ),
                           ),
@@ -304,22 +304,19 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    ).tr('home.bookmark.detail', {
-                                      'surah':
-                                          _bookmark!['surah_name'] as String,
-                                      'ayah': _bookmark!['ayah_number']
-                                          .toString(),
-                                    }),
+                                    'الصفحة ',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.8),
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
                             GestureDetector(
                               onTap: () async {
-                                await BookmarkService().clearBookmark();
-                                setState(() => _bookmark = null);
+                                await BookmarkService().clearPageBookmark();
+                                setState(() => _bookmarkPage = null);
                               },
                               child: Icon(
                                 Icons.close_rounded,
@@ -496,3 +493,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+
+
+
+
+
+

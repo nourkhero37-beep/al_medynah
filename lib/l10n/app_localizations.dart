@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AppLocalizations {
@@ -157,10 +157,32 @@ class AppLocalizations {
       'tafseer.button.prev': 'Previous',
       'tafseer.ayah.label': 'Ayah {number}',
 
+      'mushaf.bookmark.pageSaved': '? Page {page} bookmarked',
+      'mushaf.menu.goToPage': 'Go to Page',
+      'mushaf.menu.bookmarks': 'Bookmarks',
+      'mushaf.menu.share': 'Share',
+      'mushaf.menu.fontSize': 'Font Size',
+      'mushaf.menu.fontIncrease': 'Increase',
+      'mushaf.menu.fontDecrease': 'Decrease',
+      'mushaf.menu.fontReset': 'Reset',
+      'mushaf.menu.darkMode': 'Dark Mode',
+      'mushaf.menu.settings': 'Settings',
+      'mushaf.menu.jumpHint': 'Enter page number (1-604)',
+      'mushaf.menu.jumpGo': 'Go',
+      'mushaf.menu.noBookmark': 'No bookmarks saved',
+      'mushaf.menu.bookmarkedPage': 'Saved Page: {page}',
+      'mushaf.menu.shared': 'Page {page} of the Holy Quran',
+      'mushaf.menu.savePage': 'Save Current Page',
+      'mushaf.menu.cancel': 'Cancel',
+      'mushaf.menu.ok': 'OK',
+      'mushaf.menu.fontSizeChanged': 'Font size: {size}%',
+      'mushaf.menu.darkModeOn': 'Dark mode on',
+      'mushaf.menu.darkModeOff': 'Dark mode off',
+
       'audio.error.noUrl': 'Audio link not found for surah {number}',
 
       'lang.title': 'Language',
-      'lang.arabic': 'العربية',
+      'lang.arabic': '???????',
       'lang.english': 'English',
       'lang.turkish': 'T\u00fcrk\u00e7e',
 
@@ -291,7 +313,28 @@ class AppLocalizations {
       'mushaf.bookmark.saved': '\u2705 \u062A\u0645 \u062D\u0641\u0638 \u0627\u0644\u0625\u0634\u0627\u0631\u0629 \u2014 \u0633\u0648\u0631\u0629 {surah} \u0622\u064A\u0629 {ayah}',
       'mushaf.audio.ayah': '\u0622\u064A\u0629 {number}',
       'mushaf.error.noReciter': '\u064A\u062C\u0628 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0642\u0627\u0631\u0626 \u0623\u0648\u0644\u0627\u064B \u0645\u0646 \u0635\u0641\u062D\u0629 \u0627\u0644\u0642\u0631\u0627\u0621',
-      'mushaf.error.tapFirst': '\u0627\u0636\u063A\u0637 \u0639\u0644\u0649 \u0622\u064A\u0629 \u0623\u0648\u0644\u0627\u064B \u0644\u062A\u0634\u063A\u064A\u0644\u0647\u0627',
+       'mushaf.error.tapFirst': '\u0627\u0636\u063A\u0637 \u0639\u0644\u0649 \u0622\u064A\u0629 \u0623\u0648\u0644\u0627\u064B \u0644\u062A\u0634\u063A\u064A\u0644\u0647\u0627',
+      'mushaf.bookmark.pageSaved': '\u2705 \u062A\u0645 \u062D\u0641\u0638 \u0627\u0644\u0635\u0641\u062D\u0629 {page}',
+      'mushaf.menu.goToPage': '\u0627\u0644\u0630\u0647\u0627\u0628 \u0625\u0644\u0649 \u0635\u0641\u062D\u0629',
+      'mushaf.menu.bookmarks': '\u0627\u0644\u0625\u0634\u0627\u0631\u0627\u062A',
+      'mushaf.menu.share': '\u0645\u0634\u0627\u0631\u0643\u0629',
+      'mushaf.menu.fontSize': '\u062D\u062C\u0645 \u0627\u0644\u062E\u0637',
+      'mushaf.menu.fontIncrease': '\u062A\u0643\u0628\u064A\u0631',
+      'mushaf.menu.fontDecrease': '\u062A\u0635\u063A\u064A\u0631',
+      'mushaf.menu.fontReset': '\u0625\u0639\u0627\u062F\u0629 \u0636\u0628\u0637',
+      'mushaf.menu.darkMode': '\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0644\u064A\u0644\u064A',
+      'mushaf.menu.settings': '\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A',
+      'mushaf.menu.jumpHint': '\u0623\u062F\u062E\u0644 \u0631\u0642\u0645 \u0627\u0644\u0635\u0641\u062D\u0629 (1-604)',
+      'mushaf.menu.jumpGo': '\u0627\u0630\u0647\u0628',
+      'mushaf.menu.noBookmark': '\u0644\u0627 \u062A\u0648\u062C\u062F \u0625\u0634\u0627\u0631\u0627\u062A \u0645\u062D\u0641\u0648\u0638\u0629',
+      'mushaf.menu.bookmarkedPage': '\u0627\u0644\u0635\u0641\u062D\u0629 \u0627\u0644\u0645\u062D\u0641\u0648\u0638\u0629: {page}',
+      'mushaf.menu.shared': '\u0635\u0641\u062D\u0629 {page} \u0645\u0646 \u0627\u0644\u0642\u0631\u0622\u0646 \u0627\u0644\u0643\u0631\u064A\u0645',
+      'mushaf.menu.savePage': '\u062D\u0641\u0638 \u0627\u0644\u0635\u0641\u062D\u0629 \u0627\u0644\u062D\u0627\u0644\u064A\u0629',
+      'mushaf.menu.cancel': '\u0625\u0644\u063A\u0627\u0621',
+      'mushaf.menu.ok': '\u062D\u0633\u0646\u0627\u064B',
+      'mushaf.menu.fontSizeChanged': '\u062D\u062C\u0645 \u0627\u0644\u062E\u0637: {size}%',
+      'mushaf.menu.darkModeOn': '\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0644\u064A\u0644\u064A \u0645\u0641\u0639\u0644',
+      'mushaf.menu.darkModeOff': '\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0644\u064A\u0644\u064A \u0645\u0639\u0637\u0644',
 
       'tafseer.appBar.title': '\u062A\u0641\u0633\u064A\u0631 \u0627\u0644\u0642\u0631\u0622\u0646 \u0627\u0644\u0643\u0631\u064A\u0645',
       'tafseer.appBar.subtitle': '\u062A\u0641\u0633\u064A\u0631 \u0627\u0644\u0645\u064A\u0633\u0631 \u2022 {count} \u0622\u064A\u0629',
@@ -441,9 +484,30 @@ class AppLocalizations {
       'mushaf.bookmark.saved': '\u2705 Yer imi kaydedildi \u2014 Sure {surah} Ayet {ayah}',
       'mushaf.audio.ayah': 'Ayet {number}',
       'mushaf.error.noReciter': '\u00d6nce Okuyucular sayfas\u0131ndan bir okuyucu indirin',
-      'mushaf.error.tapFirst': '\u00d6nce bir ayete dokunun',
+       'mushaf.error.tapFirst': '\u00D6nce bir ayete dokunun',
+      'mushaf.bookmark.pageSaved': '\u2705 Sayfa {page} kaydedildi',
+      'mushaf.menu.goToPage': 'Sayfaya Git',
+      'mushaf.menu.bookmarks': 'Yer \u0130mleri',
+      'mushaf.menu.share': 'Payla\u015F',
+      'mushaf.menu.fontSize': 'Yaz\u0131 Boyutu',
+      'mushaf.menu.fontIncrease': 'B\u00FCy\u00FCt',
+      'mushaf.menu.fontDecrease': 'K\u00FC\u00E7\u00FClt',
+      'mushaf.menu.fontReset': 'S\u0131f\u0131rla',
+      'mushaf.menu.darkMode': 'Gece Modu',
+      'mushaf.menu.settings': 'Ayarlar',
+      'mushaf.menu.jumpHint': 'Sayfa numaras\u0131 girin (1-604)',
+      'mushaf.menu.jumpGo': 'Git',
+      'mushaf.menu.noBookmark': 'Kay\u0131tl\u0131 yer imi yok',
+      'mushaf.menu.bookmarkedPage': 'Kay\u0131tl\u0131 Sayfa: {page}',
+      'mushaf.menu.shared': 'Kur\'an-\u0131 Kerim Sayfa {page}',
+      'mushaf.menu.savePage': 'Mevcut Sayfay\u0131 Kaydet',
+      'mushaf.menu.cancel': '\u0130ptal',
+      'mushaf.menu.ok': 'Tamam',
+      'mushaf.menu.fontSizeChanged': 'Yaz\u0131 boyutu: {size}%',
+      'mushaf.menu.darkModeOn': 'Gece modu a\u00E7\u0131k',
+      'mushaf.menu.darkModeOff': 'Gece modu kapal\u0131',
 
-      'tafseer.appBar.title': 'Kur\'\u00e2n-\u0131 Ker\u00eem Tefsiri',
+      'tafseer.appBar.title': 'Kur\'\u00E2n-\u0131 Ker\u00EEm Tefsiri',
       'tafseer.appBar.subtitle': 'Tefsir-i M\u00fcyesser \u2022 {count} Ayet',
       'tafseer.search.hint': 'Sure ara...',
       'tafseer.header.title': 'Tefsir-i M\u00fcyesser',
@@ -460,7 +524,7 @@ class AppLocalizations {
       'audio.error.noUrl': 'Sure {number} i\u00e7in ses ba\u011flant\u0131s\u0131 bulunamad\u0131',
 
       'lang.title': 'Dil',
-      'lang.arabic': 'العربية',
+      'lang.arabic': '???????',
       'lang.english': 'English',
       'lang.turkish': 'T\u00fcrk\u00e7e',
 
@@ -486,6 +550,8 @@ class AppLocalizationsDelegate
   @override
   bool shouldReload(AppLocalizationsDelegate old) => false;
 }
+
+
 
 
 

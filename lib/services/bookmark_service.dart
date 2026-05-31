@@ -1,4 +1,4 @@
-import 'package:shared_preferences/shared_preferences.dart';
+﻿import 'package:shared_preferences/shared_preferences.dart';
 
 class BookmarkService {
   static final BookmarkService _instance = BookmarkService._internal();
@@ -10,7 +10,8 @@ class BookmarkService {
   static const String _surahNameKey = 'bookmark_surah_name';
   static const String _ayahNumberKey = 'bookmark_ayah_number';
 
-  // ✅ حفظ الإشارة
+  static const String _pageBookmarkKey = 'page_bookmark';
+
   Future<void> saveBookmark({
     required int page,
     required String verseKey,
@@ -24,7 +25,6 @@ class BookmarkService {
     await prefs.setInt(_ayahNumberKey, ayahNumber);
   }
 
-  // ✅ جلب الإشارة
   Future<Map<String, dynamic>?> getBookmark() async {
     final prefs = await SharedPreferences.getInstance();
     final page = prefs.getInt(_pageKey);
@@ -37,7 +37,6 @@ class BookmarkService {
     };
   }
 
-  // ✅ حذف الإشارة
   Future<void> clearBookmark() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_pageKey);
@@ -46,9 +45,23 @@ class BookmarkService {
     await prefs.remove(_ayahNumberKey);
   }
 
-  // ✅ هل يوجد إشارة
   Future<bool> hasBookmark() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.containsKey(_pageKey);
+  }
+
+  Future<void> savePageBookmark(int page) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_pageBookmarkKey, page);
+  }
+
+  Future<int?> getPageBookmark() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_pageBookmarkKey);
+  }
+
+  Future<void> clearPageBookmark() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_pageBookmarkKey);
   }
 }

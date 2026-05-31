@@ -72,3 +72,19 @@ class MushafDurationUpdated extends MushafEvent {
 class MushafCacheUpdate extends MushafEvent {
   const MushafCacheUpdate();
 }
+
+class MushafFontSizeChanged extends MushafEvent {
+  final double fontScale;
+  const MushafFontSizeChanged(this.fontScale);
+
+  @override
+  List<Object?> get props => [fontScale];
+}
+
+class MushafDarkModeToggled extends MushafEvent {
+  final bool isDarkMode;
+  const MushafDarkModeToggled(this.isDarkMode);
+
+  @override
+  List<Object?> get props => [isDarkMode];
+}

@@ -1,4 +1,4 @@
-name: al_medynah
+﻿name: al_medynah
 description: "A new Flutter project."
 publish_to: 'none'
 
@@ -32,6 +32,7 @@ dependencies:
   video_player: ^2.11.1
   chewie: ^1.13.1
   archive: ^4.0.2
+  share_plus: ^10.1.4
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.3
@@ -42,9 +43,9 @@ dev_dependencies:
 
 flutter_launcher_icons:
   android: true
-  image_path: "assets/images/app icon.png"
+  image_path: "assets/images/app icon 2.png"
   adaptive_icon_background: "#3E2A0F"
-  adaptive_icon_foreground: "assets/images/app icon.png"
+  adaptive_icon_foreground: "assets/images/app icon 2.png"
 
 flutter:
   uses-material-design: true
@@ -64,3 +65,4 @@ flutter:
     - assets/images/qublah.png
     - assets/images/reciters.png
     - assets/images/prayertime.png
+

@@ -18,12 +18,13 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     on<MushafPlayTapped>(_onPlayTapped);
     on<MushafPauseTapped>(_onPauseTapped);
     on<MushafPositionUpdated>(_onPositionUpdated);
-    on<MushafDurationUpdated>(_onDurationUpdated); // âœ… Ø¬Ø¯ÙŠØ¯
+    on<MushafDurationUpdated>(_onDurationUpdated);
     on<MushafStopTapped>(_onStopTapped);
     on<MushafCacheUpdate>(_onCacheUpdate);
+    on<MushafFontSizeChanged>(_onFontSizeChanged);
+    on<MushafDarkModeToggled>(_onDarkModeToggled);
   }
 
-  // âœ… Ø¬Ø¯ÙŠØ¯: handler Ù…Ù†ÙØµÙ„ Ù„Ù„Ù€ duration â€” Ø¨Ø¯Ù„ emit Ø¯Ø§Ø®Ù„ listener Ù…Ø¨Ø§Ø´Ø±Ø©
   void _onDurationUpdated(
     MushafDurationUpdated event,
     Emitter<MushafState> emit,
@@ -82,7 +83,6 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     await repository.preloadPages(event.initialPage);
     emit(state.copyWith(pagesCache: repository.pagesCache, isLoading: false));
 
-    // âœ… playerState listener â€” ÙŠØ³ØªØ®Ø¯Ù… add() Ù…Ø´ emit() Ù…Ø¨Ø§Ø´Ø±Ø©
     _playerStateSubscription?.cancel();
     _playerStateSubscription = repository.playerStateStream.listen((
       playerState,
@@ -98,11 +98,10 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
       }
     });
 
-    // âœ… Ù…ØµØ­Ø­: duration subscription ÙŠØ³ØªØ®Ø¯Ù… add() Ø¨Ø¯Ù„ emit() Ù…Ø¨Ø§Ø´Ø±Ø©
     _durationSubscription?.cancel();
     _durationSubscription = repository.durationStream.listen((duration) {
       if (!isClosed && duration != null) {
-        add(MushafDurationUpdated(duration)); // âœ… add() ÙˆÙ„ÙŠØ³ emit()
+        add(MushafDurationUpdated(duration));
       }
     });
   }
@@ -203,6 +202,20 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     }
   }
 
+  void _onFontSizeChanged(
+    MushafFontSizeChanged event,
+    Emitter<MushafState> emit,
+  ) {
+    emit(state.copyWith(fontScale: event.fontScale));
+  }
+
+  void _onDarkModeToggled(
+    MushafDarkModeToggled event,
+    Emitter<MushafState> emit,
+  ) {
+    emit(state.copyWith(isDarkMode: event.isDarkMode));
+  }
+
   @override
   Future<void> close() {
     _playerStateSubscription?.cancel();
@@ -212,4 +225,3 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     return super.close();
   }
 }
-

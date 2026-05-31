@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:just_audio/just_audio.dart';
 import '../../../services/audio_manager_api.dart';
 import '../../../services/quran_data_service.dart';
@@ -8,7 +8,7 @@ class MushafRepository {
   final Map<int, Map<String, dynamic>> _pagesCache = {};
   StreamSubscription<Duration>? _positionSubscription;
 
-  Map<int, Map<String, dynamic>> get pagesCache => _pagesCache;
+  Map<int, Map<String, dynamic>> get pagesCache => Map.from(_pagesCache);
 
   Future<Map<String, dynamic>> loadPage(int page) async {
     if (page < 1 || page > 604) {

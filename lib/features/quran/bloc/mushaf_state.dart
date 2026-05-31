@@ -1,16 +1,18 @@
-import 'package:equatable/equatable.dart';
+﻿import 'package:equatable/equatable.dart';
 
 class MushafState extends Equatable {
   final int currentPage;
   final String? selectedVerseKey;
   final Map<int, Map<String, dynamic>> pagesCache;
   final bool isPlaying;
-  final bool isPaused; // ✅ جديد
+  final bool isPaused;
   final Map<String, List<int>> verseTimings;
   final bool isLoading;
   final String? errorMessage;
-  final Duration currentPosition; // ✅ جديد
-  final Duration totalDuration; // ✅ جديد
+  final Duration currentPosition;
+  final Duration totalDuration;
+  final double fontScale;
+  final bool isDarkMode;
 
   const MushafState({
     this.currentPage = 1,
@@ -23,9 +25,10 @@ class MushafState extends Equatable {
     this.errorMessage,
     this.currentPosition = Duration.zero,
     this.totalDuration = Duration.zero,
+    this.fontScale = 1.0,
+    this.isDarkMode = false,
   });
 
-  // ✅ sentinel pattern لحل مشكلة selectedVerseKey = null
   static const _sentinel = Object();
 
   MushafState copyWith({
@@ -39,6 +42,8 @@ class MushafState extends Equatable {
     String? errorMessage,
     Duration? currentPosition,
     Duration? totalDuration,
+    double? fontScale,
+    bool? isDarkMode,
   }) {
     return MushafState(
       currentPage: currentPage ?? this.currentPage,
@@ -53,6 +58,8 @@ class MushafState extends Equatable {
       errorMessage: errorMessage,
       currentPosition: currentPosition ?? this.currentPosition,
       totalDuration: totalDuration ?? this.totalDuration,
+      fontScale: fontScale ?? this.fontScale,
+      isDarkMode: isDarkMode ?? this.isDarkMode,
     );
   }
 
@@ -68,5 +75,7 @@ class MushafState extends Equatable {
     errorMessage,
     currentPosition,
     totalDuration,
+    fontScale,
+    isDarkMode,
   ];
 }
