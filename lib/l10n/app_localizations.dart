@@ -157,7 +157,7 @@ class AppLocalizations {
       'tafseer.button.prev': 'Previous',
       'tafseer.ayah.label': 'Ayah {number}',
 
-      'mushaf.bookmark.pageSaved': '? Page {page} bookmarked',
+      'mushaf.bookmark.pageSaved': '✅ Page {page} bookmarked',
       'mushaf.menu.goToPage': 'Go to Page',
       'mushaf.menu.bookmarks': 'Bookmarks',
       'mushaf.menu.share': 'Share',
@@ -177,12 +177,17 @@ class AppLocalizations {
       'mushaf.menu.ok': 'OK',
       'mushaf.menu.fontSizeChanged': 'Font size: {size}%',
       'mushaf.menu.darkModeOn': 'Dark mode on',
-      'mushaf.menu.darkModeOff': 'Dark mode off',
+            'mushaf.menu.darkModeOff': 'Dark mode off',
+
+      'mushaf.longpress.tafseer': 'Tafsir',
+      'mushaf.longpress.play': 'Play',
+      'mushaf.longpress.changeColor': 'Change Color',
+      'mushaf.colorPicker.title': 'Choose Text Color',
 
       'audio.error.noUrl': 'Audio link not found for surah {number}',
 
       'lang.title': 'Language',
-      'lang.arabic': '???????',
+      'lang.arabic': 'العربية',
       'lang.english': 'English',
       'lang.turkish': 'T\u00fcrk\u00e7e',
 
@@ -334,7 +339,12 @@ class AppLocalizations {
       'mushaf.menu.ok': '\u062D\u0633\u0646\u0627\u064B',
       'mushaf.menu.fontSizeChanged': '\u062D\u062C\u0645 \u0627\u0644\u062E\u0637: {size}%',
       'mushaf.menu.darkModeOn': '\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0644\u064A\u0644\u064A \u0645\u0641\u0639\u0644',
-      'mushaf.menu.darkModeOff': '\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0644\u064A\u0644\u064A \u0645\u0639\u0637\u0644',
+            'mushaf.menu.darkModeOff': '\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0644\u064A\u0644\u064A \u0645\u0639\u0637\u0644',
+
+      'mushaf.longpress.tafseer': '\u062A\u0641\u0633\u064A\u0631',
+      'mushaf.longpress.play': '\u062A\u0634\u063A\u064A\u0644',
+      'mushaf.longpress.changeColor': '\u062A\u063A\u064A\u064A\u0631 \u0627\u0644\u0644\u0648\u0646',
+      'mushaf.colorPicker.title': '\u0627\u062E\u062A\u064A\u0627\u0631 \u0644\u0648\u0646 \u0627\u0644\u0646\u0635',
 
       'tafseer.appBar.title': '\u062A\u0641\u0633\u064A\u0631 \u0627\u0644\u0642\u0631\u0622\u0646 \u0627\u0644\u0643\u0631\u064A\u0645',
       'tafseer.appBar.subtitle': '\u062A\u0641\u0633\u064A\u0631 \u0627\u0644\u0645\u064A\u0633\u0631 \u2022 {count} \u0622\u064A\u0629',
@@ -505,7 +515,12 @@ class AppLocalizations {
       'mushaf.menu.ok': 'Tamam',
       'mushaf.menu.fontSizeChanged': 'Yaz\u0131 boyutu: {size}%',
       'mushaf.menu.darkModeOn': 'Gece modu a\u00E7\u0131k',
-      'mushaf.menu.darkModeOff': 'Gece modu kapal\u0131',
+            'mushaf.menu.darkModeOff': 'Gece modu kapal\u0131',
+
+      'mushaf.longpress.tafseer': 'Tefsir',
+      'mushaf.longpress.play': 'Oynat',
+      'mushaf.longpress.changeColor': 'Rengi De\u011Fi\u015Ftir',
+      'mushaf.colorPicker.title': 'Metin Rengi Se\u00E7',
 
       'tafseer.appBar.title': 'Kur\'\u00E2n-\u0131 Ker\u00EEm Tefsiri',
       'tafseer.appBar.subtitle': 'Tefsir-i M\u00fcyesser \u2022 {count} Ayet',
@@ -524,7 +539,7 @@ class AppLocalizations {
       'audio.error.noUrl': 'Sure {number} i\u00e7in ses ba\u011flant\u0131s\u0131 bulunamad\u0131',
 
       'lang.title': 'Dil',
-      'lang.arabic': '???????',
+      'lang.arabic': 'العربية',
       'lang.english': 'English',
       'lang.turkish': 'T\u00fcrk\u00e7e',
 
@@ -550,6 +565,7 @@ class AppLocalizationsDelegate
   @override
   bool shouldReload(AppLocalizationsDelegate old) => false;
 }
+
 
 
 

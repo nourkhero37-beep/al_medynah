@@ -1,9 +1,13 @@
+import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:al_medynah/features/quran/tafseer/tafseer_bottom_sheet.dart';
 import 'package:al_medynah/services/bookmark_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:al_medynah/model/surah_model.dart';
 import 'package:al_medynah/services/audio_manager_api.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'repository/mushaf_repository.dart';
 import 'bloc/mushaf_bloc.dart';
@@ -60,6 +64,7 @@ class _MushafView extends StatefulWidget {
 class _MushafViewState extends State<_MushafView> {
   late PageController _pageController;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey _pageCaptureKey = GlobalKey();
 
   @override
   void initState() {
@@ -141,10 +146,32 @@ class _MushafViewState extends State<_MushafView> {
     );
   }
 
-  void _sharePage(BuildContext context, int page) async {
+  Future<void> _sharePage(BuildContext context, int page) async {
     final tr = AppLocalizations.of(context).tr;
-    final text = tr('mushaf.menu.shared', {'page': page.toString()});
-    await Share.share(text);
+    final boundary = _pageCaptureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    if (boundary == null) {
+      await Share.share(tr('mushaf.menu.shared', {'page': page.toString()}));
+      return;
+    }
+    try {
+      await WidgetsBinding.instance.endOfFrame;
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      final image = await boundary.toImage(pixelRatio: 2.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) {
+        await Share.share(tr('mushaf.menu.shared', {'page': page.toString()}));
+        return;
+      }
+      final tempDir = await getTemporaryDirectory();
+      final file = File('${tempDir.path}/quran_page_$page.png');
+      await file.writeAsBytes(byteData.buffer.asUint8List());
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: tr('mushaf.menu.shared', {'page': page.toString()}),
+      );
+    } catch (_) {
+      await Share.share(tr('mushaf.menu.shared', {'page': page.toString()}));
+    }
   }
 
   @override
@@ -164,9 +191,11 @@ class _MushafViewState extends State<_MushafView> {
           );
         }
       },
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: const Color(0xfff8f3e8),
+      child: BlocBuilder<MushafBloc, MushafState>(
+        buildWhen: (p, c) => p.isDarkMode != c.isDarkMode,
+        builder: (ctx, st) => Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: st.isDarkMode ? Colors.black : const Color(0xfff8f3e8),
         drawer: _MushafDrawer(
           onBookmarkSaved: widget.onBookmarkSaved,
           scaffoldKey: _scaffoldKey,
@@ -198,12 +227,14 @@ class _MushafViewState extends State<_MushafView> {
                           return const Center(child: CircularProgressIndicator());
                         }
                         return RepaintBoundary(
+                          key: page == state.currentPage ? _pageCaptureKey : null,
                           child: _MushafPageView(
                             page: page,
                             pageData: pageData,
                             selectedVerseKey: state.selectedVerseKey,
                             fontScale: state.fontScale,
                             isDarkMode: state.isDarkMode,
+                            textColor: state.textColor,
                           ),
                         );
                       },
@@ -264,10 +295,10 @@ class _MushafViewState extends State<_MushafView> {
           ),
         ),
       ),
+      ),
     );
   }
 }
-
 class _MushafDrawer extends StatelessWidget {
   final VoidCallback? onBookmarkSaved;
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -285,9 +316,9 @@ class _MushafDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalizations.of(context).tr;
     return BlocBuilder<MushafBloc, MushafState>(
       builder: (context, state) {
-        final tr = AppLocalizations.of(context).tr;
         return Drawer(
           child: Container(
             color: const Color(0xFF3E2A0F),
@@ -644,7 +675,7 @@ class _AudioPlayerBar extends StatelessWidget {
                             ),
                             if (ayahNumber.isNotEmpty)
                               Text(
-                                'آية $ayahNumber',
+                                '\u0622\u06CC\u0629 $ayahNumber',
                                 style: const TextStyle(
                                   color: Colors.white54,
                                   fontSize: 11,
@@ -684,6 +715,7 @@ class _MushafPageView extends StatelessWidget {
   final String? selectedVerseKey;
   final double fontScale;
   final bool isDarkMode;
+  final int textColor;
 
   const _MushafPageView({
     required this.page,
@@ -691,7 +723,73 @@ class _MushafPageView extends StatelessWidget {
     this.selectedVerseKey,
     this.fontScale = 1.0,
     this.isDarkMode = false,
+    this.textColor = 0xDD000000,
   });
+
+  static const List<int> _colorOptions = [
+    0xFF000000,
+    0xFFFFFFFF,
+    0xFFB8964E,
+    0xFF3E2A0F,
+    0xFF2E5090,
+    0xFF2E7D32,
+    0xFF8B6914,
+    0xFF555555,
+  ];
+
+  static Future<void> _showColorPicker(BuildContext context) {
+    final tr = AppLocalizations.of(context).tr;
+    return showDialog(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: Text(tr('mushaf.colorPicker.title')),
+          content: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            alignment: WrapAlignment.center,
+            children: _colorOptions.map((c) {
+              final isWhite = c == 0xFFFFFFFF;
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pop(ctx);
+                  context.read<MushafBloc>().add(
+                    MushafTextColorChanged(c),
+                  );
+                },
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Color(c),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isWhite ? Colors.grey.shade400 : Colors.transparent,
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(tr('mushaf.menu.cancel')),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -705,6 +803,10 @@ class _MushafPageView extends StatelessWidget {
       height: screenHeight,
       child: Stack(
         children: [
+          if (isDarkMode)
+            Positioned.fill(
+              child: Container(color: Colors.black),
+            ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
             child: Column(
@@ -751,7 +853,7 @@ class _MushafPageView extends StatelessWidget {
                                     style: TextStyle(
                                       fontFamily: font,
                                       fontSize: screenHeight * 0.033 * fontScale,
-                                      color: Colors.black,
+                                      color: Color(textColor),
                                     ),
                                   ),
                                 ],
@@ -761,16 +863,57 @@ class _MushafPageView extends StatelessWidget {
                             final bool isHighlighted =
                                 verseKey != null && verseKey == selectedVerseKey;
 
+                            Offset? longPressPos;
+
                             return GestureDetector(
                               onTap: () {
                                 context.read<MushafBloc>().add(
                                   MushafWordTapped(verseKey),
                                 );
                               },
+                              onLongPressStart: (details) {
+                                longPressPos = details.globalPosition;
+                              },
                               onLongPress: () {
-                                if (verseKey != null) {
-                                  TafseerBottomSheet.show(context, verseKey);
-                                }
+                                if (verseKey == null || longPressPos == null) return;
+                                final pos = longPressPos!;
+                                final tr = AppLocalizations.of(context).tr;
+                                showMenu<String>(
+                                  context: context,
+                                  position: RelativeRect.fromLTRB(
+                                    pos.dx, pos.dy, pos.dx, pos.dy,
+                                  ),
+                                  items: [
+                                    PopupMenuItem(
+                                      value: 'tafseer',
+                                      child: Text(tr('mushaf.longpress.tafseer')),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'play',
+                                      child: Text(tr('mushaf.longpress.play')),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'color',
+                                      child: Text(tr('mushaf.longpress.changeColor')),
+                                    ),
+                                  ],
+                                ).then((value) {
+                                  if (value == null) return;
+                                  if (!context.mounted) return;
+                                  switch (value) {
+                                    case 'tafseer':
+                                      TafseerBottomSheet.show(context, verseKey);
+                                    case 'play':
+                                      context.read<MushafBloc>().add(
+                                        MushafWordTapped(verseKey),
+                                      );
+                                      context.read<MushafBloc>().add(
+                                        const MushafPlayTapped(),
+                                      );
+                                    case 'color':
+                                      _showColorPicker(context);
+                                  }
+                                });
                               },
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
@@ -791,7 +934,7 @@ class _MushafPageView extends StatelessWidget {
                                         fontScale,
                                     color: isHighlighted
                                         ? const Color(0xFF2E7D32)
-                                        : Colors.black87,
+                                        : Color(textColor),
                                     height: (isSpecialPage ? 3 : 1.9) / fontScale.clamp(0.7, 1.3),
                                   ),
                                 ),
@@ -806,11 +949,12 @@ class _MushafPageView extends StatelessWidget {
               ],
             ),
           ),
-          if (isDarkMode)
-            Container(color: Colors.black.withValues(alpha: 0.55)),
         ],
       ),
     );
   }
 }
+
+
+
 

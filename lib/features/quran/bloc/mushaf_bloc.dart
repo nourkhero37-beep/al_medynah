@@ -1,6 +1,8 @@
-﻿import 'dart:async';
+import 'dart:async';
+import 'dart:ui' as ui;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../repository/mushaf_repository.dart';
 import 'mushaf_event.dart';
 import 'mushaf_state.dart';
@@ -23,6 +25,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     on<MushafCacheUpdate>(_onCacheUpdate);
     on<MushafFontSizeChanged>(_onFontSizeChanged);
     on<MushafDarkModeToggled>(_onDarkModeToggled);
+    on<MushafTextColorChanged>(_onTextColorChanged);
   }
 
   void _onDurationUpdated(
@@ -72,11 +75,17 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     MushafInitialLoad event,
     Emitter<MushafState> emit,
   ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedColor = prefs.getInt('quran_text_color') ?? 0xDD000000;
+    final savedDarkMode = prefs.getBool('quran_dark_mode') ?? false;
+
     emit(
       state.copyWith(
         currentPage: event.initialPage,
         selectedVerseKey: event.highlightedVerseKey,
         isLoading: true,
+        textColor: savedColor,
+        isDarkMode: savedDarkMode,
       ),
     );
 
@@ -209,11 +218,31 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     emit(state.copyWith(fontScale: event.fontScale));
   }
 
-  void _onDarkModeToggled(
+  Future<void> _onDarkModeToggled(
     MushafDarkModeToggled event,
     Emitter<MushafState> emit,
-  ) {
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('quran_dark_mode', event.isDarkMode);
     emit(state.copyWith(isDarkMode: event.isDarkMode));
+  }
+
+  Future<void> _onTextColorChanged(
+    MushafTextColorChanged event,
+    Emitter<MushafState> emit,
+  ) async {
+    final color = ui.Color(event.colorValue);
+    final luminance = 0.299 * color.r + 0.587 * color.g + 0.114 * color.b;
+    final autoDarkMode = luminance > 0.6;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('quran_text_color', event.colorValue);
+    await prefs.setBool('quran_dark_mode', autoDarkMode);
+
+    emit(state.copyWith(
+      textColor: event.colorValue,
+      isDarkMode: autoDarkMode,
+    ));
   }
 
   @override
@@ -225,3 +254,4 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     return super.close();
   }
 }
+

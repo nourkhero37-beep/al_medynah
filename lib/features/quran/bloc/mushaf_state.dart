@@ -1,4 +1,4 @@
-﻿import 'package:equatable/equatable.dart';
+import 'package:equatable/equatable.dart';
 
 class MushafState extends Equatable {
   final int currentPage;
@@ -13,6 +13,7 @@ class MushafState extends Equatable {
   final Duration totalDuration;
   final double fontScale;
   final bool isDarkMode;
+  final int textColor;
 
   const MushafState({
     this.currentPage = 1,
@@ -27,6 +28,7 @@ class MushafState extends Equatable {
     this.totalDuration = Duration.zero,
     this.fontScale = 1.0,
     this.isDarkMode = false,
+    this.textColor = 0xDD000000,
   });
 
   static const _sentinel = Object();
@@ -44,6 +46,7 @@ class MushafState extends Equatable {
     Duration? totalDuration,
     double? fontScale,
     bool? isDarkMode,
+    int? textColor,
   }) {
     return MushafState(
       currentPage: currentPage ?? this.currentPage,
@@ -60,6 +63,7 @@ class MushafState extends Equatable {
       totalDuration: totalDuration ?? this.totalDuration,
       fontScale: fontScale ?? this.fontScale,
       isDarkMode: isDarkMode ?? this.isDarkMode,
+      textColor: textColor ?? this.textColor,
     );
   }
 
@@ -77,5 +81,6 @@ class MushafState extends Equatable {
     totalDuration,
     fontScale,
     isDarkMode,
+    textColor,
   ];
 }
