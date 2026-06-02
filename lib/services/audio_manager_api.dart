@@ -240,7 +240,7 @@ class AudioManager {
     downloadNotifier.value++;
 
     const total = 114;
-    const concurrency = 4;
+
 
     // Count already-downloaded surahs (for resume support)
     int completed = 0;
@@ -259,36 +259,28 @@ class AudioManager {
     downloadingSurah[rid] = completed;
     downloadNotifier.value++;
 
-    // Build list of remaining surahs
-    final remaining = List<int>.generate(total - completed, (i) => completed + 1 + i);
+    // Download remaining surahs sequentially (one at a time)
+    for (int surah = completed + 1; surah <= total; surah++) {
+      downloadingSurah[rid] = surah;
+      surahDownloadProgress[rid] = 0.0;
+      downloadNotifier.value++;
 
-    // Download in concurrent batches
-    for (int i = 0; i < remaining.length; i += concurrency) {
-      final end = (i + concurrency < remaining.length) ? i + concurrency : remaining.length;
-      final batch = remaining.sublist(i, end);
+      await downloadSurah(
+        rid,
+        surah,
+        reciter.serverUrl,
+        onProgress: (received, totalBytes) {
+          if (totalBytes > 0) {
+            surahDownloadProgress[rid] = received / totalBytes;
+            downloadNotifier.value++;
+          }
+        },
+      );
 
-      await Future.wait(batch.map((surah) async {
-        downloadingSurah[rid] = surah;
-        surahDownloadProgress[rid] = 0.0;
-        downloadNotifier.value++;
-
-        await downloadSurah(
-          rid,
-          surah,
-          reciter.serverUrl,
-          onProgress: (received, totalBytes) {
-            if (totalBytes > 0) {
-              surahDownloadProgress[rid] = received / totalBytes;
-              downloadNotifier.value++;
-            }
-          },
-        );
-
-        completed++;
-        downloadProgress[rid] = completed / total;
-        downloadingSurah[rid] = completed;
-        downloadNotifier.value++;
-      }));
+      completed++;
+      downloadProgress[rid] = completed / total;
+      downloadingSurah[rid] = completed;
+      downloadNotifier.value++;
     }
 
     downloadProgress[rid] = null;
