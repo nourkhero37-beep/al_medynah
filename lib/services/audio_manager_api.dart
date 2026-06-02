@@ -21,6 +21,15 @@ class AudioManager {
   String? _currentVerseKey;
   String? _currentReciterName;
 
+  // Shared download state (survives navigation away and back)
+  final Map<String, double?> downloadProgress = {};
+  final Map<String, bool> isDownloaded = {};
+  final Map<String, int?> downloadingSurah = {};
+  final Map<String, double> surahDownloadProgress = {};
+  final ValueNotifier<int> downloadNotifier = ValueNotifier<int>(0);
+  final Map<String, Future<void>> _downloadFutures = {};
+  final Map<String, String> _audioUrlsCache = {};
+
   AudioPlayer get player => _player;
   String? get currentReciterId => _currentReciterId;
   String? get currentVerseKey => _currentVerseKey;
@@ -89,6 +98,34 @@ class AudioManager {
     }
   }
 
+  /// Best-effort batch fetch of all surah audio URLs in a single API call.
+  /// If it fails, individual calls fall back to per-surah fetches.
+  Future<void> _fetchAllAudioUrls(int reciterId) async {
+    try {
+      final response = await _dio.get(
+        'https://api.qurancdn.com/api/qdc/audio/reciters/$reciterId/audio_files',
+        queryParameters: {'segments': false},
+      );
+
+      final audioFiles = response.data['audio_files'] as List<dynamic>?;
+      if (audioFiles == null || audioFiles.isEmpty) return;
+
+      for (final file in audioFiles) {
+        final verseKey = file['verse_key'] as String?;
+        final audioUrl = file['audio_url'] as String?;
+        if (verseKey != null && audioUrl != null) {
+          final surah = int.tryParse(verseKey.split(':').first);
+          if (surah != null) {
+            _audioUrlsCache['$reciterId:$surah'] = audioUrl;
+          }
+        }
+      }
+      debugPrint('Cached ${_audioUrlsCache.length} URLs for reciter $reciterId');
+    } catch (e) {
+      debugPrint('Batch URL fetch failed (falling back to per-surah): $e');
+    }
+  }
+
   Future<Map<String, List<int>>> fetchVerseTimings(
     int reciterId,
     int surahNumber,
@@ -113,7 +150,7 @@ class AudioManager {
       }
 
       debugPrint(
-        '✅ تم جلب ${timings.length} آية للقارئ $reciterId سورة $surahNumber',
+        'fetched ${timings.length} verses for reciter $reciterId surah $surahNumber',
       );
       return timings;
     } catch (e) {
@@ -140,6 +177,7 @@ class AudioManager {
     return File(path).existsSync();
   }
 
+  /// Downloads a single surah, checking the cached URL first.
   Future<void> downloadSurah(
     String reciterId,
     int surahNumber,
@@ -149,17 +187,18 @@ class AudioManager {
     final path = await _getSurahPath(reciterId, surahNumber);
     if (File(path).existsSync()) return;
 
-    final audioUrl = await fetchAudioUrl(
-      int.tryParse(reciterId) ?? 0,
-      surahNumber,
-    );
+    final audioUrl = _audioUrlsCache['$reciterId:$surahNumber'] ??
+        await fetchAudioUrl(
+          int.tryParse(reciterId) ?? 0,
+          surahNumber,
+        );
 
     if (audioUrl == null) {
-      throw Exception('لم يتم إيجاد رابط الصوت للسورة $surahNumber');
+      throw Exception('no audio URL for surah $surahNumber');
     }
 
     final cleanUrl = audioUrl.replaceAll(RegExp(r'(?<!:)//'), '/');
-    debugPrint('تحميل سورة $surahNumber من: $cleanUrl');
+    debugPrint('downloading surah $surahNumber from: $cleanUrl');
 
     try {
       await _dio.download(
@@ -171,15 +210,105 @@ class AudioManager {
     } catch (e) {
       final file = File(path);
       if (file.existsSync()) file.deleteSync();
-      debugPrint('خطأ تحميل سورة $surahNumber: $e');
+      debugPrint('error downloading surah $surahNumber: $e');
       rethrow;
     }
+  }
+
+  /// Starts or resumes a download for the given reciter.
+  /// Returns the same Future if already running (no-op duplicate calls).
+  Future<void> startDownload(RecitersModel reciter) async {
+    final rid = reciter.id.toString();
+    if (_downloadFutures.containsKey(rid)) {
+      await _downloadFutures[rid]!;
+      return;
+    }
+    final future = _doDownload(reciter);
+    _downloadFutures[rid] = future;
+    try {
+      await future;
+    } finally {
+      _downloadFutures.remove(rid);
+    }
+  }
+
+  Future<void> _doDownload(RecitersModel reciter) async {
+    final rid = reciter.id.toString();
+
+    downloadProgress[rid] = 0.0;
+    surahDownloadProgress[rid] = 0.0;
+    downloadNotifier.value++;
+
+    const total = 114;
+    const concurrency = 4;
+
+    // Count already-downloaded surahs (for resume support)
+    int completed = 0;
+    for (int s = 1; s <= total; s++) {
+      if (await isSurahDownloaded(rid, s)) {
+        completed++;
+      } else {
+        break;
+      }
+    }
+
+    // Fetch all audio URLs in one batch call
+    await _fetchAllAudioUrls(int.parse(rid));
+
+    downloadProgress[rid] = completed / total;
+    downloadingSurah[rid] = completed;
+    downloadNotifier.value++;
+
+    // Build list of remaining surahs
+    final remaining = List<int>.generate(total - completed, (i) => completed + 1 + i);
+
+    // Download in concurrent batches
+    for (int i = 0; i < remaining.length; i += concurrency) {
+      final end = (i + concurrency < remaining.length) ? i + concurrency : remaining.length;
+      final batch = remaining.sublist(i, end);
+
+      await Future.wait(batch.map((surah) async {
+        downloadingSurah[rid] = surah;
+        surahDownloadProgress[rid] = 0.0;
+        downloadNotifier.value++;
+
+        await downloadSurah(
+          rid,
+          surah,
+          reciter.serverUrl,
+          onProgress: (received, totalBytes) {
+            if (totalBytes > 0) {
+              surahDownloadProgress[rid] = received / totalBytes;
+              downloadNotifier.value++;
+            }
+          },
+        );
+
+        completed++;
+        downloadProgress[rid] = completed / total;
+        downloadingSurah[rid] = completed;
+        downloadNotifier.value++;
+      }));
+    }
+
+    downloadProgress[rid] = null;
+    downloadingSurah[rid] = null;
+    surahDownloadProgress[rid] = 0.0;
+    isDownloaded[rid] = true;
+    downloadNotifier.value++;
   }
 
   Future<void> deleteReciter(String reciterId) async {
     final dir = await getApplicationDocumentsDirectory();
     final audioDir = Directory('${dir.path}/audio/$reciterId');
     if (audioDir.existsSync()) audioDir.deleteSync(recursive: true);
+    downloadProgress.remove(reciterId);
+    isDownloaded[reciterId] = false;
+    downloadingSurah.remove(reciterId);
+    surahDownloadProgress.remove(reciterId);
+    _downloadFutures.remove(reciterId);
+    _audioUrlsCache.removeWhere((key, _) => key.startsWith('$reciterId:'));
+    downloadNotifier.value++;
   }
 
   Future<void> saveSelectedReciter(

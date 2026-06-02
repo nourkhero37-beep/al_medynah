@@ -20,15 +20,21 @@ class _RecitersScreenState extends State<ReciterPage> {
   bool _isLoadingReciters = true;
   String? _selectedReciterId;
 
-  final Map<String, double?> _downloadProgress = {};
-  final Map<String, bool> _isDownloaded = {};
-  final Map<String, int?> _downloadingSurah = {};
-  final Map<String, double> _surahDownloadProgress = {};
-
   @override
   void initState() {
     super.initState();
+    _audioManager.downloadNotifier.addListener(_onDownloadStateChanged);
     _init();
+  }
+
+  @override
+  void dispose() {
+    _audioManager.downloadNotifier.removeListener(_onDownloadStateChanged);
+    super.dispose();
+  }
+
+  void _onDownloadStateChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _init() async {
@@ -39,9 +45,11 @@ class _RecitersScreenState extends State<ReciterPage> {
 
     for (final r in reciters) {
       final rid = r.id.toString();
-      final first = await _audioManager.isSurahDownloaded(rid, 1);
-      final last = await _audioManager.isSurahDownloaded(rid, 114);
-      _isDownloaded[rid] = first && last;
+      if (_audioManager.downloadProgress[rid] == null && !(_audioManager.isDownloaded[rid] ?? false)) {
+        final first = await _audioManager.isSurahDownloaded(rid, 1);
+        final last = await _audioManager.isSurahDownloaded(rid, 114);
+        _audioManager.isDownloaded[rid] = first && last;
+      }
     }
 
     if (mounted) {
@@ -53,59 +61,9 @@ class _RecitersScreenState extends State<ReciterPage> {
   }
 
   Future<void> _download(RecitersModel reciter) async {
-    final rid = reciter.id.toString();
-    setState(() {
-      _downloadProgress[rid] = 0.0;
-      _surahDownloadProgress[rid] = 0.0;
-    });
-
     try {
-      const total = 114;
-
-      int completed = 0;
-      for (int s = 1; s <= total; s++) {
-        final downloaded = await _audioManager.isSurahDownloaded(rid, s);
-        if (downloaded) {
-          completed++;
-        } else {
-          break;
-        }
-      }
-
+      await _audioManager.startDownload(reciter);
       if (mounted) {
-        setState(() => _downloadProgress[rid] = completed / total);
-      }
-
-      for (int surah = completed + 1; surah <= total; surah++) {
-        if (mounted) {
-          setState(() {
-            _downloadingSurah[rid] = surah;
-            _surahDownloadProgress[rid] = 0.0;
-          });
-        }
-        await _audioManager.downloadSurah(
-          rid,
-          surah,
-          reciter.serverUrl,
-          onProgress: (received, totalBytes) {
-            if (mounted && totalBytes > 0) {
-              setState(() => _surahDownloadProgress[rid] = received / totalBytes);
-            }
-          },
-        );
-        completed++;
-        if (mounted) {
-          setState(() => _downloadProgress[rid] = completed / total);
-        }
-      }
-
-      if (mounted) {
-        setState(() {
-          _downloadProgress[rid] = null;
-          _downloadingSurah[rid] = null;
-          _surahDownloadProgress[rid] = 0.0;
-          _isDownloaded[rid] = true;
-        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context).tr('reciter.download.success', {'name': reciter.nameArabic})),
@@ -115,11 +73,6 @@ class _RecitersScreenState extends State<ReciterPage> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() {
-          _downloadProgress[rid] = null;
-          _downloadingSurah[rid] = null;
-          _surahDownloadProgress[rid] = 0.0;
-        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context).tr('reciter.download.fail')),
@@ -151,10 +104,11 @@ class _RecitersScreenState extends State<ReciterPage> {
   Future<void> _delete(RecitersModel reciter) async {
     final rid = reciter.id.toString();
     await _audioManager.deleteReciter(rid);
-    setState(() {
-      _isDownloaded[rid] = false;
-      if (_selectedReciterId == rid) _selectedReciterId = null;
-    });
+    if (mounted) {
+      setState(() {
+        if (_selectedReciterId == rid) _selectedReciterId = null;
+      });
+    }
   }
 
   void _showDeleteDialog(RecitersModel reciter) {
@@ -222,9 +176,9 @@ class _RecitersScreenState extends State<ReciterPage> {
               itemBuilder: (context, index) {
                 final reciter = _reciters[index];
                 final rid = reciter.id.toString();
-                final isDownloaded = _isDownloaded[rid] ?? false;
+                final isDownloaded = _audioManager.isDownloaded[rid] ?? false;
                 final isSelected = _selectedReciterId == rid;
-                final progress = _downloadProgress[rid];
+                final progress = _audioManager.downloadProgress[rid];
                 final isDownloading = progress != null;
 
                 return Container(
@@ -375,7 +329,7 @@ class _RecitersScreenState extends State<ReciterPage> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(4),
                                 child: LinearProgressIndicator(
-                                  value: _surahDownloadProgress[rid],
+                                  value: _audioManager.surahDownloadProgress[rid],
                                   backgroundColor: Colors.grey.withValues(alpha: 0.2),
                                   color: goldColor,
                                   minHeight: 6,
@@ -384,10 +338,10 @@ class _RecitersScreenState extends State<ReciterPage> {
                               const SizedBox(height: 4),
                               Text(
                                 AppLocalizations.of(context).tr('reciter.progress', {
-                                  'current': '${_downloadingSurah[rid] ?? '...'}',
-                                  'percent': '${((_surahDownloadProgress[rid] ?? 0) * 100).toInt()}',
+                                  'completed': '${_audioManager.downloadingSurah[rid] ?? 0}',
+                                  'percent': '${((_audioManager.downloadProgress[rid] ?? 0) * 100).toInt()}',
                                 }),
-                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -399,4 +353,3 @@ class _RecitersScreenState extends State<ReciterPage> {
     );
   }
 }
-

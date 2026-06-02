@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AppLocalizations {
@@ -68,7 +68,7 @@ class AppLocalizations {
       'reciter.action.download': 'Download full Quran',
       'reciter.action.select': 'Select',
       'reciter.action.delete': 'Delete',
-      'reciter.progress': 'Surah {current}: {percent}%',
+      'reciter.progress': '{completed} / 114  {percent}%',
 
       'qibla.appBar.title': 'Qibla',
       'qibla.error.location': 'Please allow location access\nto determine Qibla direction',
@@ -245,7 +245,7 @@ class AppLocalizations {
       'reciter.action.download': '\u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0642\u0631\u0622\u0646 \u0643\u0627\u0645\u0644',
       'reciter.action.select': '\u0627\u062E\u062A\u064A\u0627\u0631',
       'reciter.action.delete': '\u062D\u0630\u0641',
-      'reciter.progress': '\u0633\u0648\u0631\u0629 {current}: {percent}%',
+      'reciter.progress': '{completed} / 114  {percent}%',
 
       'qibla.appBar.title': '\u0627\u0644\u0642\u0628\u0644\u0629',
       'qibla.error.location': '\u064A\u0631\u062C\u0649 \u0627\u0644\u0633\u0645\u0627\u062D \u0628\u0627\u0644\u0648\u0635\u0648\u0644 \u0625\u0644\u0649 \u0627\u0644\u0645\u0648\u0642\u0639\n\u0644\u062A\u062D\u062F\u064A\u062F \u0627\u062A\u062C\u0627\u0647 \u0627\u0644\u0642\u0628\u0644\u0629',
@@ -421,7 +421,7 @@ class AppLocalizations {
       'reciter.action.download': 'Kur\'an\'\u0131 Tamamen \u0130ndir',
       'reciter.action.select': 'Se\u00e7',
       'reciter.action.delete': 'Sil',
-      'reciter.progress': 'Sure {current}: {percent}%',
+      'reciter.progress': '{completed} / 114  {percent}%',
 
       'qibla.appBar.title': 'K\u0131ble',
       'qibla.error.location': 'K\u0131ble y\u00f6n\u00fcn\u00fc belirlemek i\u00e7in\nl\u00fctfen konum izni verin',
