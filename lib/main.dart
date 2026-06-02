@@ -1,4 +1,5 @@
-import 'package:al_medynah/l10n/app_localizations.dart';
+﻿import 'package:al_medynah/l10n/app_localizations.dart';
+import 'package:al_medynah/services/audio_manager_api.dart';
 import 'package:al_medynah/screens/language_selection_page.dart';
 import 'package:al_medynah/screens/splash.dart';
 import 'package:al_medynah/services/locale_service.dart';
@@ -12,6 +13,7 @@ final ValueNotifier<Locale> appLocaleNotifier =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting();
+  await AudioManager().loadSelectedReciter();
   runApp(const Almedinah());
 }
 

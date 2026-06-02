@@ -1,4 +1,4 @@
-import 'package:al_medynah/features/quran/mushaf_screen.dart';
+﻿import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
 import 'package:al_medynah/screens/azkar_categories_screen.dart';

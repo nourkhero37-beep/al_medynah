@@ -1,4 +1,5 @@
-﻿import 'package:shared_preferences/shared_preferences.dart';
+﻿import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BookmarkService {
   static final BookmarkService _instance = BookmarkService._internal();
@@ -11,6 +12,7 @@ class BookmarkService {
   static const String _ayahNumberKey = 'bookmark_ayah_number';
 
   static const String _pageBookmarkKey = 'page_bookmark';
+  final ValueNotifier<int> bookmarkNotifier = ValueNotifier<int>(0);
 
   Future<void> saveBookmark({
     required int page,
@@ -53,6 +55,7 @@ class BookmarkService {
   Future<void> savePageBookmark(int page) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_pageBookmarkKey, page);
+    bookmarkNotifier.value++;
   }
 
   Future<int?> getPageBookmark() async {
