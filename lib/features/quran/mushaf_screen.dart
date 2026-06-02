@@ -148,6 +148,8 @@ class _MushafViewState extends State<_MushafView> {
 
   Future<void> _sharePage(BuildContext context, int page) async {
     final tr = AppLocalizations.of(context).tr;
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await WidgetsBinding.instance.endOfFrame;
     final boundary = _pageCaptureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     if (boundary == null) {
       await Share.share(tr('mushaf.menu.shared', {'page': page.toString()}));
@@ -155,8 +157,8 @@ class _MushafViewState extends State<_MushafView> {
     }
     try {
       await WidgetsBinding.instance.endOfFrame;
-      await Future<void>.delayed(const Duration(milliseconds: 50));
-      final image = await boundary.toImage(pixelRatio: 2.0);
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      final image = await boundary.toImage(pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) {
         await Share.share(tr('mushaf.menu.shared', {'page': page.toString()}));
@@ -256,14 +258,14 @@ class _MushafViewState extends State<_MushafView> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.1),
+                          color: (state.isDarkMode ? Colors.white : Colors.black).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           '${state.currentPage} / 604',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Colors.black54,
+                            color: state.isDarkMode ? Colors.white54 : Colors.black54,
                           ),
                         ),
                       ),
@@ -280,12 +282,12 @@ class _MushafViewState extends State<_MushafView> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.15),
+                      color: (st.isDarkMode ? Colors.white : Colors.black).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Icon(
                       Icons.menu_rounded,
-                      color: Colors.black.withValues(alpha: 0.6),
+                      color: (st.isDarkMode ? Colors.white : Colors.black).withValues(alpha: 0.6),
                       size: 22,
                     ),
                   ),
@@ -803,10 +805,11 @@ class _MushafPageView extends StatelessWidget {
       height: screenHeight,
       child: Stack(
         children: [
-          if (isDarkMode)
-            Positioned.fill(
-              child: Container(color: Colors.black),
+          Positioned.fill(
+            child: Container(
+              color: isDarkMode ? Colors.black : const Color(0xfff8f3e8),
             ),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
             child: Column(

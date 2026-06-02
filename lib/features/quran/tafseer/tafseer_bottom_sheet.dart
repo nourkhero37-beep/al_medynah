@@ -12,9 +12,12 @@ class TafseerBottomSheet extends StatefulWidget {
   const TafseerBottomSheet({super.key, required this.verseKey});
 
   static void show(BuildContext context, String verseKey) {
+    final screenHeight = MediaQuery.of(context).size.height;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(maxHeight: screenHeight * 0.85),
       backgroundColor: Colors.transparent,
       builder: (_) => TafseerBottomSheet(verseKey: verseKey),
     );
@@ -209,10 +212,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Container(
-      constraints: BoxConstraints(maxHeight: screenHeight * 0.85),
       decoration: const BoxDecoration(
         color: Color(0xFFF5ECD7),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
