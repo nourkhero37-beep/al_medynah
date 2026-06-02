@@ -1,4 +1,4 @@
-﻿import 'package:al_medynah/features/quran/mushaf_screen.dart';
+import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
 import 'package:al_medynah/screens/azkar_categories_screen.dart';
@@ -15,6 +15,7 @@ import 'package:al_medynah/services/bookmark_service.dart';
 import 'package:al_medynah/services/locale_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' hide TextDirection;
+import 'package:hijri/hijri_calendar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,6 +27,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool isDarkMode = true;
   int? _bookmarkPage;
+  bool _showGregorian = false;
 
   @override
   void initState() {
@@ -36,6 +38,16 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadBookmark() async {
     final page = await BookmarkService().getPageBookmark();
     if (mounted) setState(() => _bookmarkPage = page);
+  }
+
+  String _formatHijriDate(String localeCode) {
+    final locale = switch (localeCode) {
+      'ar' => 'ar',
+      'tr' => 'tr',
+      _ => 'en',
+    };
+    HijriCalendar.setLocal(locale);
+    return HijriCalendar.fromDate(DateTime.now()).fullDate();
   }
 
   final List<Map<String, String>> gridItems = [
@@ -122,7 +134,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final localeCode = AppLocalizations.of(context).localeCode;
-    final dateStr = DateFormat.yMMMMEEEEd(localeCode).format(now);
+    final gregorianStr = DateFormat.yMMMMEEEEd(localeCode).format(now);
+    final hijriStr = _formatHijriDate(localeCode);
+    final dateStr = _showGregorian ? gregorianStr : hijriStr;
 
     return Scaffold(
       body: Stack(
@@ -181,12 +195,16 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 25),
 
-                  Text(
-                    dateStr,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onLongPressStart: (_) => setState(() => _showGregorian = true),
+                    onLongPressEnd: (_) => setState(() => _showGregorian = false),
+                    child: Text(
+                      dateStr,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
 

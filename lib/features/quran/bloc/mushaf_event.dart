@@ -89,6 +89,14 @@ class MushafDarkModeToggled extends MushafEvent {
   List<Object?> get props => [isDarkMode];
 }
 
+class MushafAutoAdvanceSurah extends MushafEvent {
+  final int surahNumber;
+  const MushafAutoAdvanceSurah(this.surahNumber);
+
+  @override
+  List<Object?> get props => [surahNumber];
+}
+
 class MushafTextColorChanged extends MushafEvent {
   final int colorValue;
   const MushafTextColorChanged(this.colorValue);

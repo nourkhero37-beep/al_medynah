@@ -1,10 +1,12 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:al_medynah/l10n/app_localizations.dart';
 import 'package:al_medynah/screens/home_page.dart';
 import 'package:al_medynah/services/quran_data_service.dart';
 import 'package:al_medynah/screens/language_selection_page.dart';
 import 'package:al_medynah/services/locale_service.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:al_medynah/features/quran/mushaf_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -47,12 +49,26 @@ class _SplashScreenState extends State<SplashScreen> {
     await _dataService.registerFonts();
     if (!mounted) return;
 
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 2), () async {
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomePage()),
-        );
+        final prefs = await SharedPreferences.getInstance();
+        final lastPage = prefs.getInt('last_read_page');
+        final hasLastPage = lastPage != null && lastPage >= 1 && lastPage <= 604;
+        if (mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const HomePage()),
+            (route) => false,
+          );
+          if (hasLastPage) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MushafScreen(initialPage: lastPage),
+              ),
+            );
+          }
+        }
       }
     });
   }

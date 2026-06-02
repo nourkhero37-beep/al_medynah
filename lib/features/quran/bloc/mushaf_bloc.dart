@@ -26,6 +26,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     on<MushafFontSizeChanged>(_onFontSizeChanged);
     on<MushafDarkModeToggled>(_onDarkModeToggled);
     on<MushafTextColorChanged>(_onTextColorChanged);
+    on<MushafAutoAdvanceSurah>(_onAutoAdvanceSurah);
   }
 
   void _onDurationUpdated(
@@ -98,6 +99,15 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     ) {
       if (!isClosed &&
           playerState.processingState == ProcessingState.completed) {
+        final currentVerseKey = state.selectedVerseKey;
+        if (currentVerseKey != null) {
+          final currentSurah = int.tryParse(currentVerseKey.split(':')[0]) ?? 0;
+          final nextSurah = currentSurah + 1;
+          if (nextSurah <= 114) {
+            unawaited(_tryAdvanceSurah(nextSurah));
+            return;
+          }
+        }
         add(
           const MushafPositionUpdated(
             position: Duration.zero,
@@ -120,6 +130,8 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     Emitter<MushafState> emit,
   ) async {
     emit(state.copyWith(currentPage: event.page, pagesCache: repository.pagesCache));
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('last_read_page', event.page);
     unawaited(repository.preloadPages(event.page).then((_) {
       if (!isClosed) add(const MushafCacheUpdate());
     }));
@@ -245,6 +257,41 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     ));
   }
 
+  Future<void> _tryAdvanceSurah(int nextSurah) async {
+    if (nextSurah > 114) return;
+    final downloaded = await repository.isSurahDownloaded(nextSurah);
+    if (!downloaded) return;
+    if (!isClosed) add(MushafAutoAdvanceSurah(nextSurah));
+  }
+
+  Future<void> _onAutoAdvanceSurah(
+    MushafAutoAdvanceSurah event,
+    Emitter<MushafState> emit,
+  ) async {
+    final firstVerseKey = '${event.surahNumber}:1';
+    await repository.stopAudio();
+    _positionSubscription?.cancel();
+
+    final timings = await repository.fetchVerseTimings(event.surahNumber);
+    final seekToMs = timings[firstVerseKey]?[0];
+
+    _positionSubscription = repository.positionStream.listen((position) {
+      if (!isClosed) {
+        add(MushafPositionUpdated(position: position, verseTimings: timings));
+      }
+    });
+
+    emit(state.copyWith(
+      selectedVerseKey: firstVerseKey,
+      verseTimings: timings,
+      isPlaying: true,
+      isPaused: false,
+      currentPosition: Duration.zero,
+    ));
+
+    await repository.playVerse(firstVerseKey, seekToMs: seekToMs);
+  }
+
   @override
   Future<void> close() {
     _playerStateSubscription?.cancel();
@@ -254,4 +301,3 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     return super.close();
   }
 }
-

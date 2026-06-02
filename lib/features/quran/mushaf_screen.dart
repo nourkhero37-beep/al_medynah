@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:al_medynah/features/quran/tafseer/tafseer_bottom_sheet.dart';
 import 'package:al_medynah/services/bookmark_service.dart';
 import 'package:flutter/material.dart';
@@ -65,17 +67,31 @@ class _MushafViewState extends State<_MushafView> {
   late PageController _pageController;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey _pageCaptureKey = GlobalKey();
+  Map<String, int> _verseToPage = {};
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: widget.initialPage - 1);
+    _loadVersePageMap();
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadVersePageMap() async {
+    try {
+      final jsonStr = await rootBundle.loadString('assets/quran_data/verses.json');
+      final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+      final map = <String, int>{};
+      data.forEach((key, value) {
+        map[key] = (value as Map<String, dynamic>)['page'] as int;
+      });
+      _verseToPage = map;
+    } catch (_) {}
   }
 
   void _goToPage(BuildContext context) {
@@ -179,6 +195,9 @@ class _MushafViewState extends State<_MushafView> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<MushafBloc, MushafState>(
+      listenWhen: (prev, curr) =>
+        prev.selectedVerseKey != curr.selectedVerseKey ||
+        prev.errorMessage != curr.errorMessage,
       listener: (context, state) {
         if (state.errorMessage != null) {
           final tr = AppLocalizations.of(context).tr;
@@ -191,6 +210,12 @@ class _MushafViewState extends State<_MushafView> {
                   : Colors.orange,
             ),
           );
+        }
+        if (state.isPlaying && state.selectedVerseKey != null) {
+          final page = _verseToPage[state.selectedVerseKey];
+          if (page != null && page != state.currentPage) {
+            _pageController.jumpToPage(page - 1);
+          }
         }
       },
       child: BlocBuilder<MushafBloc, MushafState>(
@@ -957,7 +982,4 @@ class _MushafPageView extends StatelessWidget {
     );
   }
 }
-
-
-
 

@@ -1,4 +1,4 @@
-﻿name: al_medynah
+name: al_medynah
 description: "A new Flutter project."
 publish_to: 'none'
 
@@ -33,6 +33,7 @@ dependencies:
   chewie: ^1.13.1
   archive: ^4.0.2
   share_plus: ^10.1.4
+  hijri: ^3.0.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.3
@@ -65,4 +66,5 @@ flutter:
     - assets/images/qublah.png
     - assets/images/reciters.png
     - assets/images/prayertime.png
+    - assets/quran_data/verses.json
 
