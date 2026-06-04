@@ -1,4 +1,4 @@
-﻿import 'package:al_medynah/l10n/app_localizations.dart';
+import 'package:al_medynah/l10n/app_localizations.dart';
 // ignore_for_file: unused_field
 
 import 'package:al_medynah/features/quran/mushaf_screen.dart';
@@ -147,7 +147,7 @@ class _AyahListState extends State<AyahList> {
                   Text(
                     '${surah.id}',
                     style: const TextStyle(
-                      color: darkBrown,
+                      color: Colors.orange,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
@@ -226,4 +226,5 @@ class _AyahListState extends State<AyahList> {
     );
   }
 }
+
 

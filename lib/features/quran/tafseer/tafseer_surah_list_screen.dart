@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:al_medynah/model/surah_model.dart';
 import 'tafseer_ayah_screen.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
@@ -129,7 +129,7 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
                           Text(
                             '${surah.id}',
                             style: const TextStyle(
-                              color: darkBrown,
+                              color: Colors.orange,
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                             ),
@@ -220,4 +220,6 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
     );
   }
 }
+
+
 
