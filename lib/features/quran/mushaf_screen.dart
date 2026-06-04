@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/services.dart';
@@ -219,7 +219,7 @@ class _MushafViewState extends State<_MushafView> {
         }
       },
       child: BlocBuilder<MushafBloc, MushafState>(
-        buildWhen: (p, c) => p.isDarkMode != c.isDarkMode,
+        buildWhen: (p, c) => p.isDarkMode != c.isDarkMode || p.isPlaying != c.isPlaying,
         builder: (ctx, st) => Scaffold(
           key: _scaffoldKey,
           backgroundColor: st.isDarkMode ? Colors.black : const Color(0xfff8f3e8),
@@ -270,7 +270,7 @@ class _MushafViewState extends State<_MushafView> {
                 },
               ),
 
-              Positioned(
+              if (!st.isPlaying) Positioned(
                 bottom: 8,
                 left: 0,
                 right: 0,
@@ -299,7 +299,7 @@ class _MushafViewState extends State<_MushafView> {
                 ),
               ),
 
-              Positioned(
+              if (!st.isPlaying) Positioned(
                 top: 8,
                 right: 12,
                 child: GestureDetector(
@@ -353,21 +353,6 @@ class _MushafDrawer extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFB8964E),
-                    ),
-                    child: Text(
-                      '${tr('mushaf.menu.goToPage')} ${state.currentPage} / 604',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
                   Expanded(
                     child: ListView(
                       padding: EdgeInsets.zero,
@@ -492,20 +477,6 @@ class _MushafDrawer extends StatelessWidget {
                                 content: Text(tr(newMode ? 'mushaf.menu.darkModeOn' : 'mushaf.menu.darkModeOff')),
                                 backgroundColor: const Color(0xFF8B6914),
                                 duration: const Duration(seconds: 1),
-                              ),
-                            );
-                          },
-                        ),
-                        const Divider(color: Colors.white24, height: 1),
-                        _drawerItem(
-                          icon: Icons.settings_rounded,
-                          text: tr('mushaf.menu.settings'),
-                          onTap: () {
-                            scaffoldKey.currentState?.closeDrawer();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(tr('mushaf.menu.settings')),
-                                backgroundColor: const Color(0xFF8B6914),
                               ),
                             );
                           },

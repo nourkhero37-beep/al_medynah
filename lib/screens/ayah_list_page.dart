@@ -43,7 +43,7 @@ class _AyahListState extends State<AyahList> {
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: TextDirection.rtl, // ✅ كل الشاشة من اليمين لليسار
+      textDirection: TextDirection.rtl, // ? ?? ?????? ?? ?????? ??????
       child: Scaffold(
         backgroundColor: const Color(0xFFF5ECD7),
         appBar: AppBar(
@@ -62,7 +62,7 @@ class _AyahListState extends State<AyahList> {
         ),
         body: Column(
           children: [
-            // شريط البحث
+            // ???? ?????
             Container(
               color: const Color(0xFF8B6914),
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -85,7 +85,7 @@ class _AyahListState extends State<AyahList> {
               ),
             ),
 
-            // قائمة السور
+            // ????? ?????
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -131,7 +131,7 @@ class _AyahListState extends State<AyahList> {
         ),
         child: Row(
           children: [
-            // ✅ رقم السورة داخل الصورة
+            // ? ??? ?????? ???? ??????
             SizedBox(
               width: 42,
               height: 42,
@@ -139,7 +139,7 @@ class _AyahListState extends State<AyahList> {
                 alignment: Alignment.center,
                 children: [
                   Image.asset(
-                    'assets/images/ارقام الايات.png', // ← مسار صورتك
+                    'assets/images/ارقام الايات.png', // ? ???? ?????
                     width: 42,
                     height: 42,
                     fit: BoxFit.contain,
@@ -158,7 +158,7 @@ class _AyahListState extends State<AyahList> {
 
             const SizedBox(width: 14),
 
-            // اسم السورة
+            // ??? ??????
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,6 +166,7 @@ class _AyahListState extends State<AyahList> {
                   Text(
                     surah.nameArabic,
                     style: const TextStyle(
+                      fontFamily: 'GE SS Two',
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                       color: darkBrown,
@@ -183,7 +184,7 @@ class _AyahListState extends State<AyahList> {
               ),
             ),
 
-            // عدد الآيات + نوع السورة
+            // ??? ?????? + ??? ??????
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -225,3 +226,4 @@ class _AyahListState extends State<AyahList> {
     );
   }
 }
+

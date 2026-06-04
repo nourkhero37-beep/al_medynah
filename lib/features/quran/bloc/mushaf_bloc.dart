@@ -12,6 +12,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
   StreamSubscription<PlayerState>? _playerStateSubscription;
   StreamSubscription<Duration>? _positionSubscription;
   StreamSubscription<Duration?>? _durationSubscription;
+  bool _isHandlingCompletion = false;
 
   MushafBloc({required this.repository}) : super(const MushafState()) {
     on<MushafInitialLoad>(_onInitialLoad);
@@ -40,12 +41,18 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     MushafPauseTapped event,
     Emitter<MushafState> emit,
   ) async {
+    _isHandlingCompletion = false;
+
     if (state.isPlaying) {
       await repository.pauseAudio();
       emit(state.copyWith(isPlaying: false, isPaused: true));
     } else if (state.isPaused) {
       await repository.resumeAudio();
       emit(state.copyWith(isPlaying: true, isPaused: false));
+    } else {
+      if (state.selectedVerseKey != null) {
+        add(const MushafPlayTapped());
+      }
     }
   }
 
@@ -53,6 +60,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     MushafStopTapped event,
     Emitter<MushafState> emit,
   ) async {
+    _isHandlingCompletion = false;
     await repository.stopAudio();
     _positionSubscription?.cancel();
     emit(
@@ -98,7 +106,20 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
       playerState,
     ) {
       if (!isClosed &&
-          playerState.processingState == ProcessingState.completed) {
+          playerState.processingState == ProcessingState.completed &&
+          !_isHandlingCompletion) {
+        // Position guard: only consider completion legitimate if
+        // we're near the end of the audio (filters false events on Windows)
+        final timings = state.verseTimings;
+        if (timings.isNotEmpty) {
+          final maxEndMs = timings.values
+              .expand((list) => list)
+              .reduce((a, b) => a > b ? a : b);
+          if (repository.currentPosition.inMilliseconds < maxEndMs - 500) {
+            return;
+          }
+        }
+        _isHandlingCompletion = true;
         final currentVerseKey = state.selectedVerseKey;
         if (currentVerseKey != null) {
           final currentSurah = int.tryParse(currentVerseKey.split(':')[0]) ?? 0;
@@ -108,6 +129,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
             return;
           }
         }
+        _isHandlingCompletion = false;
         add(
           const MushafPositionUpdated(
             position: Duration.zero,
@@ -148,6 +170,8 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     MushafPlayTapped event,
     Emitter<MushafState> emit,
   ) async {
+    _isHandlingCompletion = false;
+
     if (state.selectedVerseKey == null) {
       emit(state.copyWith(errorMessage: 'mushaf.error.tapFirst'));
       return;
@@ -184,6 +208,13 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     MushafPositionUpdated event,
     Emitter<MushafState> emit,
   ) {
+    // Guard: skip stale events from old position subscription after auto-advance
+    if (state.verseTimings.isNotEmpty && event.verseTimings.isNotEmpty &&
+        state.verseTimings.keys.first != event.verseTimings.keys.first) {
+      return;
+    }
+
+    // Early exit if no timings loaded yet
     if (event.verseTimings.isEmpty) {
       emit(
         state.copyWith(
@@ -193,6 +224,26 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
         ),
       );
       return;
+    }
+
+    // Position-based completion fallback (for platforms where ProcessingState.completed is unreliable)
+    final maxEndMs = event.verseTimings.values
+        .expand((list) => list)
+        .reduce((a, b) => a > b ? a : b);
+    if (!_isHandlingCompletion &&
+        state.isPlaying &&
+        maxEndMs > 500 &&
+        event.position.inMilliseconds >= maxEndMs - 500) {
+      _isHandlingCompletion = true;
+      final vsKey = state.selectedVerseKey;
+      if (vsKey != null) {
+        final surah = int.tryParse(vsKey.split(':')[0]) ?? 0;
+        if (surah > 0 && surah < 114) {
+          unawaited(_tryAdvanceSurah(surah + 1));
+          return;
+        }
+      }
+      _isHandlingCompletion = false;
     }
 
     final ms = event.position.inMilliseconds;
@@ -258,9 +309,15 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
   }
 
   Future<void> _tryAdvanceSurah(int nextSurah) async {
-    if (nextSurah > 114) return;
+    if (nextSurah > 114) {
+      _isHandlingCompletion = false;
+      return;
+    }
     final downloaded = await repository.isSurahDownloaded(nextSurah);
-    if (!downloaded) return;
+    if (!downloaded) {
+      _isHandlingCompletion = false;
+      return;
+    }
     if (!isClosed) add(MushafAutoAdvanceSurah(nextSurah));
   }
 
@@ -268,8 +325,9 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     MushafAutoAdvanceSurah event,
     Emitter<MushafState> emit,
   ) async {
+    _isHandlingCompletion = false;
+
     final firstVerseKey = '${event.surahNumber}:1';
-    await repository.stopAudio();
     _positionSubscription?.cancel();
 
     final timings = await repository.fetchVerseTimings(event.surahNumber);
@@ -301,3 +359,5 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     return super.close();
   }
 }
+
+

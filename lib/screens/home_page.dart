@@ -1,4 +1,4 @@
-﻿import 'package:al_medynah/features/quran/mushaf_screen.dart';
+import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
 import 'package:al_medynah/screens/azkar_categories_screen.dart';
@@ -25,9 +25,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isDarkMode = true;
+  bool isDarkMode = false;
   int? _bookmarkPage;
-  bool _showGregorian = false;
 
   @override
   void initState() {
@@ -50,6 +49,15 @@ class _HomePageState extends State<HomePage> {
     return HijriCalendar.fromDate(DateTime.now()).fullDate();
   }
 
+  String _currentLanguageName(AppLocalizations loc) {
+    switch (appLocaleNotifier.value.languageCode) {
+      case 'ar': return loc.tr('lang.arabic');
+      case 'en': return loc.tr('lang.english');
+      case 'tr': return loc.tr('lang.turkish');
+      default: return loc.tr('lang.arabic');
+    }
+  }
+
   final List<Map<String, String>> gridItems = [
     {'key': 'tv', 'image': 'assets/images/tv.png'},
     {'key': 'azkar', 'image': 'assets/images/azkar.png'},
@@ -61,82 +69,13 @@ class _HomePageState extends State<HomePage> {
     {'key': 'qibla', 'image': 'assets/images/qublah.png'},
   ];
 
-  Future<void> _showLanguageDialog() async {
-    final loc = AppLocalizations.of(context);
-    final current = appLocaleNotifier.value;
-    await showDialog<String>(
-      context: context,
-      builder: (ctx) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: AlertDialog(
-            backgroundColor: const Color(0xFFF5ECD7),
-            title: Text(
-              loc.tr('lang.title'),
-              style: const TextStyle(color: Color(0xFF3E2A0F)),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _langOption(ctx, loc, current, 'ar', 'lang.arabic'),
-                _langOption(ctx, loc, current, 'en', 'lang.english'),
-                _langOption(ctx, loc, current, 'tr', 'lang.turkish'),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _langOption(
-    BuildContext ctx,
-    AppLocalizations loc,
-    Locale current,
-    String code,
-    String labelKey,
-  ) {
-    final selected = current.languageCode == code;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: selected ? const Color(0xFF8B6914) : Colors.white,
-            foregroundColor: selected ? Colors.white : const Color(0xFF3E2A0F),
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(
-                color: selected
-                    ? const Color(0xFF8B6914)
-                    : const Color(0xFFB8964E).withValues(alpha: 0.3),
-              ),
-            ),
-          ),
-          onPressed: () async {
-            final newLocale = Locale(code);
-            appLocaleNotifier.value = newLocale;
-            await LocaleService.setLocale(newLocale);
-            if (ctx.mounted) Navigator.pop(ctx);
-          },
-          child: Text(
-            loc.tr(labelKey),
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final localeCode = AppLocalizations.of(context).localeCode;
+    final loc = AppLocalizations.of(context);
     final gregorianStr = DateFormat.yMMMMEEEEd(localeCode).format(now);
     final hijriStr = _formatHijriDate(localeCode);
-    final dateStr = _showGregorian ? gregorianStr : hijriStr;
 
     return Scaffold(
       body: Stack(
@@ -154,7 +93,7 @@ class _HomePageState extends State<HomePage> {
             duration: const Duration(milliseconds: 300),
             color: isDarkMode
                 ? Colors.black.withValues(alpha: 0.75)
-                : Colors.black.withValues(alpha: 0.30),
+                : Colors.black.withValues(alpha: 0.12),
           ),
 
           SafeArea(
@@ -167,8 +106,17 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
+                          color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
                           borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDarkMode
+                                  ? Colors.white.withValues(alpha: 0.05)
+                                  : Colors.black.withValues(alpha: 0.08),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: IconButton(
                           onPressed: () {
@@ -176,18 +124,69 @@ class _HomePageState extends State<HomePage> {
                           },
                           icon: Icon(
                             isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                            color: Colors.white,
+                            color: isDarkMode ? Colors.white70 : const Color(0xFF3E2A0F),
                           ),
                         ),
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
+                          color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
                           borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDarkMode
+                                  ? Colors.white.withValues(alpha: 0.05)
+                                  : Colors.black.withValues(alpha: 0.08),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        child: IconButton(
-                          onPressed: _showLanguageDialog,
-                          icon: const Icon(Icons.language, color: Colors.white),
+                        child: PopupMenuButton<String>(
+                          onSelected: (code) async {
+                            final newLocale = Locale(code);
+                            appLocaleNotifier.value = newLocale;
+                            await LocaleService.setLocale(newLocale);
+                          },
+                          itemBuilder: (ctx) => [
+                            PopupMenuItem(
+                              value: 'ar',
+                              child: Text(loc.tr('lang.arabic')),
+                            ),
+                            PopupMenuItem(
+                              value: 'en',
+                              child: Text(loc.tr('lang.english')),
+                            ),
+                            PopupMenuItem(
+                              value: 'tr',
+                              child: Text(loc.tr('lang.turkish')),
+                            ),
+                          ],
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _currentLanguageName(loc),
+                                  style: TextStyle(
+                                    fontFamily: 'GE SS Two',
+                                    color: isDarkMode ? Colors.white70 : const Color(0xFF3E2A0F),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(width: 2),
+                                Icon(
+                                  Icons.arrow_drop_down,
+                                  color: isDarkMode ? Colors.white70 : const Color(0xFF3E2A0F),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -195,17 +194,28 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 25),
 
-                  GestureDetector(
-                    onLongPressStart: (_) => setState(() => _showGregorian = true),
-                    onLongPressEnd: (_) => setState(() => _showGregorian = false),
-                    child: Text(
-                      dateStr,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                  Column(
+                    children: [
+                      Text(
+                        hijriStr,
+                        style: const TextStyle(
+                          fontFamily: 'GE SS Two',
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 4),
+                      Text(
+                        gregorianStr,
+                        style: const TextStyle(
+                          fontFamily: 'GE SS Two',
+                          color: Colors.white70,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 25),
@@ -222,14 +232,19 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: Container(
                       width: double.infinity,
-
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
+                        color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
                         borderRadius: BorderRadius.circular(28),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
-                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDarkMode
+                                ? Colors.white.withValues(alpha: 0.05)
+                                : Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
@@ -239,22 +254,22 @@ class _HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  AppLocalizations.of(
-                                    context,
-                                  ).tr('home.hero.title'),
+                                  loc.tr('home.hero.title'),
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    fontFamily: 'GE SS Two',
+                                    color: isDarkMode ? Colors.white : const Color(0xFF3E2A0F),
                                     fontSize: 34,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 10),
+                                const SizedBox(height: 10),
                                 Text(
-                                  AppLocalizations.of(
-                                    context,
-                                  ).tr('home.hero.subtitle'),
+                                  loc.tr('home.hero.subtitle'),
                                   style: TextStyle(
-                                    color: Colors.white70,
+                                    fontFamily: 'GE SS Two',
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : const Color(0xFF3E2A0F).withValues(alpha: 0.7),
                                     fontSize: 16,
                                   ),
                                 ),
@@ -277,8 +292,6 @@ class _HomePageState extends State<HomePage> {
                           MaterialPageRoute(
                             builder: (_) => MushafScreen(
                               initialPage: _bookmarkPage!,
-                              
-                                  
                               onBookmarkSaved: _loadBookmark,
                             ),
                           ),
@@ -291,12 +304,14 @@ class _HomePageState extends State<HomePage> {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(
-                            0xFF8B6914,
-                          ).withValues(alpha: 0.85),
+                          color: isDarkMode
+                              ? const Color(0xFF2A2A2A)
+                              : const Color(0xFF8B6914).withValues(alpha: 0.85),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
+                            color: isDarkMode
+                                ? const Color(0xFF8B6914).withValues(alpha: 0.5)
+                                : Colors.white.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Row(
@@ -312,19 +327,19 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    ).tr('home.bookmark.resume'),
-                                    style: TextStyle(
+                                    loc.tr('home.bookmark.resume'),
+                                    style: const TextStyle(
+                                      fontFamily: 'GE SS Two',
                                       color: Colors.white,
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   Text(
-                                    'الصفحة ',
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.8),
+                                    'الصفحة $_bookmarkPage',
+                                    style: const TextStyle(
+                                      fontFamily: 'GE SS Two',
+                                      color: Colors.white,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -366,20 +381,34 @@ class _HomePageState extends State<HomePage> {
                         vertical: 14,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
+                        color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
-                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDarkMode
+                                ? Colors.white.withValues(alpha: 0.05)
+                                : Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.search, color: Colors.white70),
+                          Icon(
+                            Icons.search,
+                            color: isDarkMode
+                                ? Colors.white70
+                                : const Color(0xFF3E2A0F).withValues(alpha: 0.7),
+                          ),
                           const SizedBox(width: 10),
                           Text(
-                            AppLocalizations.of(context).tr('home.search.hint'),
+                            loc.tr('home.search.hint'),
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.7),
+                              fontFamily: 'GE SS Two',
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : const Color(0xFF3E2A0F).withValues(alpha: 0.7),
                               fontSize: 16,
                             ),
                           ),
@@ -395,10 +424,10 @@ class _HomePageState extends State<HomePage> {
                       itemCount: gridItems.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 0.75,
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 1.0,
                           ),
                       itemBuilder: (context, index) {
                         return GestureDetector(
@@ -466,8 +495,17 @@ class _HomePageState extends State<HomePage> {
                           },
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.12),
+                              color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
                               borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: isDarkMode
+                                      ? Colors.white.withValues(alpha: 0.05)
+                                      : Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -483,14 +521,13 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  AppLocalizations.of(
-                                    context,
-                                  ).tr('home.grid.${gridItems[index]['key']}'),
+                                  loc.tr('home.grid.${gridItems[index]['key']}'),
                                   textAlign: TextAlign.center,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    fontFamily: 'GE SS Two',
+                                    color: isDarkMode ? Colors.white : const Color(0xFF3E2A0F),
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -511,10 +548,5 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-
-
-
-
 
 

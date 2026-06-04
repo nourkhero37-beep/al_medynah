@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AppLocalizations {
@@ -166,7 +166,6 @@ class AppLocalizations {
       'mushaf.menu.fontDecrease': 'Decrease',
       'mushaf.menu.fontReset': 'Reset',
       'mushaf.menu.darkMode': 'Dark Mode',
-      'mushaf.menu.settings': 'Settings',
       'mushaf.menu.jumpHint': 'Enter page number (1-604)',
       'mushaf.menu.jumpGo': 'Go',
       'mushaf.menu.noBookmark': 'No bookmarks saved',
@@ -328,7 +327,6 @@ class AppLocalizations {
       'mushaf.menu.fontDecrease': '\u062A\u0635\u063A\u064A\u0631',
       'mushaf.menu.fontReset': '\u0625\u0639\u0627\u062F\u0629 \u0636\u0628\u0637',
       'mushaf.menu.darkMode': '\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0644\u064A\u0644\u064A',
-      'mushaf.menu.settings': '\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A',
       'mushaf.menu.jumpHint': '\u0623\u062F\u062E\u0644 \u0631\u0642\u0645 \u0627\u0644\u0635\u0641\u062D\u0629 (1-604)',
       'mushaf.menu.jumpGo': '\u0627\u0630\u0647\u0628',
       'mushaf.menu.noBookmark': '\u0644\u0627 \u062A\u0648\u062C\u062F \u0625\u0634\u0627\u0631\u0627\u062A \u0645\u062D\u0641\u0648\u0638\u0629',
@@ -504,7 +502,6 @@ class AppLocalizations {
       'mushaf.menu.fontDecrease': 'K\u00FC\u00E7\u00FClt',
       'mushaf.menu.fontReset': 'S\u0131f\u0131rla',
       'mushaf.menu.darkMode': 'Gece Modu',
-      'mushaf.menu.settings': 'Ayarlar',
       'mushaf.menu.jumpHint': 'Sayfa numaras\u0131 girin (1-604)',
       'mushaf.menu.jumpGo': 'Git',
       'mushaf.menu.noBookmark': 'Kay\u0131tl\u0131 yer imi yok',

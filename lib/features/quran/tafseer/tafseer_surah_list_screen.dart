@@ -113,7 +113,7 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
                 ),
                 child: Row(
                   children: [
-                    // ✅ رقم السورة
+                    // ? ??? ??????
                     SizedBox(
                       width: 42,
                       height: 42,
@@ -140,7 +140,7 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
 
                     const SizedBox(width: 14),
 
-                    // ✅ اسم السورة
+                    // ? ??? ??????
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,6 +148,7 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
                           Text(
                             surah.nameArabic,
                             style: const TextStyle(
+                              fontFamily: 'GE SS Two',
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                               color: darkBrown,
@@ -165,7 +166,7 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
                       ),
                     ),
 
-                    // ✅ نوع + عدد الآيات
+                    // ? ??? + ??? ??????
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
@@ -202,7 +203,7 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
                       ],
                     ),
 
-                    // ✅ سهم للتنقل
+                    // ? ??? ??????
                     const SizedBox(width: 8),
                     Icon(
                       Icons.arrow_back_ios_rounded,
@@ -219,3 +220,4 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
     );
   }
 }
+

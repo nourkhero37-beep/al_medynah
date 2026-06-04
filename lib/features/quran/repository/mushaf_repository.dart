@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:just_audio/just_audio.dart';
 import '../../../services/audio_manager_api.dart';
 import '../../../services/quran_data_service.dart';
@@ -65,6 +65,8 @@ class MushafRepository {
 
   Stream<PlayerState> get playerStateStream =>
       _audioManager.player.playerStateStream;
+
+  Duration get currentPosition => _audioManager.player.position;
 
   Stream<Duration> get positionStream => _audioManager.player.positionStream;
 

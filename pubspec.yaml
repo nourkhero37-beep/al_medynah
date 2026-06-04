@@ -67,4 +67,10 @@ flutter:
     - assets/images/reciters.png
     - assets/images/prayertime.png
     - assets/quran_data/verses.json
+  fonts:
+    - family: GE SS Two
+      fonts:
+        - asset: assets/fonts/GE SS Two Bold.otf
+          weight: 700
+
 
