@@ -51,10 +51,14 @@ class _HomePageState extends State<HomePage> {
 
   String _currentLanguageName(AppLocalizations loc) {
     switch (appLocaleNotifier.value.languageCode) {
-      case 'ar': return loc.tr('lang.arabic');
-      case 'en': return loc.tr('lang.english');
-      case 'tr': return loc.tr('lang.turkish');
-      default: return loc.tr('lang.arabic');
+      case 'ar':
+        return loc.tr('lang.arabic');
+      case 'en':
+        return loc.tr('lang.english');
+      case 'tr':
+        return loc.tr('lang.turkish');
+      default:
+        return loc.tr('lang.arabic');
     }
   }
 
@@ -106,7 +110,9 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
+                          color: isDarkMode
+                              ? const Color(0xFF2A2A2A)
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(14),
                           boxShadow: [
                             BoxShadow(
@@ -124,13 +130,17 @@ class _HomePageState extends State<HomePage> {
                           },
                           icon: Icon(
                             isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                            color: isDarkMode ? Colors.white70 : const Color(0xFF3E2A0F),
+                            color: isDarkMode
+                                ? Colors.white70
+                                : const Color(0xFF3E2A0F),
                           ),
                         ),
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
+                          color: isDarkMode
+                              ? const Color(0xFF2A2A2A)
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(14),
                           boxShadow: [
                             BoxShadow(
@@ -174,7 +184,9 @@ class _HomePageState extends State<HomePage> {
                                   _currentLanguageName(loc),
                                   style: TextStyle(
                                     fontFamily: 'GE SS Two',
-                                    color: isDarkMode ? Colors.white70 : const Color(0xFF3E2A0F),
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : const Color(0xFF3E2A0F),
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -182,7 +194,9 @@ class _HomePageState extends State<HomePage> {
                                 const SizedBox(width: 2),
                                 Icon(
                                   Icons.arrow_drop_down,
-                                  color: isDarkMode ? Colors.white70 : const Color(0xFF3E2A0F),
+                                  color: isDarkMode
+                                      ? Colors.white70
+                                      : const Color(0xFF3E2A0F),
                                 ),
                               ],
                             ),
@@ -234,7 +248,9 @@ class _HomePageState extends State<HomePage> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
+                        color: isDarkMode
+                            ? const Color(0xFF2A2A2A)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(
@@ -257,7 +273,9 @@ class _HomePageState extends State<HomePage> {
                                   loc.tr('home.hero.title'),
                                   style: TextStyle(
                                     fontFamily: 'GE SS Two',
-                                    color: isDarkMode ? Colors.white : const Color(0xFF3E2A0F),
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : const Color(0xFF3E2A0F),
                                     fontSize: 34,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -269,7 +287,9 @@ class _HomePageState extends State<HomePage> {
                                     fontFamily: 'GE SS Two',
                                     color: isDarkMode
                                         ? Colors.white70
-                                        : const Color(0xFF3E2A0F).withValues(alpha: 0.7),
+                                        : const Color(
+                                            0xFF3E2A0F,
+                                          ).withValues(alpha: 0.7),
                                     fontSize: 16,
                                   ),
                                 ),
@@ -381,7 +401,9 @@ class _HomePageState extends State<HomePage> {
                         vertical: 14,
                       ),
                       decoration: BoxDecoration(
-                        color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
+                        color: isDarkMode
+                            ? const Color(0xFF2A2A2A)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
@@ -399,7 +421,9 @@ class _HomePageState extends State<HomePage> {
                             Icons.search,
                             color: isDarkMode
                                 ? Colors.white70
-                                : const Color(0xFF3E2A0F).withValues(alpha: 0.7),
+                                : const Color(
+                                    0xFF3E2A0F,
+                                  ).withValues(alpha: 0.7),
                           ),
                           const SizedBox(width: 10),
                           Text(
@@ -408,7 +432,9 @@ class _HomePageState extends State<HomePage> {
                               fontFamily: 'GE SS Two',
                               color: isDarkMode
                                   ? Colors.white70
-                                  : const Color(0xFF3E2A0F).withValues(alpha: 0.7),
+                                  : const Color(
+                                      0xFF3E2A0F,
+                                    ).withValues(alpha: 0.7),
                               fontSize: 16,
                             ),
                           ),
@@ -495,7 +521,9 @@ class _HomePageState extends State<HomePage> {
                           },
                           child: Container(
                             decoration: BoxDecoration(
-                              color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
+                              color: isDarkMode
+                                  ? const Color(0xFF2A2A2A)
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
@@ -521,13 +549,17 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  loc.tr('home.grid.${gridItems[index]['key']}'),
+                                  loc.tr(
+                                    'home.grid.${gridItems[index]['key']}',
+                                  ),
                                   textAlign: TextAlign.center,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontFamily: 'GE SS Two',
-                                    color: isDarkMode ? Colors.white : const Color(0xFF3E2A0F),
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : const Color(0xFF3E2A0F),
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -548,5 +580,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-

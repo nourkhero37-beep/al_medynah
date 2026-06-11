@@ -74,10 +74,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     );
   }
 
-  void _onCacheUpdate(
-    MushafCacheUpdate event,
-    Emitter<MushafState> emit,
-  ) {
+  void _onCacheUpdate(MushafCacheUpdate event, Emitter<MushafState> emit) {
     emit(state.copyWith(pagesCache: repository.pagesCache));
   }
 
@@ -132,9 +129,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
           }
         }
         _isHandlingCompletion = false;
-        add(
-          const MushafPlaybackCompleted(),
-        );
+        add(const MushafPlaybackCompleted());
       }
     });
 
@@ -150,12 +145,19 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     MushafPageChanged event,
     Emitter<MushafState> emit,
   ) async {
-    emit(state.copyWith(currentPage: event.page, pagesCache: repository.pagesCache));
+    emit(
+      state.copyWith(
+        currentPage: event.page,
+        pagesCache: repository.pagesCache,
+      ),
+    );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('last_read_page', event.page);
-    unawaited(repository.preloadPages(event.page).then((_) {
-      if (!isClosed) add(const MushafCacheUpdate());
-    }));
+    unawaited(
+      repository.preloadPages(event.page).then((_) {
+        if (!isClosed) add(const MushafCacheUpdate());
+      }),
+    );
   }
 
   void _onWordTapped(MushafWordTapped event, Emitter<MushafState> emit) {
@@ -180,9 +182,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
         int.tryParse(state.selectedVerseKey!.split(':')[0]) ?? 1;
     final downloaded = await repository.isSurahDownloaded(surahNumber);
     if (!downloaded) {
-      emit(
-        state.copyWith(errorMessage: 'mushaf.error.noReciter'),
-      );
+      emit(state.copyWith(errorMessage: 'mushaf.error.noReciter'));
       return;
     }
 
@@ -208,13 +208,14 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     Emitter<MushafState> emit,
   ) {
     // Guard: skip stale events from old position subscription after auto-advance
-    if (state.verseTimings.isNotEmpty && event.verseTimings.isNotEmpty &&
+    if (state.verseTimings.isNotEmpty &&
+        event.verseTimings.isNotEmpty &&
         state.verseTimings.keys.first != event.verseTimings.keys.first) {
       return;
     }
 
     // Early exit if no timings loaded yet.
-    // Do NOT reset isPlaying/isPaused here — the position stream
+    // Do NOT reset isPlaying/isPaused here â€” the position stream
     // continues to fire while paused and would corrupt the pause state,
     // requiring a double-tap to resume.
     if (event.verseTimings.isEmpty) {
@@ -301,10 +302,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     await prefs.setInt('quran_text_color', event.colorValue);
     await prefs.setBool('quran_dark_mode', autoDarkMode);
 
-    emit(state.copyWith(
-      textColor: event.colorValue,
-      isDarkMode: autoDarkMode,
-    ));
+    emit(state.copyWith(textColor: event.colorValue, isDarkMode: autoDarkMode));
   }
 
   Future<void> _tryAdvanceSurah(int nextSurah) async {
@@ -325,11 +323,13 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     Emitter<MushafState> emit,
   ) {
     _isHandlingCompletion = false;
-    emit(state.copyWith(
-      isPlaying: false,
-      isPaused: false,
-      currentPosition: Duration.zero,
-    ));
+    emit(
+      state.copyWith(
+        isPlaying: false,
+        isPaused: false,
+        currentPosition: Duration.zero,
+      ),
+    );
   }
 
   Future<void> _onAutoAdvanceSurah(
@@ -350,13 +350,15 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
       }
     });
 
-    emit(state.copyWith(
-      selectedVerseKey: firstVerseKey,
-      verseTimings: timings,
-      isPlaying: true,
-      isPaused: false,
-      currentPosition: Duration.zero,
-    ));
+    emit(
+      state.copyWith(
+        selectedVerseKey: firstVerseKey,
+        verseTimings: timings,
+        isPlaying: true,
+        isPaused: false,
+        currentPosition: Duration.zero,
+      ),
+    );
 
     await repository.playVerse(firstVerseKey, seekToMs: seekToMs);
   }
@@ -370,8 +372,3 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     return super.close();
   }
 }
-
-
-
-
-
