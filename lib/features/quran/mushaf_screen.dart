@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/services.dart';
@@ -54,10 +54,7 @@ class _MushafView extends StatefulWidget {
   final int initialPage;
   final VoidCallback? onBookmarkSaved;
 
-  const _MushafView({
-    this.initialPage = 1,
-    this.onBookmarkSaved,
-  });
+  const _MushafView({this.initialPage = 1, this.onBookmarkSaved});
 
   @override
   State<_MushafView> createState() => _MushafViewState();
@@ -84,7 +81,9 @@ class _MushafViewState extends State<_MushafView> {
 
   Future<void> _loadVersePageMap() async {
     try {
-      final jsonStr = await rootBundle.loadString('assets/quran_data/verses.json');
+      final jsonStr = await rootBundle.loadString(
+        'assets/quran_data/verses.json',
+      );
       final data = jsonDecode(jsonStr) as Map<String, dynamic>;
       final map = <String, int>{};
       data.forEach((key, value) {
@@ -106,9 +105,7 @@ class _MushafViewState extends State<_MushafView> {
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              hintText: tr('mushaf.menu.jumpHint'),
-            ),
+            decoration: InputDecoration(hintText: tr('mushaf.menu.jumpHint')),
           ),
           actions: [
             TextButton(
@@ -140,7 +137,11 @@ class _MushafViewState extends State<_MushafView> {
         child: AlertDialog(
           title: Text(tr('mushaf.menu.bookmarks')),
           content: savedPage != null
-              ? Text(tr('mushaf.menu.bookmarkedPage', {'page': savedPage.toString()}))
+              ? Text(
+                  tr('mushaf.menu.bookmarkedPage', {
+                    'page': savedPage.toString(),
+                  }),
+                )
               : Text(tr('mushaf.menu.noBookmark')),
           actions: [
             TextButton(
@@ -166,7 +167,9 @@ class _MushafViewState extends State<_MushafView> {
     final tr = AppLocalizations.of(context).tr;
     await Future<void>.delayed(const Duration(milliseconds: 100));
     await WidgetsBinding.instance.endOfFrame;
-    final boundary = _pageCaptureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    final boundary =
+        _pageCaptureKey.currentContext?.findRenderObject()
+            as RenderRepaintBoundary?;
     if (boundary == null) {
       await Share.share(tr('mushaf.menu.shared', {'page': page.toString()}));
       return;
@@ -183,10 +186,9 @@ class _MushafViewState extends State<_MushafView> {
       final tempDir = await getTemporaryDirectory();
       final file = File('${tempDir.path}/quran_page_$page.png');
       await file.writeAsBytes(byteData.buffer.asUint8List());
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: tr('mushaf.menu.shared', {'page': page.toString()}),
-      );
+      await Share.shareXFiles([
+        XFile(file.path),
+      ], text: tr('mushaf.menu.shared', {'page': page.toString()}));
     } catch (_) {
       await Share.share(tr('mushaf.menu.shared', {'page': page.toString()}));
     }
@@ -196,16 +198,15 @@ class _MushafViewState extends State<_MushafView> {
   Widget build(BuildContext context) {
     return BlocListener<MushafBloc, MushafState>(
       listenWhen: (prev, curr) =>
-        prev.selectedVerseKey != curr.selectedVerseKey ||
-        prev.errorMessage != curr.errorMessage,
+          prev.selectedVerseKey != curr.selectedVerseKey ||
+          prev.errorMessage != curr.errorMessage,
       listener: (context, state) {
         if (state.errorMessage != null) {
           final tr = AppLocalizations.of(context).tr;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(tr(state.errorMessage!)),
-              backgroundColor:
-                  state.errorMessage == 'mushaf.error.noReciter'
+              backgroundColor: state.errorMessage == 'mushaf.error.noReciter'
                   ? Colors.red
                   : Colors.orange,
             ),
@@ -219,113 +220,137 @@ class _MushafViewState extends State<_MushafView> {
         }
       },
       child: BlocBuilder<MushafBloc, MushafState>(
-        buildWhen: (p, c) => p.isDarkMode != c.isDarkMode || p.isPlaying != c.isPlaying,
-        builder: (ctx, st) => Scaffold(
-          key: _scaffoldKey,
-          backgroundColor: st.isDarkMode ? Colors.black : const Color(0xfff8f3e8),
-        drawer: _MushafDrawer(
-          onBookmarkSaved: widget.onBookmarkSaved,
-          scaffoldKey: _scaffoldKey,
-          onGoToPage: () => _goToPage(context),
-          onShowSavedPage: (page) => _showSavedPage(context, page),
-          onSharePage: (page) => _sharePage(context, page),
-        ),
-        bottomNavigationBar: const _AudioPlayerBar(),
-        body: SafeArea(
-          child: Stack(
-            children: [
-              BlocBuilder<MushafBloc, MushafState>(
-                builder: (context, state) {
-                  return Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: 604,
-                      pageSnapping: true,
-                      physics: const PageScrollPhysics(),
-                      onPageChanged: (index) {
-                        final page = index + 1;
-                        context.read<MushafBloc>().add(MushafPageChanged(page));
-                      },
-                      itemBuilder: (context, index) {
-                        final page = index + 1;
-                        final pageData = state.pagesCache[page];
-                        if (pageData == null) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        return RepaintBoundary(
-                          key: page == state.currentPage ? _pageCaptureKey : null,
-                          child: _MushafPageView(
-                            page: page,
-                            pageData: pageData,
-                            selectedVerseKey: state.selectedVerseKey,
-                            fontScale: state.fontScale,
-                            isDarkMode: state.isDarkMode,
-                            textColor: state.textColor,
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
+        buildWhen: (p, c) =>
+            p.isDarkMode != c.isDarkMode ||
+            p.isPlaying != c.isPlaying ||
+            p.isPaused != c.isPaused,
+        builder: (ctx, st) {
+          return Scaffold(
+            key: _scaffoldKey,
+            backgroundColor: st.isDarkMode
+                ? Colors.black
+                : const Color(0xfff8f3e8),
+            drawer: _MushafDrawer(
+              onBookmarkSaved: widget.onBookmarkSaved,
+              scaffoldKey: _scaffoldKey,
+              onGoToPage: () => _goToPage(context),
+              onShowSavedPage: (page) => _showSavedPage(context, page),
+              onSharePage: (page) => _sharePage(context, page),
+            ),
+            bottomNavigationBar: _AudioPlayerBar(),
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  BlocBuilder<MushafBloc, MushafState>(
+                    builder: (context, state) {
+                      return Directionality(
+                        textDirection: TextDirection.rtl,
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: 604,
+                          pageSnapping: true,
+                          physics: const PageScrollPhysics(),
+                          onPageChanged: (index) {
+                            final page = index + 1;
+                            context.read<MushafBloc>().add(
+                              MushafPageChanged(page),
+                            );
+                          },
+                          itemBuilder: (context, index) {
+                            final page = index + 1;
+                            final pageData = state.pagesCache[page];
+                            if (pageData == null) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            return RepaintBoundary(
+                              key: page == state.currentPage
+                                  ? _pageCaptureKey
+                                  : null,
+                              child: _MushafPageView(
+                                page: page,
+                                pageData: pageData,
+                                selectedVerseKey: state.selectedVerseKey,
+                                fontScale: state.fontScale,
+                                isDarkMode: state.isDarkMode,
+                                textColor: state.textColor,
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
 
-              if (!st.isPlaying) Positioned(
-                bottom: 8,
-                left: 0,
-                right: 0,
-                child: BlocBuilder<MushafBloc, MushafState>(
-                  builder: (context, state) {
-                    return Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: (state.isDarkMode ? Colors.white : Colors.black).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${state.currentPage} / 604',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: state.isDarkMode ? Colors.white54 : Colors.black54,
+                  if (!st.isPlaying)
+                    Positioned(
+                      bottom: 8,
+                      left: 0,
+                      right: 0,
+                      child: BlocBuilder<MushafBloc, MushafState>(
+                        builder: (context, state) {
+                          return Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    (state.isDarkMode
+                                            ? Colors.white
+                                            : Colors.black)
+                                        .withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${state.currentPage} / 604',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: state.isDarkMode
+                                      ? Colors.white54
+                                      : Colors.black54,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                  if (!st.isPlaying)
+                    Positioned(
+                      top: 8,
+                      right: 12,
+                      child: GestureDetector(
+                        onTap: () => _scaffoldKey.currentState?.openDrawer(),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: (st.isDarkMode ? Colors.white : Colors.black)
+                                .withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Icon(
+                            Icons.menu_rounded,
+                            color: (st.isDarkMode ? Colors.white : Colors.black)
+                                .withValues(alpha: 0.6),
+                            size: 22,
                           ),
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
-
-              if (!st.isPlaying) Positioned(
-                top: 8,
-                right: 12,
-                child: GestureDetector(
-                  onTap: () => _scaffoldKey.currentState?.openDrawer(),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: (st.isDarkMode ? Colors.white : Colors.black).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Icon(
-                      Icons.menu_rounded,
-                      color: (st.isDarkMode ? Colors.white : Colors.black).withValues(alpha: 0.6),
-                      size: 22,
-                    ),
-                  ),
-                ),
+                ],
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
+          );
+        },
       ),
     );
   }
 }
+
 class _MushafDrawer extends StatelessWidget {
   final VoidCallback? onBookmarkSaved;
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -361,14 +386,18 @@ class _MushafDrawer extends StatelessWidget {
                           icon: Icons.bookmark_add_rounded,
                           text: tr('mushaf.menu.savePage'),
                           onTap: () async {
-                            await BookmarkService().savePageBookmark(state.currentPage);
+                            await BookmarkService().savePageBookmark(
+                              state.currentPage,
+                            );
                             onBookmarkSaved?.call();
                             if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(tr('mushaf.bookmark.pageSaved', {
-                                  'page': state.currentPage.toString(),
-                                })),
+                                content: Text(
+                                  tr('mushaf.bookmark.pageSaved', {
+                                    'page': state.currentPage.toString(),
+                                  }),
+                                ),
                                 backgroundColor: const Color(0xFF8B6914),
                                 duration: const Duration(seconds: 2),
                               ),
@@ -391,7 +420,8 @@ class _MushafDrawer extends StatelessWidget {
                           text: tr('mushaf.menu.bookmarks'),
                           onTap: () async {
                             scaffoldKey.currentState?.closeDrawer();
-                            final savedPage = await BookmarkService().getPageBookmark();
+                            final savedPage = await BookmarkService()
+                                .getPageBookmark();
                             if (context.mounted) onShowSavedPage(savedPage);
                           },
                         ),
@@ -410,15 +440,20 @@ class _MushafDrawer extends StatelessWidget {
                           text: tr('mushaf.menu.fontIncrease'),
                           onTap: () {
                             scaffoldKey.currentState?.closeDrawer();
-                            final newScale = (state.fontScale + 0.1).clamp(0.5, 2.0);
+                            final newScale = (state.fontScale + 0.1).clamp(
+                              0.5,
+                              2.0,
+                            );
                             context.read<MushafBloc>().add(
                               MushafFontSizeChanged(newScale),
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(tr('mushaf.menu.fontSizeChanged', {
-                                  'size': (newScale * 100).toInt().toString(),
-                                })),
+                                content: Text(
+                                  tr('mushaf.menu.fontSizeChanged', {
+                                    'size': (newScale * 100).toInt().toString(),
+                                  }),
+                                ),
                                 backgroundColor: const Color(0xFF8B6914),
                                 duration: const Duration(seconds: 1),
                               ),
@@ -431,15 +466,20 @@ class _MushafDrawer extends StatelessWidget {
                           text: tr('mushaf.menu.fontDecrease'),
                           onTap: () {
                             scaffoldKey.currentState?.closeDrawer();
-                            final newScale = (state.fontScale - 0.1).clamp(0.5, 2.0);
+                            final newScale = (state.fontScale - 0.1).clamp(
+                              0.5,
+                              2.0,
+                            );
                             context.read<MushafBloc>().add(
                               MushafFontSizeChanged(newScale),
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(tr('mushaf.menu.fontSizeChanged', {
-                                  'size': (newScale * 100).toInt().toString(),
-                                })),
+                                content: Text(
+                                  tr('mushaf.menu.fontSizeChanged', {
+                                    'size': (newScale * 100).toInt().toString(),
+                                  }),
+                                ),
                                 backgroundColor: const Color(0xFF8B6914),
                                 duration: const Duration(seconds: 1),
                               ),
@@ -464,7 +504,11 @@ class _MushafDrawer extends StatelessWidget {
                               : Icons.dark_mode_rounded,
                           text: tr('mushaf.menu.darkMode'),
                           trailing: state.isDarkMode
-                              ? const Icon(Icons.check, color: Color(0xFFB8964E), size: 20)
+                              ? const Icon(
+                                  Icons.check,
+                                  color: Color(0xFFB8964E),
+                                  size: 20,
+                                )
                               : null,
                           onTap: () {
                             scaffoldKey.currentState?.closeDrawer();
@@ -474,7 +518,13 @@ class _MushafDrawer extends StatelessWidget {
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(tr(newMode ? 'mushaf.menu.darkModeOn' : 'mushaf.menu.darkModeOff')),
+                                content: Text(
+                                  tr(
+                                    newMode
+                                        ? 'mushaf.menu.darkModeOn'
+                                        : 'mushaf.menu.darkModeOff',
+                                  ),
+                                ),
                                 backgroundColor: const Color(0xFF8B6914),
                                 duration: const Duration(seconds: 1),
                               ),
@@ -503,10 +553,7 @@ class _MushafDrawer extends StatelessWidget {
       leading: Icon(icon, color: const Color(0xFFB8964E), size: 22),
       title: Text(
         text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 15,
-        ),
+        style: const TextStyle(color: Colors.white, fontSize: 15),
       ),
       trailing: trailing,
       onTap: onTap,
@@ -515,10 +562,15 @@ class _MushafDrawer extends StatelessWidget {
   }
 }
 
-
-class _AudioPlayerBar extends StatelessWidget {
+// ✅ مصحح: بدون isPlaying parameter وبدون buildWhen
+class _AudioPlayerBar extends StatefulWidget {
   const _AudioPlayerBar();
 
+  @override
+  State<_AudioPlayerBar> createState() => _AudioPlayerBarState();
+}
+
+class _AudioPlayerBarState extends State<_AudioPlayerBar> {
   String _formatDuration(Duration d) {
     final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
     final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
@@ -528,12 +580,6 @@ class _AudioPlayerBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MushafBloc, MushafState>(
-      buildWhen: (prev, curr) =>
-          prev.isPlaying != curr.isPlaying ||
-          prev.isPaused != curr.isPaused ||
-          prev.selectedVerseKey != curr.selectedVerseKey ||
-          prev.currentPosition != curr.currentPosition ||
-          prev.totalDuration != curr.totalDuration,
       builder: (context, state) {
         final bool isActive = state.isPlaying || state.isPaused;
         final bool show = isActive || state.selectedVerseKey != null;
@@ -649,8 +695,9 @@ class _AudioPlayerBar extends StatelessWidget {
                               color: Color(0xFFB8964E),
                               shape: BoxShape.circle,
                             ),
+                            // ✅ المصحح: state.isPlaying بدل widget.isPlaying
                             child: Icon(
-                              state.isPlaying
+                              (state.isPlaying && !state.isPaused)
                                   ? Icons.pause_rounded
                                   : Icons.play_arrow_rounded,
                               color: Colors.white,
@@ -700,7 +747,7 @@ class _AudioPlayerBar extends StatelessWidget {
                 ),
               ),
             ),
-            ),
+          ),
         );
       },
     );
@@ -752,9 +799,7 @@ class _MushafPageView extends StatelessWidget {
               return GestureDetector(
                 onTap: () {
                   Navigator.pop(ctx);
-                  context.read<MushafBloc>().add(
-                    MushafTextColorChanged(c),
-                  );
+                  context.read<MushafBloc>().add(MushafTextColorChanged(c));
                 },
                 child: Container(
                   width: 48,
@@ -763,7 +808,9 @@ class _MushafPageView extends StatelessWidget {
                     color: Color(c),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isWhite ? Colors.grey.shade400 : Colors.transparent,
+                      color: isWhite
+                          ? Colors.grey.shade400
+                          : Colors.transparent,
                       width: 2,
                     ),
                     boxShadow: [
@@ -819,7 +866,9 @@ class _MushafPageView extends StatelessWidget {
                   if (words.isEmpty) return const SizedBox();
 
                   return Padding(
-                    padding: EdgeInsets.symmetric(vertical: isSpecialPage ? 1 : 0),
+                    padding: EdgeInsets.symmetric(
+                      vertical: isSpecialPage ? 1 : 0,
+                    ),
                     child: SizedBox(
                       width: double.infinity,
                       child: FittedBox(
@@ -851,7 +900,8 @@ class _MushafPageView extends StatelessWidget {
                                     textDirection: TextDirection.rtl,
                                     style: TextStyle(
                                       fontFamily: font,
-                                      fontSize: screenHeight * 0.033 * fontScale,
+                                      fontSize:
+                                          screenHeight * 0.033 * fontScale,
                                       color: Color(textColor),
                                     ),
                                   ),
@@ -860,7 +910,8 @@ class _MushafPageView extends StatelessWidget {
                             }
 
                             final bool isHighlighted =
-                                verseKey != null && verseKey == selectedVerseKey;
+                                verseKey != null &&
+                                verseKey == selectedVerseKey;
 
                             Offset? longPressPos;
 
@@ -874,18 +925,25 @@ class _MushafPageView extends StatelessWidget {
                                 longPressPos = details.globalPosition;
                               },
                               onLongPress: () {
-                                if (verseKey == null || longPressPos == null) return;
+                                if (verseKey == null || longPressPos == null) {
+                                  return;
+                                }
                                 final pos = longPressPos!;
                                 final tr = AppLocalizations.of(context).tr;
                                 showMenu<String>(
                                   context: context,
                                   position: RelativeRect.fromLTRB(
-                                    pos.dx, pos.dy, pos.dx, pos.dy,
+                                    pos.dx,
+                                    pos.dy,
+                                    pos.dx,
+                                    pos.dy,
                                   ),
                                   items: [
                                     PopupMenuItem(
                                       value: 'tafseer',
-                                      child: Text(tr('mushaf.longpress.tafseer')),
+                                      child: Text(
+                                        tr('mushaf.longpress.tafseer'),
+                                      ),
                                     ),
                                     PopupMenuItem(
                                       value: 'play',
@@ -893,7 +951,9 @@ class _MushafPageView extends StatelessWidget {
                                     ),
                                     PopupMenuItem(
                                       value: 'color',
-                                      child: Text(tr('mushaf.longpress.changeColor')),
+                                      child: Text(
+                                        tr('mushaf.longpress.changeColor'),
+                                      ),
                                     ),
                                   ],
                                 ).then((value) {
@@ -901,7 +961,10 @@ class _MushafPageView extends StatelessWidget {
                                   if (!context.mounted) return;
                                   switch (value) {
                                     case 'tafseer':
-                                      TafseerBottomSheet.show(context, verseKey);
+                                      TafseerBottomSheet.show(
+                                        context,
+                                        verseKey,
+                                      );
                                     case 'play':
                                       context.read<MushafBloc>().add(
                                         MushafWordTapped(verseKey),
@@ -918,7 +981,9 @@ class _MushafPageView extends StatelessWidget {
                                 duration: const Duration(milliseconds: 200),
                                 decoration: BoxDecoration(
                                   color: isHighlighted
-                                      ? const Color(0xFFB8D4A8).withValues(alpha: 0.6)
+                                      ? const Color(
+                                          0xFFB8D4A8,
+                                        ).withValues(alpha: 0.6)
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
@@ -927,14 +992,17 @@ class _MushafPageView extends StatelessWidget {
                                   textDirection: TextDirection.rtl,
                                   style: TextStyle(
                                     fontFamily: font,
-                                    fontSize: (isSpecialPage
+                                    fontSize:
+                                        (isSpecialPage
                                             ? screenHeight * 0.024
                                             : screenHeight * 0.022) *
                                         fontScale,
                                     color: isHighlighted
                                         ? const Color(0xFF2E7D32)
                                         : Color(textColor),
-                                    height: (isSpecialPage ? 3 : 1.9) / fontScale.clamp(0.7, 1.3),
+                                    height:
+                                        (isSpecialPage ? 3 : 1.9) /
+                                        fontScale.clamp(0.7, 1.3),
                                   ),
                                 ),
                               ),
@@ -953,4 +1021,3 @@ class _MushafPageView extends StatelessWidget {
     );
   }
 }
-

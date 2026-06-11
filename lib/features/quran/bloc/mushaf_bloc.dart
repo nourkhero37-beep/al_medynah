@@ -28,6 +28,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     on<MushafDarkModeToggled>(_onDarkModeToggled);
     on<MushafTextColorChanged>(_onTextColorChanged);
     on<MushafAutoAdvanceSurah>(_onAutoAdvanceSurah);
+    on<MushafPlaybackCompleted>(_onPlaybackCompleted);
   }
 
   void _onDurationUpdated(
@@ -44,11 +45,11 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     _isHandlingCompletion = false;
 
     if (state.isPlaying) {
-      await repository.pauseAudio();
       emit(state.copyWith(isPlaying: false, isPaused: true));
+      await repository.pauseAudio();
     } else if (state.isPaused) {
-      await repository.resumeAudio();
       emit(state.copyWith(isPlaying: true, isPaused: false));
+      await repository.resumeAudio();
     } else {
       if (state.selectedVerseKey != null) {
         add(const MushafPlayTapped());
@@ -107,6 +108,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     ) {
       if (!isClosed &&
           playerState.processingState == ProcessingState.completed &&
+          state.isPlaying &&
           !_isHandlingCompletion) {
         // Position guard: only consider completion legitimate if
         // we're near the end of the audio (filters false events on Windows)
@@ -131,10 +133,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
         }
         _isHandlingCompletion = false;
         add(
-          const MushafPositionUpdated(
-            position: Duration.zero,
-            verseTimings: {},
-          ),
+          const MushafPlaybackCompleted(),
         );
       }
     });
@@ -214,15 +213,15 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
       return;
     }
 
-    // Early exit if no timings loaded yet
+    // Early exit if no timings loaded yet.
+    // Do NOT reset isPlaying/isPaused here — the position stream
+    // continues to fire while paused and would corrupt the pause state,
+    // requiring a double-tap to resume.
     if (event.verseTimings.isEmpty) {
-      emit(
-        state.copyWith(
-          isPlaying: false,
-          isPaused: false,
-          currentPosition: Duration.zero,
-        ),
-      );
+      if (state.isPlaying || state.isPaused) {
+        return;
+      }
+      emit(state.copyWith(currentPosition: Duration.zero));
       return;
     }
 
@@ -321,6 +320,18 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     if (!isClosed) add(MushafAutoAdvanceSurah(nextSurah));
   }
 
+  void _onPlaybackCompleted(
+    MushafPlaybackCompleted event,
+    Emitter<MushafState> emit,
+  ) {
+    _isHandlingCompletion = false;
+    emit(state.copyWith(
+      isPlaying: false,
+      isPaused: false,
+      currentPosition: Duration.zero,
+    ));
+  }
+
   Future<void> _onAutoAdvanceSurah(
     MushafAutoAdvanceSurah event,
     Emitter<MushafState> emit,
@@ -359,5 +370,8 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     return super.close();
   }
 }
+
+
+
 
 

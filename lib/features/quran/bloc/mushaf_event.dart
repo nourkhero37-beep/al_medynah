@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+﻿import 'package:equatable/equatable.dart';
 
 abstract class MushafEvent extends Equatable {
   const MushafEvent();
@@ -89,6 +89,10 @@ class MushafDarkModeToggled extends MushafEvent {
   List<Object?> get props => [isDarkMode];
 }
 
+class MushafPlaybackCompleted extends MushafEvent {
+  const MushafPlaybackCompleted();
+}
+
 class MushafAutoAdvanceSurah extends MushafEvent {
   final int surahNumber;
   const MushafAutoAdvanceSurah(this.surahNumber);
@@ -104,3 +108,4 @@ class MushafTextColorChanged extends MushafEvent {
   @override
   List<Object?> get props => [colorValue];
 }
+
