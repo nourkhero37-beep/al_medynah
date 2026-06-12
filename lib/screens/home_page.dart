@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                           },
                           icon: Icon(
                             isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                            color: const Color(0xFF795548),
+                            color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFF795548),
                           ),
                         ),
                       ),
@@ -184,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                                   _currentLanguageName(loc),
                                   style: TextStyle(
                                     fontFamily: 'GE SS Two',
-                                    color: const Color(0xFF00BCD4),
+                                    color: isDarkMode ? const Color(0xFF4DD0E1) : const Color(0xFF00BCD4),
                                     fontSize: 14 * scale,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -193,7 +193,7 @@ class _HomePageState extends State<HomePage> {
                                 Icon(
                                   Icons.arrow_drop_down,
                                   color: isDarkMode
-                                      ? Colors.white70
+                                      ? const Color(0xFFD4B88A)
                                       : const Color(0xFF3E2A0F),
                                 ),
                               ],
@@ -212,7 +212,7 @@ class _HomePageState extends State<HomePage> {
                         hijriStr,
                         style: TextStyle(
                           fontFamily: 'GE SS Two',
-                          color: const Color(0xFF795548),
+                          color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFF795548),
                           fontSize: 20 * scale,
                           fontWeight: FontWeight.bold,
                         ),
@@ -222,7 +222,7 @@ class _HomePageState extends State<HomePage> {
                         gregorianStr,
                         style: TextStyle(
                           fontFamily: 'GE SS Two',
-                          color: const Color(0xFF795548),
+                          color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFF795548),
                           fontSize: 16 * scale,
                           fontWeight: FontWeight.bold,
                         ),
@@ -386,7 +386,7 @@ class _HomePageState extends State<HomePage> {
                           Icon(
                             Icons.search,
                             color: isDarkMode
-                                ? Colors.white70
+                                ? const Color(0xFFD4B88A)
                                 : const Color(
                                     0xFF3E2A0F,
                                   ).withValues(alpha: 0.7),
@@ -397,7 +397,7 @@ class _HomePageState extends State<HomePage> {
                             style: TextStyle(
                               fontFamily: 'GE SS Two',
                               color: isDarkMode
-                                  ? Colors.white70
+                                  ? const Color(0xFFD4B88A)
                                   : const Color(
                                       0xFF3E2A0F,
                                     ).withValues(alpha: 0.7),
@@ -523,7 +523,7 @@ class _HomePageState extends State<HomePage> {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontFamily: 'GE SS Two',
-                                    color: const Color(0xFFFF9800),
+                                    color: isDarkMode ? const Color(0xFFFFB74D) : const Color(0xFFFF9800),
                                     fontSize: 15 * scale,
                                     fontWeight: FontWeight.bold,
                                   ),
