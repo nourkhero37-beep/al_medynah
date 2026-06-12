@@ -303,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                         decoration: BoxDecoration(
                           color: isDarkMode
                               ? const Color(0xFF2A2A2A)
-                              : const Color(0xFF8B6914).withValues(alpha: 0.85),
+                              : const Color(0xFF00BCD4),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: isDarkMode
@@ -333,7 +333,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Text(
-                                    'Ø§Ù„ØµÙØ­Ø© $_bookmarkPage',
+                                    '\u0627\u0644\u0635\u0641\u062D\u0629 $_bookmarkPage',
                                     style: TextStyle(
                                       fontFamily: 'GE SS Two',
                                       color: Colors.white,
