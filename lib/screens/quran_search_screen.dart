@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
+import 'package:al_medynah/model/surah_model.dart';
 import 'package:al_medynah/services/quran_data_service.dart';
 
 class QuranSearchScreen extends StatefulWidget {
@@ -81,6 +82,25 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
       } catch (_) {}
     }
 
+    // Search surah names
+    final queryTrimmed = query.trim();
+    final cleanQuery = _removeDiacritics(queryTrimmed);
+    final surahResults = surahList.where((s) {
+      return _removeDiacritics(s.nameArabic).contains(cleanQuery) ||
+          s.nameEnglish.toLowerCase().contains(queryTrimmed.toLowerCase()) ||
+          s.id.toString() == queryTrimmed;
+    }).map((s) {
+      return {
+        'type': 'surah',
+        'surah_id': s.id,
+        'name_arabic': s.nameArabic,
+        'name_english': s.nameEnglish,
+        'page': s.pageNumber,
+      };
+    }).toList();
+
+    results.addAll(surahResults);
+
     setState(() {
       _results = results;
       _isLoading = false;
@@ -122,7 +142,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
               style: const TextStyle(color: Colors.white),
               onSubmitted: _search,
               decoration: InputDecoration(
-                hintText: AppLocalizations.of(context).tr('qsearch.hint'),
+                hintText: AppLocalizations.of(context).tr('qsearch.hint2'),
                 hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                 prefixIcon: _isLoading
                     ? const Padding(
@@ -165,9 +185,113 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                     itemCount: _results.length,
                     itemBuilder: (context, index) {
                       final result = _results[index];
+                      final type = result['type'] as String? ?? 'verse';
+
+                      if (type == 'surah') {
+                        final surahId = result['surah_id'] as int;
+                        final nameArabic = result['name_arabic'] as String;
+                        final nameEnglish = result['name_english'] as String;
+                        final page = result['page'] as int;
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MushafScreen(
+                                  initialPage: page,
+                                  onBookmarkSaved: widget.onBookmarkSaved,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.06),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 42,
+                                  height: 42,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: goldColor.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(21),
+                                    border: Border.all(
+                                      color: goldColor,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '\u0633\u0648\u0631\u0629 $surahId',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      color: darkBrown,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        nameArabic,
+                                        textDirection: TextDirection.rtl,
+                                        style: const TextStyle(
+                                          fontFamily: 'GE SS Two',
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.bold,
+                                          color: darkBrown,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        nameEnglish,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color:
+                                              darkBrown.withValues(alpha: 0.5),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Text(
+                                  '\u0635\u0641\u062D\u0629 $page',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: darkBrown.withValues(alpha: 0.5),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
                       final verseKey = result['verse_key'] as String;
                       final parts = verseKey.split(':');
-                      final surahId = int.tryParse(parts[0]) ?? 0;
+                      final sid = int.tryParse(parts[0]) ?? 0;
                       final ayahNum = int.tryParse(parts[1]) ?? 0;
                       final page = result['page'] as int;
                       final text = result['text'] as String;
@@ -210,7 +334,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'صفحة $page',
+                                    '\u0635\u0641\u062D\u0629 $page',
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: darkBrown.withValues(alpha: 0.5),
@@ -230,7 +354,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                                       ),
                                     ),
                                     child: Text(
-                                      '$surahId : $ayahNum',
+                                      '$sid : $ayahNum',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: darkBrown,

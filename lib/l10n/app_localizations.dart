@@ -86,6 +86,7 @@ class AppLocalizations {
       'qsearch.appBar.title': 'Search in Quran',
       'qsearch.hint': 'Search for an ayah...',
       'qsearch.empty': 'Type a word to search',
+      'qsearch.hint2': 'Search for an ayah or surah...',
       'qsearch.page': 'Page {page}',
 
       'tv.appBar.title': 'TV',
@@ -262,6 +263,7 @@ class AppLocalizations {
       'qsearch.appBar.title': '\u0627\u0644\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0642\u0631\u0622\u0646',
       'qsearch.hint': '\u0627\u0628\u062D\u062B \u0639\u0646 \u0622\u064A\u0629...',
       'qsearch.empty': '\u0627\u0643\u062A\u0628 \u0643\u0644\u0645\u0629 \u0644\u0644\u0628\u062D\u062B \u0639\u0646\u0647\u0627',
+      'qsearch.hint2': '\u0625\u0628\u062D\u062B \u0639\u0646 \u0622\u064A\u0629 \u0623\u0648 \u0633\u0648\u0631\u0629',
       'qsearch.page': '\u0635\u0641\u062D\u0629 {page}',
 
       'tv.appBar.title': '\u0627\u0644\u062A\u0644\u0641\u0632\u064A\u0648\u0646',
@@ -437,6 +439,7 @@ class AppLocalizations {
       'qsearch.appBar.title': 'Kur\'an\'da Ara',
       'qsearch.hint': 'Ayet ara...',
       'qsearch.empty': 'Aramak i\u00e7in bir kelime yaz\u0131n',
+      'qsearch.hint2': 'Ayet veya sure ara...',
       'qsearch.page': 'Sayfa {page}',
 
       'tv.appBar.title': 'Televizyon',

@@ -1,11 +1,10 @@
-﻿import 'package:al_medynah/features/quran/mushaf_screen.dart';
+import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
 import 'package:al_medynah/screens/azkar_categories_screen.dart';
 import 'package:al_medynah/screens/hadith_library_screen.dart';
 import 'package:al_medynah/screens/names_of_allah_screen.dart';
 import 'package:al_medynah/screens/prayer_time_screen.dart';
-import 'package:al_medynah/screens/quran_search_screen.dart';
 import 'package:al_medynah/screens/qibla_screen.dart';
 import 'package:al_medynah/screens/reciter_page.dart';
 import 'package:al_medynah/screens/tv_screen.dart';
@@ -37,6 +36,18 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadBookmark() async {
     final page = await BookmarkService().getPageBookmark();
     if (mounted) setState(() => _bookmarkPage = page);
+  }
+
+  String _toWesternNumerals(String s) {
+    return String.fromCharCodes(s.codeUnits.map((code) {
+      if (code >= 0x0660 && code <= 0x0669) {
+        return code - 0x0660 + 48;
+      }
+      if (code >= 0x06F0 && code <= 0x06F9) {
+        return code - 0x06F0 + 48;
+      }
+      return code;
+    }));
   }
 
   String _formatHijriDate(String localeCode) {
@@ -78,8 +89,8 @@ class _HomePageState extends State<HomePage> {
     final now = DateTime.now();
     final localeCode = AppLocalizations.of(context).localeCode;
     final loc = AppLocalizations.of(context);
-    final gregorianStr = DateFormat.yMMMMEEEEd(localeCode).format(now);
-    final hijriStr = _formatHijriDate(localeCode);
+    final gregorianStr = localeCode == 'ar' ? DateFormat.yMMMMEEEEd(localeCode).format(now) : _toWesternNumerals(DateFormat.yMMMMEEEEd(localeCode).format(now));
+    final hijriStr = localeCode == 'ar' ? _formatHijriDate(localeCode) : _toWesternNumerals(_formatHijriDate(localeCode));
     final textScale = MediaQuery.of(context).size.width / 430;
     final scale = textScale.clamp(0.75, 1.3);
 
@@ -211,7 +222,7 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         hijriStr,
                         style: TextStyle(
-                          fontFamily: 'GE SS Two',
+                          fontFamily: localeCode == 'ar' ? 'GE SS Two' : null,
                           color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFF795548),
                           fontSize: 20 * scale,
                           fontWeight: FontWeight.bold,
@@ -221,7 +232,7 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         gregorianStr,
                         style: TextStyle(
-                          fontFamily: 'GE SS Two',
+                          fontFamily: localeCode == 'ar' ? 'GE SS Two' : null,
                           color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFF795548),
                           fontSize: 16 * scale,
                           fontWeight: FontWeight.bold,
@@ -322,7 +333,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Text(
-                                    'الصفحة $_bookmarkPage',
+                                    'Ø§Ù„ØµÙØ­Ø© $_bookmarkPage',
                                     style: TextStyle(
                                       fontFamily: 'GE SS Two',
                                       color: Colors.white,
@@ -348,67 +359,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
 
-                  const SizedBox(height: 12),
-
-                  GestureDetector(
-                    onTap: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              QuranSearchScreen(onBookmarkSaved: _loadBookmark),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDarkMode
-                            ? const Color(0xFF2A2A2A)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: isDarkMode
-                                ? Colors.white.withValues(alpha: 0.05)
-                                : Colors.black.withValues(alpha: 0.08),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.search,
-                            color: isDarkMode
-                                ? const Color(0xFFD4B88A)
-                                : const Color(
-                                    0xFF3E2A0F,
-                                  ).withValues(alpha: 0.7),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            loc.tr('home.search.hint'),
-                            style: TextStyle(
-                              fontFamily: 'GE SS Two',
-                              color: isDarkMode
-                                  ? const Color(0xFFD4B88A)
-                                  : const Color(
-                                      0xFF3E2A0F,
-                                    ).withValues(alpha: 0.7),
-                              fontSize: 16 * scale,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
+                  
                   const SizedBox(height: 12),
 
                   Expanded(
