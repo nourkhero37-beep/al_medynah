@@ -1,4 +1,4 @@
-import 'package:al_medynah/features/quran/mushaf_screen.dart';
+﻿import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
 import 'package:al_medynah/screens/azkar_categories_screen.dart';
@@ -80,6 +80,8 @@ class _HomePageState extends State<HomePage> {
     final loc = AppLocalizations.of(context);
     final gregorianStr = DateFormat.yMMMMEEEEd(localeCode).format(now);
     final hijriStr = _formatHijriDate(localeCode);
+    final textScale = MediaQuery.of(context).size.width / 430;
+    final scale = textScale.clamp(0.75, 1.3);
 
     return Scaffold(
       body: Stack(
@@ -130,9 +132,7 @@ class _HomePageState extends State<HomePage> {
                           },
                           icon: Icon(
                             isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                            color: isDarkMode
-                                ? Colors.white70
-                                : const Color(0xFF3E2A0F),
+                            color: const Color(0xFF795548),
                           ),
                         ),
                       ),
@@ -184,10 +184,8 @@ class _HomePageState extends State<HomePage> {
                                   _currentLanguageName(loc),
                                   style: TextStyle(
                                     fontFamily: 'GE SS Two',
-                                    color: isDarkMode
-                                        ? Colors.white70
-                                        : const Color(0xFF3E2A0F),
-                                    fontSize: 14,
+                                    color: const Color(0xFF00BCD4),
+                                    fontSize: 14 * scale,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -212,20 +210,20 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Text(
                         hijriStr,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'GE SS Two',
-                          color: Colors.white,
-                          fontSize: 20,
+                          color: const Color(0xFFC4B08B),
+                          fontSize: 20 * scale,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         gregorianStr,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'GE SS Two',
-                          color: Colors.white70,
-                          fontSize: 16,
+                          color: const Color(0xFFC4B08B),
+                          fontSize: 16 * scale,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -273,10 +271,8 @@ class _HomePageState extends State<HomePage> {
                                   loc.tr('home.hero.title'),
                                   style: TextStyle(
                                     fontFamily: 'GE SS Two',
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : const Color(0xFF3E2A0F),
-                                    fontSize: 34,
+                                    color: const Color(0xFFFF9800),
+                                    fontSize: 34 * scale,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -290,7 +286,7 @@ class _HomePageState extends State<HomePage> {
                                         : const Color(
                                             0xFF3E2A0F,
                                           ).withValues(alpha: 0.7),
-                                    fontSize: 16,
+                                    fontSize: 16 * scale,
                                   ),
                                 ),
                               ],
@@ -348,19 +344,19 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Text(
                                     loc.tr('home.bookmark.resume'),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontFamily: 'GE SS Two',
                                       color: Colors.white,
-                                      fontSize: 14,
+                                      fontSize: 14 * scale,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   Text(
                                     'الصفحة $_bookmarkPage',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontFamily: 'GE SS Two',
                                       color: Colors.white,
-                                      fontSize: 12,
+                                      fontSize: 12 * scale,
                                     ),
                                   ),
                                 ],
@@ -435,7 +431,7 @@ class _HomePageState extends State<HomePage> {
                                   : const Color(
                                       0xFF3E2A0F,
                                     ).withValues(alpha: 0.7),
-                              fontSize: 16,
+                              fontSize: 16 * scale,
                             ),
                           ),
                         ],
@@ -560,7 +556,7 @@ class _HomePageState extends State<HomePage> {
                                     color: isDarkMode
                                         ? Colors.white
                                         : const Color(0xFF3E2A0F),
-                                    fontSize: 15,
+                                    fontSize: 15 * scale,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
