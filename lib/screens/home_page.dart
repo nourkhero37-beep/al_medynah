@@ -212,7 +212,7 @@ class _HomePageState extends State<HomePage> {
                         hijriStr,
                         style: TextStyle(
                           fontFamily: 'GE SS Two',
-                          color: const Color(0xFFC4B08B),
+                          color: const Color(0xFF795548),
                           fontSize: 20 * scale,
                           fontWeight: FontWeight.bold,
                         ),
@@ -222,7 +222,7 @@ class _HomePageState extends State<HomePage> {
                         gregorianStr,
                         style: TextStyle(
                           fontFamily: 'GE SS Two',
-                          color: const Color(0xFFC4B08B),
+                          color: const Color(0xFF795548),
                           fontSize: 16 * scale,
                           fontWeight: FontWeight.bold,
                         ),
@@ -265,7 +265,7 @@ class _HomePageState extends State<HomePage> {
                           Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
                                   loc.tr('home.hero.title'),
@@ -274,19 +274,6 @@ class _HomePageState extends State<HomePage> {
                                     color: const Color(0xFFFF9800),
                                     fontSize: 34 * scale,
                                     fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  loc.tr('home.hero.subtitle'),
-                                  style: TextStyle(
-                                    fontFamily: 'GE SS Two',
-                                    color: isDarkMode
-                                        ? Colors.white70
-                                        : const Color(
-                                            0xFF3E2A0F,
-                                          ).withValues(alpha: 0.7),
-                                    fontSize: 16 * scale,
                                   ),
                                 ),
                               ],
