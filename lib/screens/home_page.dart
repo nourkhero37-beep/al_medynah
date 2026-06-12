@@ -161,15 +161,15 @@ class _HomePageState extends State<HomePage> {
                           itemBuilder: (ctx) => [
                             PopupMenuItem(
                               value: 'ar',
-                              child: Text(loc.tr('lang.arabic')),
+                              child: Text(loc.tr('lang.arabic'), style: TextStyle(fontFamily: 'GE SS Two')),
                             ),
                             PopupMenuItem(
                               value: 'en',
-                              child: Text(loc.tr('lang.english')),
+                              child: Text(loc.tr('lang.english'), style: TextStyle(fontFamily: 'GE SS Two')),
                             ),
                             PopupMenuItem(
                               value: 'tr',
-                              child: Text(loc.tr('lang.turkish')),
+                              child: Text(loc.tr('lang.turkish'), style: TextStyle(fontFamily: 'GE SS Two')),
                             ),
                           ],
                           child: Padding(
@@ -261,30 +261,13 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  loc.tr('home.hero.title'),
-                                  style: TextStyle(
-                                    fontFamily: 'GE SS Two',
-                                    color: const Color(0xFFFF9800),
-                                    fontSize: 34 * scale,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                           Image.asset('assets/images/logo.jpg', width: 120),
                         ],
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 12),
 
                   if (_bookmarkPage != null)
@@ -540,9 +523,7 @@ class _HomePageState extends State<HomePage> {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontFamily: 'GE SS Two',
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : const Color(0xFF3E2A0F),
+                                    color: const Color(0xFFFF9800),
                                     fontSize: 15 * scale,
                                     fontWeight: FontWeight.bold,
                                   ),
