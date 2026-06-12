@@ -127,6 +127,7 @@ class _HomePageState extends State<HomePage> {
                               ? const Color(0xFF2A2A2A)
                               : Colors.white,
                           borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFF8B6914).withValues(alpha: 0.5)),
                           boxShadow: [
                             BoxShadow(
                               color: isDarkMode
@@ -153,6 +154,7 @@ class _HomePageState extends State<HomePage> {
                               ? const Color(0xFF2A2A2A)
                               : Colors.white,
                           borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFF8B6914).withValues(alpha: 0.5)),
                           boxShadow: [
                             BoxShadow(
                               color: isDarkMode
@@ -261,6 +263,7 @@ class _HomePageState extends State<HomePage> {
                             ? const Color(0xFF2A2A2A)
                             : Colors.white,
                         borderRadius: BorderRadius.circular(28),
+                        border: Border.all(color: const Color(0xFF8B6914).withValues(alpha: 0.5)),
                         boxShadow: [
                           BoxShadow(
                             color: isDarkMode
@@ -308,7 +311,7 @@ class _HomePageState extends State<HomePage> {
                           border: Border.all(
                             color: isDarkMode
                                 ? const Color(0xFF8B6914).withValues(alpha: 0.5)
-                                : Colors.white.withValues(alpha: 0.2),
+                                : const Color(0xFF8B6914).withValues(alpha: 0.5),
                           ),
                         ),
                         child: Row(
@@ -442,6 +445,7 @@ class _HomePageState extends State<HomePage> {
                                   ? const Color(0xFF2A2A2A)
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: const Color(0xFF8B6914).withValues(alpha: 0.5)),
                               boxShadow: [
                                 BoxShadow(
                                   color: isDarkMode
@@ -474,7 +478,7 @@ class _HomePageState extends State<HomePage> {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontFamily: 'GE SS Two',
-                                    color: isDarkMode ? const Color(0xFFFFB74D) : const Color(0xFFFF9800),
+                                    color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFFFF9800),
                                     fontSize: 15 * scale,
                                     fontWeight: FontWeight.bold,
                                   ),
