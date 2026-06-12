@@ -53,7 +53,6 @@ class _HomePageState extends State<HomePage> {
   String _formatHijriDate(String localeCode) {
     final locale = switch (localeCode) {
       'ar' => 'ar',
-      'tr' => 'tr',
       _ => 'en',
     };
     HijriCalendar.setLocal(locale);
