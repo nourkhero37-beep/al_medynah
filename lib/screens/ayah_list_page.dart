@@ -137,7 +137,7 @@ class _AyahListState extends State<AyahList> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5ECD7),
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: const Color(0xFF2493B4),
           elevation: 0,
@@ -280,8 +280,7 @@ class _AyahListState extends State<AyahList> {
                                         '\u0635\u0641\u062D\u0629 $page',
                                         style: TextStyle(
                                           fontSize: 11,
-                                          color: const Color(0xFF1E7FA0)
-                                              .withValues(alpha: 0.5),
+                                          color: Colors.grey,
                                         ),
                                       ),
                                       Container(
@@ -355,134 +354,131 @@ class _AyahListState extends State<AyahList> {
                               ),
                             );
                           },
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 4,
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.circular(14),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black
-                                      .withValues(alpha: 0.06),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
                                 ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 42,
-                                  height: 42,
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/\u0627\u0631\u0642\u0627\u0645 \u0627\u0644\u0627\u064A\u0627\u062A.png',
-                                        width: 42,
-                                        height: 42,
-                                        fit: BoxFit.contain,
-                                      ),
-                                      Text(
-                                        '$surahId',
-                                        style: const TextStyle(
-                                          color: Colors.orange,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 14),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        nameArabic,
-                                        style: const TextStyle(
-                                          fontFamily: 'GE SS Two',
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF1E7FA0),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        nameEnglish,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: const Color(0xFF1E7FA0)
-                                              .withValues(alpha: 0.5),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.end,
+                                child: Row(
                                   children: [
-                                    Container(
-                                      padding:
-                                          const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 3,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: revelationType ==
-                                                AppLocalizations.of(
-                                                        context)
-                                                    .tr(
-                                                        'ayahList.meccan')
-                                            ? const Color(0xFF5C8A5C)
-                                                .withValues(alpha: 0.15)
-                                            : const Color(0xFF2E86AB)
-                                                .withValues(alpha: 0.15),
-                                        borderRadius:
-                                            BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        revelationType,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: revelationType ==
-                                                  AppLocalizations.of(
-                                                          context)
-                                                      .tr(
-                                                          'ayahList.meccan')
-                                              ? const Color(0xFF5C8A5C)
-                                              : const Color(
-                                                  0xFF2E86AB),
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                    SizedBox(
+                                      width: 42,
+                                      height: 42,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/\u0627\u0631\u0642\u0627\u0645 \u0627\u0644\u0627\u064A\u0627\u062A.png',
+                                            width: 42,
+                                            height: 42,
+                                            fit: BoxFit.contain,
+                                          ),
+                                          Text(
+                                            '$surahId',
+                                            style: const TextStyle(
+                                              color: Colors.orange,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      AppLocalizations.of(context).tr(
-                                          'ayahList.verses',
-                                          {'count': '$versesCount'}),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: darkBrown
-                                            .withValues(alpha: 0.5),
+                                    const SizedBox(width: 14),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            nameArabic,
+                                            style: const TextStyle(
+                                              fontFamily: 'GE SS Two',
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF1E7FA0),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            nameEnglish,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
                                       ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          padding:
+                                              const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 3,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: revelationType ==
+                                                    AppLocalizations.of(
+                                                            context)
+                                                        .tr(
+                                                            'ayahList.meccan')
+                                                ? const Color(0xFF5C8A5C)
+                                                    .withValues(alpha: 0.15)
+                                                : const Color(0xFF2E86AB)
+                                                    .withValues(alpha: 0.15),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            revelationType,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: revelationType ==
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .tr(
+                                                              'ayahList.meccan')
+                                                  ? const Color(0xFF5C8A5C)
+                                                  : const Color(
+                                                      0xFF2E86AB),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          AppLocalizations.of(context).tr(
+                                              'ayahList.verses',
+                                              {'count': '$versesCount'}),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: darkBrown
+                                                .withValues(alpha: 0.5),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              if (index < _results.length - 1)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                  ),
+                                  child: Divider(
+                                    height: 1,
+                                    color: Colors.grey.withValues(alpha: 0.3),
+                                  ),
+                                ),
+                            ],
                           ),
                         );
                       },
