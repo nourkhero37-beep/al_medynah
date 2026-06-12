@@ -139,12 +139,13 @@ class _AyahListState extends State<AyahList> {
       child: Scaffold(
         backgroundColor: const Color(0xFFF5ECD7),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF8B6914),
+          backgroundColor: const Color(0xFF2493B4),
           elevation: 0,
           centerTitle: true,
           title: Text(
             AppLocalizations.of(context).tr('ayahList.appBar.title'),
             style: TextStyle(
+              fontFamily: 'GE SS Two',
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -155,7 +156,13 @@ class _AyahListState extends State<AyahList> {
         body: Column(
           children: [
             Container(
-              color: const Color(0xFF8B6914),
+              decoration: const BoxDecoration(
+                color: Color(0xFF2493B4),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(22),
+                  bottomRight: Radius.circular(22),
+                ),
+              ),
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: TextField(
                 controller: _searchController,
@@ -167,7 +174,7 @@ class _AyahListState extends State<AyahList> {
                   hintText:
                       AppLocalizations.of(context).tr('qsearch.hint2'),
                   hintStyle:
-                      TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                      TextStyle(fontFamily: 'GE SS Two', color: Colors.white.withValues(alpha: 0.7)),
                   prefixIcon: _isSearching
                       ? const Padding(
                           padding: EdgeInsets.all(12),
@@ -273,7 +280,7 @@ class _AyahListState extends State<AyahList> {
                                         '\u0635\u0641\u062D\u0629 $page',
                                         style: TextStyle(
                                           fontSize: 11,
-                                          color: darkBrown
+                                          color: const Color(0xFF1E7FA0)
                                               .withValues(alpha: 0.5),
                                         ),
                                       ),
@@ -407,7 +414,7 @@ class _AyahListState extends State<AyahList> {
                                           fontFamily: 'GE SS Two',
                                           fontSize: 17,
                                           fontWeight: FontWeight.bold,
-                                          color: darkBrown,
+                                          color: Color(0xFF1E7FA0),
                                         ),
                                       ),
                                       const SizedBox(height: 2),
@@ -415,7 +422,7 @@ class _AyahListState extends State<AyahList> {
                                         nameEnglish,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: darkBrown
+                                          color: const Color(0xFF1E7FA0)
                                               .withValues(alpha: 0.5),
                                         ),
                                       ),
