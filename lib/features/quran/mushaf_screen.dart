@@ -373,7 +373,7 @@ class _MushafDrawer extends StatelessWidget {
       builder: (context, state) {
         return Drawer(
           child: Container(
-            color: const Color(0xFF3E2A0F),
+            color: const Color(0xFF1E7FA0),
             child: SafeArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -398,7 +398,7 @@ class _MushafDrawer extends StatelessWidget {
                                     'page': state.currentPage.toString(),
                                   }),
                                 ),
-                                backgroundColor: const Color(0xFF8B6914),
+                                backgroundColor: const Color(0xFF2493B4),
                                 duration: const Duration(seconds: 2),
                               ),
                             );
@@ -454,7 +454,7 @@ class _MushafDrawer extends StatelessWidget {
                                     'size': (newScale * 100).toInt().toString(),
                                   }),
                                 ),
-                                backgroundColor: const Color(0xFF8B6914),
+                                backgroundColor: const Color(0xFF2493B4),
                                 duration: const Duration(seconds: 1),
                               ),
                             );
@@ -480,7 +480,7 @@ class _MushafDrawer extends StatelessWidget {
                                     'size': (newScale * 100).toInt().toString(),
                                   }),
                                 ),
-                                backgroundColor: const Color(0xFF8B6914),
+                                backgroundColor: const Color(0xFF2493B4),
                                 duration: const Duration(seconds: 1),
                               ),
                             );
@@ -506,7 +506,7 @@ class _MushafDrawer extends StatelessWidget {
                           trailing: state.isDarkMode
                               ? const Icon(
                                   Icons.check,
-                                  color: Color(0xFFB8964E),
+                                  color: Color(0xFF2493B4),
                                   size: 20,
                                 )
                               : null,
@@ -525,7 +525,7 @@ class _MushafDrawer extends StatelessWidget {
                                         : 'mushaf.menu.darkModeOff',
                                   ),
                                 ),
-                                backgroundColor: const Color(0xFF8B6914),
+                                backgroundColor: const Color(0xFF2493B4),
                                 duration: const Duration(seconds: 1),
                               ),
                             );
@@ -550,10 +550,10 @@ class _MushafDrawer extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFFB8964E), size: 22),
+      leading: Icon(icon, color: Colors.white, size: 22),
       title: Text(
         text,
-        style: const TextStyle(color: Colors.white, fontSize: 15),
+        style: const TextStyle(color: Colors.white, fontSize: 15, fontFamily: 'GE SS Two'),
       ),
       trailing: trailing,
       onTap: onTap,
@@ -608,8 +608,12 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
           child: Container(
             height: show ? null : 0,
             clipBehavior: Clip.hardEdge,
-            decoration: const BoxDecoration(
-              color: Color(0xFF3E2A0F),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF2493B4), Color(0xFF1E7FA0)],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black26,
@@ -634,10 +638,10 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                         overlayShape: const RoundSliderOverlayShape(
                           overlayRadius: 12,
                         ),
-                        activeTrackColor: const Color(0xFFB8964E),
+                        activeTrackColor: const Color(0xFF2493B4),
                         inactiveTrackColor: Colors.white24,
-                        thumbColor: const Color(0xFFB8964E),
-                        overlayColor: const Color(0x33B8964E),
+                        thumbColor: const Color(0xFF2493B4),
+                        overlayColor: const Color(0x332493B4),
                       ),
                       child: Slider(
                         value: progress,
@@ -660,6 +664,7 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                             style: const TextStyle(
                               color: Colors.white54,
                               fontSize: 11,
+                              fontFamily: 'GE SS Two',
                             ),
                           ),
                         ),
@@ -691,11 +696,15 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                           child: Container(
                             width: 44,
                             height: 44,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFB8964E),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFF2493B4), Color(0xFF1E7FA0)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                               shape: BoxShape.circle,
                             ),
-                            // ✅ المصحح: state.isPlaying بدل widget.isPlaying
+                            // المصحح: state.isPlaying بدل widget.isPlaying
                             child: Icon(
                               (state.isPlaying && !state.isPaused)
                                   ? Icons.pause_rounded
@@ -716,6 +725,7 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                                 color: Colors.white,
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: 'GE SS Two',
                               ),
                             ),
                             if (ayahNumber.isNotEmpty)
@@ -724,6 +734,7 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                                 style: const TextStyle(
                                   color: Colors.white54,
                                   fontSize: 11,
+                                  fontFamily: 'GE SS Two',
                                 ),
                               ),
                           ],
@@ -737,6 +748,7 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                             style: const TextStyle(
                               color: Colors.white54,
                               fontSize: 11,
+                              fontFamily: 'GE SS Two',
                             ),
                           ),
                         ),
@@ -774,11 +786,11 @@ class _MushafPageView extends StatelessWidget {
   static const List<int> _colorOptions = [
     0xFF000000,
     0xFFFFFFFF,
-    0xFFB8964E,
-    0xFF3E2A0F,
+    0xFF2493B4,
+    0xFF1E7FA0,
     0xFF2E5090,
     0xFF2E7D32,
-    0xFF8B6914,
+    0xFF2493B4,
     0xFF555555,
   ];
 
@@ -1021,3 +1033,10 @@ class _MushafPageView extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
