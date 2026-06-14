@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -288,7 +288,12 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
   ) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('quran_dark_mode', event.isDarkMode);
-    emit(state.copyWith(isDarkMode: event.isDarkMode));
+    final newColor = event.isDarkMode ? 0xDDFFFFFF : 0xDD000000;
+    await prefs.setInt('quran_text_color', newColor);
+    emit(state.copyWith(
+      isDarkMode: event.isDarkMode,
+      textColor: newColor,
+    ));
   }
 
   Future<void> _onTextColorChanged(

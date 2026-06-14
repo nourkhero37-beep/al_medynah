@@ -790,12 +790,12 @@ class _MushafPageView extends StatelessWidget {
   static const List<int> _colorOptions = [
     0xFF000000,
     0xFFFFFFFF,
-    0xFF2493B4,
-    0xFF1E7FA0,
-    0xFF2E5090,
-    0xFF2E7D32,
-    0xFF2493B4,
-    0xFF555555,
+    0xFF800000,  // maroon
+    0xFFFF8F00,  // amber/gold
+    0xFF5D4037,  // brown
+    0xFF6A1B9A,  // purple
+    0xFF1B5E20,  // dark green
+    0xFF1A237E,  // navy
   ];
 
   static Future<void> _showColorPicker(BuildContext context) {
