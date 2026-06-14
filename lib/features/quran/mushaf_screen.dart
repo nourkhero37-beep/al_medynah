@@ -858,6 +858,7 @@ class _MushafPageView extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isSpecialPage = page == 1 || page == 2;
+    final double textScale = MediaQuery.textScalerOf(context).scale(1.0);
 
     return SizedBox(
       width: double.infinity,
@@ -907,18 +908,23 @@ class _MushafPageView extends StatelessWidget {
                                 children: [
                                   Image.asset(
                                     'assets/images/surah_header_frames.png',
-                                    width: screenWidth * 1.20,
-                                    height: screenHeight * 0.06,
+                                    width: screenWidth * 1.20 * fontScale * textScale,
+                                    height: screenHeight * 0.06 * fontScale * textScale,
                                     fit: BoxFit.contain,
                                   ),
-                                  Text(
-                                    char,
-                                    textDirection: TextDirection.rtl,
-                                    style: TextStyle(
-                                      fontFamily: font,
-                                      fontSize:
-                                          screenHeight * 0.033 * fontScale,
-                                      color: Color(textColor),
+                                  Transform.translate(
+                                    offset: Offset(0, -screenHeight * 0.006 * fontScale * textScale),
+                                    child: Text(
+                                      char,
+                                      textDirection: TextDirection.rtl,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: font,
+                                        fontSize:
+                                            screenHeight * 0.033 * fontScale,
+                                        color: Color(textColor),
+                                        height: 1.2,
+                                      ),
                                     ),
                                   ),
                                 ],
