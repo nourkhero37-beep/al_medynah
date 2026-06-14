@@ -734,7 +734,7 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                             ),
                             if (ayahNumber.isNotEmpty)
                               Text(
-                                '\u0622\u06CC\u0629 $ayahNumber',
+                                '\u0622\u064A\u0629 $ayahNumber',
                                 style: const TextStyle(
                                   color: Colors.white54,
                                   fontSize: 11,
