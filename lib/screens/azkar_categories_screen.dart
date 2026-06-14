@@ -11,27 +11,25 @@ class AzkarCategoriesScreen extends StatefulWidget {
 }
 
 class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
-  static const Color goldColor = Color(0xFFB8964E);
-  static const Color darkBrown = Color(0xFF3E2A0F);
+  static const Color tealColor = Color(0xFF2493B4);
 
   final MuslimRepository _repo = MuslimRepository();
   List<AzkarCategory> _categories = [];
   bool _isLoading = true;
 
-  // أيقونات لكل تصنيف حسب الترتيب
   final List<IconData> _icons = [
-    Icons.wb_sunny_rounded, // الصباح
-    Icons.nights_stay_rounded, // المساء
-    Icons.bedtime_rounded, // النوم
-    Icons.alarm_rounded, // الاستيقاظ — fallback لو مش موجود
-    Icons.mosque_rounded, // الصلاة
-    Icons.water_drop_rounded, // الوضوء
-    Icons.restaurant_rounded, // الطعام
-    Icons.home_rounded, // البيت
-    Icons.directions_walk_rounded, // الخروج
-    Icons.favorite_rounded, // أدعية متنوعة
-    Icons.menu_book_rounded, // أذكار عامة
-    Icons.star_rounded, // مختلفة
+    Icons.wb_sunny_rounded,
+    Icons.nights_stay_rounded,
+    Icons.bedtime_rounded,
+    Icons.alarm_rounded,
+    Icons.mosque_rounded,
+    Icons.water_drop_rounded,
+    Icons.restaurant_rounded,
+    Icons.home_rounded,
+    Icons.directions_walk_rounded,
+    Icons.favorite_rounded,
+    Icons.menu_book_rounded,
+    Icons.star_rounded,
   ];
 
   @override
@@ -65,14 +63,15 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5ECD7),
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF8B6914),
+          backgroundColor: const Color(0xFF2493B4),
           elevation: 0,
           centerTitle: true,
           title: Text(
             AppLocalizations.of(context).tr('azkar.appBar.title'),
-            style: TextStyle(
+            style: const TextStyle(
+              fontFamily: 'GE SS Two',
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -82,7 +81,7 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
         ),
         body: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFF8B6914)),
+                child: CircularProgressIndicator(color: Color(0xFF2493B4)),
               )
             : _categories.isEmpty
             ? Center(
@@ -99,7 +98,7 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
                     const SizedBox(height: 12),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B6914),
+                        backgroundColor: tealColor,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -154,16 +153,16 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
                             width: 56,
                             height: 56,
                             decoration: BoxDecoration(
-                              color: goldColor.withValues(alpha: 0.12),
+                              color: tealColor.withValues(alpha: 0.12),
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: goldColor.withValues(alpha: 0.3),
+                                color: tealColor.withValues(alpha: 0.3),
                                 width: 1.5,
                               ),
                             ),
                             child: Icon(
                               _getIcon(index),
-                              color: const Color(0xFF8B6914),
+                              color: tealColor,
                               size: 28,
                             ),
                           ),
@@ -176,9 +175,10 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
+                                fontFamily: 'GE SS Two',
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: darkBrown,
+                                color: Color(0xFF1E7FA0),
                                 height: 1.4,
                               ),
                             ),

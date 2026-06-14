@@ -10,9 +10,6 @@ class NamesOfAllahScreen extends StatefulWidget {
 }
 
 class _NamesOfAllahScreenState extends State<NamesOfAllahScreen> {
-  static const Color goldColor = Color(0xFFB8964E);
-  static const Color darkBrown = Color(0xFF3E2A0F);
-
   final MuslimRepository _repo = MuslimRepository();
   List<NameOfAllah> _names = [];
   bool _isLoading = true;
@@ -33,7 +30,7 @@ class _NamesOfAllahScreenState extends State<NamesOfAllahScreen> {
         });
       }
     } catch (e) {
-      debugPrint('Error loading names: $e');
+      debugPrint("Error loading names: $e");
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -45,12 +42,13 @@ class _NamesOfAllahScreenState extends State<NamesOfAllahScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF8B6914),
+          backgroundColor: const Color(0xFF2493B4),
           elevation: 0,
           centerTitle: true,
           title: Text(
-            AppLocalizations.of(context).tr('namesOfAllah.appBar.title'),
-            style: TextStyle(
+            AppLocalizations.of(context).tr("namesOfAllah.appBar.title"),
+            style: const TextStyle(
+              fontFamily: "GE SS Two",
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -60,7 +58,7 @@ class _NamesOfAllahScreenState extends State<NamesOfAllahScreen> {
         ),
         body: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFF8B6914)),
+                child: CircularProgressIndicator(color: Color(0xFF2493B4)),
               )
             : _names.isEmpty
             ? Center(
@@ -73,11 +71,11 @@ class _NamesOfAllahScreenState extends State<NamesOfAllahScreen> {
                       color: Colors.grey,
                     ),
                     const SizedBox(height: 12),
-                    Text(AppLocalizations.of(context).tr('namesOfAllah.error.load')),
+                    Text(AppLocalizations.of(context).tr("namesOfAllah.error.load")),
                     const SizedBox(height: 12),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B6914),
+                        backgroundColor: const Color(0xFF2493B4),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -87,50 +85,57 @@ class _NamesOfAllahScreenState extends State<NamesOfAllahScreen> {
                         setState(() => _isLoading = true);
                         _loadNames();
                       },
-                      child: Text(AppLocalizations.of(context).tr('namesOfAllah.retry')),
+                      child: Text(AppLocalizations.of(context).tr("namesOfAllah.retry")),
                     ),
                   ],
                 ),
               )
-            : Center(
+            : SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 20,
+                ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    for (
-                      var row = 0;
-                      row < (_names.length / 6).ceil();
-                      row++
-                    ) ...[
+                    for (var row = 0; row < (_names.length / 3).ceil(); row++) ...[
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            for (var col = 0; col < 6; col++) ...[
-                              if (row * 6 + col < _names.length) ...[
-                                Text(
-                                  _names[row * 6 + col].name,
-                                  style: const TextStyle(
-                                    color: darkBrown,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
+                            for (var col = 0; col < 3; col++) ...[
+                              if (row * 3 + col < _names.length) ...[
+                                Expanded(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      _names[row * 3 + col].name,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontFamily: "GE SS Two",
+                                        color: Color(0xFF1E7FA0),
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                if (col < 5 &&
-                                    row * 6 + col + 1 < _names.length)
+                                if (col < 2 && row * 3 + col + 1 < _names.length)
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 4,
                                     ),
                                     child: Text(
-                                      '✦',
+                                      "\u2726",
                                       style: TextStyle(
-                                        color: goldColor,
+                                        color: const Color(0xFF2493B4)
+                                            .withValues(alpha: 0.6),
                                         fontSize: 11,
                                       ),
                                     ),
                                   ),
-                              ],
+                              ] else
+                                const Spacer(),
                             ],
                           ],
                         ),
@@ -143,3 +148,4 @@ class _NamesOfAllahScreenState extends State<NamesOfAllahScreen> {
     );
   }
 }
+

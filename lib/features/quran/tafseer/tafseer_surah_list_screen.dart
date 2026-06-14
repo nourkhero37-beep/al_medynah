@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:al_medynah/model/surah_model.dart';
 import 'tafseer_ayah_screen.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
@@ -42,24 +42,33 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5ECD7),
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF8B6914),
+          backgroundColor: const Color(0xFF2493B4),
           elevation: 0,
           centerTitle: true,
           title: Text(
             AppLocalizations.of(context).tr('tafseer.appBar.title'),
-            style: TextStyle(
+            style: const TextStyle(
+              fontFamily: 'GE SS Two',
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           iconTheme: const IconThemeData(color: Colors.white),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(60),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        ),
+        body: Column(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                color: Color(0xFF2493B4),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(22),
+                  bottomRight: Radius.circular(22),
+                ),
+              ),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: TextField(
                 controller: _searchController,
                 onChanged: _onSearch,
@@ -67,7 +76,10 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context).tr('tafseer.search.hint'),
-                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                  hintStyle: TextStyle(
+                    fontFamily: 'GE SS Two',
+                    color: Colors.white.withValues(alpha: 0.7),
+                  ),
                   prefixIcon: const Icon(Icons.search, color: Colors.white),
                   filled: true,
                   fillColor: Colors.white.withValues(alpha: 0.15),
@@ -78,148 +90,143 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
                 ),
               ),
             ),
-          ),
-        ),
-        body: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          itemCount: _filteredList.length,
-          itemBuilder: (context, index) {
-            final surah = _filteredList[index];
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => TafseerAyahScreen(surah: surah),
-                  ),
-                );
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.06),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    // ? ??? ??????
-                    SizedBox(
-                      width: 42,
-                      height: 42,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/ارقام الايات.png',
-                            width: 42,
-                            height: 42,
-                            fit: BoxFit.contain,
-                          ),
-                          Text(
-                            '${surah.id}',
-                            style: const TextStyle(
-                              color: Colors.orange,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(width: 14),
-
-                    // ? ??? ??????
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            surah.nameArabic,
-                            style: const TextStyle(
-                              fontFamily: 'GE SS Two',
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color: darkBrown,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            surah.nameEnglish,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: darkBrown.withValues(alpha: 0.5),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // ? ??? + ??? ??????
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: _filteredList.length,
+                itemBuilder: (context, index) {
+                  final surah = _filteredList[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => TafseerAyahScreen(surah: surah),
+                        ),
+                      );
+                    },
+                    child: Column(
                       children: [
-                        Container(
+                        Padding(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
+                            horizontal: 16,
+                            vertical: 12,
                           ),
-                          decoration: BoxDecoration(
-                            color: surah.revelationType == AppLocalizations.of(context).tr('ayahList.meccan')
-                                ? const Color(0xFF5C8A5C).withValues(alpha: 0.15)
-                                : const Color(0xFF2E86AB).withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(8),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 42,
+                                height: 42,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/ارقام الايات.png',
+                                      width: 42,
+                                      height: 42,
+                                      fit: BoxFit.contain,
+                                    ),
+                                    Text(
+                                      '${surah.id}',
+                                      style: const TextStyle(
+                                        color: Colors.orange,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      surah.nameArabic,
+                                      style: const TextStyle(
+                                        fontFamily: 'GE SS Two',
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF1E7FA0),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      surah.nameEnglish,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: surah.revelationType == AppLocalizations.of(context).tr('ayahList.meccan')
+                                          ? const Color(0xFF5C8A5C).withValues(alpha: 0.15)
+                                          : const Color(0xFF2E86AB).withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      surah.revelationType,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: surah.revelationType == AppLocalizations.of(context).tr('ayahList.meccan')
+                                            ? const Color(0xFF5C8A5C)
+                                            : const Color(0xFF2E86AB),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    AppLocalizations.of(context).tr('tafseer.appBar.subtitle', {'count': surah.versesCount.toString()}),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: darkBrown.withValues(alpha: 0.5),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(
+                                Icons.arrow_back_ios_rounded,
+                                size: 16,
+                                color: goldColor.withValues(alpha: 0.7),
+                              ),
+                            ],
                           ),
-                          child: Text(
-                            surah.revelationType,
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: surah.revelationType == AppLocalizations.of(context).tr('ayahList.meccan')
-                                  ? const Color(0xFF5C8A5C)
-                                  : const Color(0xFF2E86AB),
-                              fontWeight: FontWeight.w600,
+                        ),
+                        if (index < _filteredList.length - 1)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Divider(
+                              height: 1,
+                              color: Colors.grey.withValues(alpha: 0.3),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          AppLocalizations.of(context).tr('tafseer.appBar.subtitle', {'count': surah.versesCount.toString()}),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: darkBrown.withValues(alpha: 0.5),
-                          ),
-                        ),
                       ],
                     ),
-
-                    // ? ??? ??????
-                    const SizedBox(width: 8),
-                    Icon(
-                      Icons.arrow_back_ios_rounded,
-                      size: 16,
-                      color: goldColor.withValues(alpha: 0.7),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
-
 

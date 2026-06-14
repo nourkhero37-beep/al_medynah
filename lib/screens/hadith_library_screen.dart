@@ -40,14 +40,15 @@ class _HadithLibraryScreenState extends State<HadithLibraryScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5ECD7),
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF8B6914),
+          backgroundColor: const Color(0xFF2493B4),
           elevation: 0,
           centerTitle: true,
           title: Text(
             AppLocalizations.of(context).tr('hadith.appBar.title'),
-            style: TextStyle(
+            style: const TextStyle(
+              fontFamily: 'GE SS Two',
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -57,7 +58,7 @@ class _HadithLibraryScreenState extends State<HadithLibraryScreen> {
         ),
         body: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFF8B6914)),
+                child: CircularProgressIndicator(color: Color(0xFF2493B4)),
               )
             : _collections.isEmpty
             ? Center(
@@ -107,7 +108,8 @@ class _HadithLibraryScreenState extends State<HadithLibraryScreen> {
                               Text(
                                 book.arabicName,
                                 style: const TextStyle(
-                                  color: Color(0xFF3E2A0F),
+                                  fontFamily: 'GE SS Two',
+                                  color: Color(0xFF1E7FA0),
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -126,7 +128,7 @@ class _HadithLibraryScreenState extends State<HadithLibraryScreen> {
                               Text(
                                 AppLocalizations.of(context).tr('hadith.hadithCount', {'count': book.totalHadiths.toString()}),
                                 style: const TextStyle(
-                                  color: Color(0xFFB8964E),
+                                  color: Color(0xFF2493B4),
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -318,14 +320,15 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5ECD7),
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF8B6914),
+          backgroundColor: const Color(0xFF2493B4),
           elevation: 0,
           centerTitle: true,
           title: Text(
             widget.collection.arabicName,
             style: const TextStyle(
+              fontFamily: 'GE SS Two',
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -349,7 +352,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                   ),
                   prefixIcon: const Icon(
                     Icons.search,
-                    color: Color(0xFFB8964E),
+                    color: Color(0xFF2493B4),
                   ),
                   suffixIcon: _searchCtrl.text.isNotEmpty
                       ? IconButton(
@@ -384,7 +387,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                           AppLocalizations.of(context).tr('hadith.search.result', {'number': num.toString()}),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF3E2A0F),
+                            color: Color(0xFF1E7FA0),
                           ),
                         ),
                         subtitle: Text(
@@ -400,7 +403,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
             else if (_isSearching)
               const Expanded(
                 child: Center(
-                  child: CircularProgressIndicator(color: Color(0xFF8B6914)),
+                  child: CircularProgressIndicator(color: Color(0xFF2493B4)),
                 ),
               )
             else
@@ -408,7 +411,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                 child: Center(
                   child: _isLoading
                       ? const CircularProgressIndicator(
-                          color: Color(0xFF8B6914),
+                          color: Color(0xFF2493B4),
                         )
                       : SingleChildScrollView(
                           padding: const EdgeInsets.all(16),
@@ -440,17 +443,13 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                             vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: const Color(
-                                              0xFFB8964E,
-                                            ).withValues(alpha: 0.12),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
+                                            color: const Color(0xFF2493B4).withValues(alpha: 0.12),
+                                            borderRadius: BorderRadius.circular(8),
                                           ),
                                           child: Text(
                                             AppLocalizations.of(context).tr('hadith.detail.number', {'number': _hadith!.hadithNumber.toString()}),
                                             style: const TextStyle(
-                                              color: Color(0xFFB8964E),
+                                              color: Color(0xFF2493B4),
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -489,12 +488,8 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                             vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: const Color(
-                                              0xFF3E2A0F,
-                                            ).withValues(alpha: 0.08),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
+                                            color: const Color(0xFF3E2A0F).withValues(alpha: 0.08),
+                                            borderRadius: BorderRadius.circular(8),
                                           ),
                                           child: Text(
                                             AppLocalizations.of(context).tr('hadith.grade'),
@@ -547,9 +542,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                         filled: true,
                                         fillColor: Colors.white,
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
+                                          borderRadius: BorderRadius.circular(12),
                                           borderSide: BorderSide.none,
                                         ),
                                         contentPadding:
@@ -566,7 +559,7 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
                                   const SizedBox(width: 8),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF8B6914),
+                                      backgroundColor: const Color(0xFF2493B4),
                                       foregroundColor: Colors.white,
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 20,
@@ -623,9 +616,9 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF3E2A0F),
+        foregroundColor: const Color(0xFF2493B4),
         elevation: 0,
-        side: BorderSide(color: const Color(0xFFB8964E).withValues(alpha: 0.3)),
+        side: BorderSide(color: const Color(0xFF2493B4).withValues(alpha: 0.3)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       ),
@@ -635,3 +628,4 @@ class _HadithBrowserScreenState extends State<HadithBrowserScreen> {
     );
   }
 }
+

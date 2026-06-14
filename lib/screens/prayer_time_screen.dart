@@ -11,8 +11,8 @@ class PrayerTimesScreen extends StatefulWidget {
 }
 
 class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
-  static const Color goldColor = Color(0xFFB8964E);
-  static const Color darkBrown = Color(0xFF3E2A0F);
+  static const Color tealColor = Color(0xFF2493B4);
+  static const Color tealDark = Color(0xFF1E7FA0);
 
   PrayerTimes? _prayerTimes;
   bool _isLoading = true;
@@ -225,9 +225,9 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5ECD7),
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF8B6914),
+          backgroundColor: tealColor,
           elevation: 0,
           centerTitle: true,
           title: Text(
@@ -236,6 +236,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
+              fontFamily: 'GE SS Two',
             ),
           ),
           iconTheme: const IconThemeData(color: Colors.white),
@@ -248,7 +249,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         ),
         body: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFF8B6914)),
+                child: CircularProgressIndicator(color: tealColor),
               )
             : _errorMessage != null
             ? Center(
@@ -266,13 +267,13 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 15,
-                        color: darkBrown.withValues(alpha: 0.7),
+                        color: tealDark.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B6914),
+                        backgroundColor: tealColor,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -315,14 +316,14 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF8B6914), Color(0xFFB8964E)],
+          colors: [tealColor, tealDark],
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF8B6914).withValues(alpha: 0.3),
+            color: tealColor.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -401,13 +402,13 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: isCurrent
-              ? const Color(0xFF8B6914)
+              ? tealColor
               : isNext
-              ? goldColor.withValues(alpha: 0.15)
+              ? tealColor.withValues(alpha: 0.15)
               : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: isNext
-              ? Border.all(color: goldColor.withValues(alpha: 0.5), width: 1.5)
+              ? Border.all(color: tealColor.withValues(alpha: 0.5), width: 1.5)
               : null,
           boxShadow: [
             BoxShadow(
@@ -425,7 +426,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: isCurrent ? Colors.white : darkBrown,
+                color: isCurrent ? Colors.white : tealDark,
               ),
             ),
 
@@ -437,7 +438,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: isCurrent ? Colors.white : darkBrown,
+                color: isCurrent ? Colors.white : tealDark,
               ),
             ),
 
@@ -450,12 +451,12 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               decoration: BoxDecoration(
                 color: isCurrent
                     ? Colors.white.withValues(alpha: 0.2)
-                    : goldColor.withValues(alpha: 0.12),
+                    : tealColor.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 _prayerNames[index]['icon'],
-                color: isCurrent ? Colors.white : const Color(0xFF8B6914),
+                color: isCurrent ? Colors.white : tealColor,
                 size: 20,
               ),
             ),
@@ -485,13 +486,13 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: goldColor.withValues(alpha: 0.2),
+                  color: tealColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   AppLocalizations.of(context).tr('prayer.upcoming'),
                   style: TextStyle(
-                    color: Color(0xFF8B6914),
+                    color: tealColor,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
@@ -504,3 +505,5 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     });
   }
 }
+
+

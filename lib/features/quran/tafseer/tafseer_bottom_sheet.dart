@@ -28,7 +28,7 @@ class TafseerBottomSheet extends StatefulWidget {
 }
 
 class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
-  static const Color goldColor = Color(0xFFB8964E);
+  static const Color tealColor = Color(0xFF2493B4);
   static const Color darkBrown = Color(0xFF3E2A0F);
 
   String? _tafseerText;
@@ -39,7 +39,6 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
   late int _currentSurahId;
   late int _currentAyahNumber;
 
-  // ✅ TTS
   final FlutterTts _tts = FlutterTts();
   bool _isSpeaking = false;
   bool _isPaused = false;
@@ -53,19 +52,16 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
     _loadTafseer();
   }
 
-  // ✅ إعداد الـ TTS بالعربي
   Future<void> _initTts() async {
     await _tts.setLanguage('ar-SA');
     await _tts.setSpeechRate(0.45);
     await _tts.setVolume(1.0);
     await _tts.setPitch(1.0);
 
-    // ✅ نجيب كل الأصوات المتاحة ونختار ذكر عربي
     final voices = await _tts.getVoices as List?;
     if (voices != null) {
       debugPrint('Available voices: $voices');
 
-      // ✅ نفلتر على العربي والذكر
       final arabicMaleVoice = voices.firstWhere((v) {
         final name = (v['name'] as String? ?? '').toLowerCase();
         final locale = (v['locale'] as String? ?? '').toLowerCase();
@@ -79,10 +75,9 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
           'name': arabicMaleVoice['name'],
           'locale': arabicMaleVoice['locale'],
         });
-        debugPrint('✅ Selected voice: ${arabicMaleVoice['name']}');
+        debugPrint('Selected voice: ${arabicMaleVoice['name']}');
       } else {
-        // ✅ لو ما لقينا ذكر، نخفض الـ pitch يصير أثقل
-        debugPrint('⚠️ No male Arabic voice found, lowering pitch');
+        debugPrint('No male Arabic voice found, lowering pitch');
         await _tts.setPitch(0.75);
       }
     }
@@ -119,7 +114,6 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
   }
 
   Future<void> _loadTafseer() async {
-    // ✅ نوقف الصوت لما ننتقل لآية جديدة
     await _stopSpeaking();
 
     setState(() {
@@ -138,18 +132,14 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
     });
   }
 
-  // ✅ تشغيل / إيقاف مؤقت / استئناف
   Future<void> _toggleSpeech() async {
     if (_tafseerText == null) return;
 
     if (_isSpeaking && !_isPaused) {
-      // إيقاف مؤقت
       await _tts.pause();
     } else if (_isPaused) {
-      // استئناف
       await _tts.speak(_tafseerText!);
     } else {
-      // بداية التشغيل
       await _tts.speak(_tafseerText!);
     }
   }
@@ -214,28 +204,25 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFFF5ECD7),
+        color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ✅ Handle
           Container(
             margin: const EdgeInsets.only(top: 12),
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.brown.withValues(alpha: 0.3),
+              color: Colors.grey.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
-          // ✅ Header
           Container(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
             decoration: const BoxDecoration(
-              color: Color(0xFF8B6914),
+              color: Color(0xFF2493B4),
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Row(
@@ -254,7 +241,8 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                   children: [
                     Text(
                       AppLocalizations.of(context).tr('tafseer.header.title'),
-                      style: TextStyle(
+                      style: const TextStyle(
+                        fontFamily: 'GE SS Two',
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -278,15 +266,13 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
               ],
             ),
           ),
-
-          // ✅ المحتوى
           Flexible(
             child: _isLoading
                 ? const Padding(
                     padding: EdgeInsets.all(48),
                     child: Center(
                       child: CircularProgressIndicator(
-                        color: Color(0xFF8B6914),
+                        color: Color(0xFF2493B4),
                       ),
                     ),
                   )
@@ -309,7 +295,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                         const SizedBox(height: 16),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF8B6914),
+                            backgroundColor: const Color(0xFF2493B4),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -328,7 +314,6 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // ✅ badge السورة والآية + زر TTS
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(
@@ -336,15 +321,14 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: goldColor.withValues(alpha: 0.12),
+                              color: tealColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: goldColor.withValues(alpha: 0.4),
+                                color: tealColor.withValues(alpha: 0.4),
                               ),
                             ),
                             child: Row(
                               children: [
-                                // ✅ زر الصوت
                                 GestureDetector(
                                   onTap: _toggleSpeech,
                                   child: Container(
@@ -352,10 +336,9 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                                     height: 38,
                                     decoration: BoxDecoration(
                                       color: _isSpeaking
-                                          ? const Color(0xFF8B6914)
-                                          : const Color(
-                                              0xFF8B6914,
-                                            ).withValues(alpha: 0.15),
+                                          ? const Color(0xFF2493B4)
+                                          : const Color(0xFF2493B4)
+                                              .withValues(alpha: 0.15),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
@@ -364,50 +347,46 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                                           : Icons.volume_up_rounded,
                                       color: _isSpeaking
                                           ? Colors.white
-                                          : const Color(0xFF8B6914),
+                                          : const Color(0xFF2493B4),
                                       size: 20,
                                     ),
                                   ),
                                 ),
-
                                 const Spacer(),
-
                                 Text(
                                   'سورة $_surahName — الآية $_currentAyahNumber',
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
+                                    fontFamily: 'GE SS Two',
                                     fontSize: 13,
-                                    color: darkBrown,
+                                    color: Color(0xFF1E7FA0),
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-
                           const SizedBox(height: 16),
-
                           Row(
                             children: [
                               const Icon(
                                 Icons.format_quote_rounded,
-                                color: Color(0xFF8B6914),
+                                color: Color(0xFF2493B4),
                                 size: 20,
                               ),
                               const SizedBox(width: 6),
                               Text(
                                 AppLocalizations.of(context).tr('tafseer.section.tafsir'),
-                                style: TextStyle(
+                                style: const TextStyle(
+                                  fontFamily: 'GE SS Two',
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF8B6914),
+                                  color: Color(0xFF2493B4),
                                 ),
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 12),
-
                           Text(
                             _tafseerText ?? '',
                             textAlign: TextAlign.justify,
@@ -422,19 +401,16 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                     ),
                   ),
           ),
-
-          // ✅ زرا التنقل بالأسفل
           Container(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5ECD7),
+              color: Colors.white,
               border: Border(
-                top: BorderSide(color: goldColor.withValues(alpha: 0.2), width: 1),
+                top: BorderSide(color: tealColor.withValues(alpha: 0.2), width: 1),
               ),
             ),
             child: Row(
               children: [
-                // ✅ زر الآية السابقة
                 Expanded(
                   child: GestureDetector(
                     onTap: _hasPrevious ? _goToPrevious : null,
@@ -443,7 +419,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _hasPrevious
-                            ? const Color(0xFF8B6914)
+                            ? const Color(0xFF2493B4)
                             : Colors.grey.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -469,17 +445,14 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 12),
-
-                // ✅ رقم الآية الحالية
                 Container(
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: goldColor.withValues(alpha: 0.15),
+                    color: tealColor.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
-                    border: Border.all(color: goldColor.withValues(alpha: 0.4)),
+                    border: Border.all(color: tealColor.withValues(alpha: 0.4)),
                   ),
                   child: Center(
                     child: Text(
@@ -487,15 +460,12 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: darkBrown,
+                        color: Color(0xFF2493B4),
                       ),
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 12),
-
-                // ✅ زر الآية التالية
                 Expanded(
                   child: GestureDetector(
                     onTap: _hasNext ? _goToNext : null,
@@ -504,7 +474,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _hasNext
-                            ? const Color(0xFF8B6914)
+                            ? const Color(0xFF2493B4)
                             : Colors.grey.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
