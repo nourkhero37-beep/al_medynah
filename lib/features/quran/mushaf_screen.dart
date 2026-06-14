@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/services.dart';
@@ -572,8 +572,12 @@ class _AudioPlayerBar extends StatefulWidget {
 
 class _AudioPlayerBarState extends State<_AudioPlayerBar> {
   String _formatDuration(Duration d) {
+    final h = d.inHours;
     final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
     final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    if (h > 0) {
+      return '${h.toString().padLeft(2, '0')}:$m:$s';
+    }
     return '$m:$s';
   }
 
@@ -658,7 +662,7 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                     Row(
                       children: [
                         SizedBox(
-                          width: 36,
+                          width: 56,
                           child: Text(
                             _formatDuration(position),
                             style: const TextStyle(
@@ -741,7 +745,7 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                         ),
                         const Spacer(),
                         SizedBox(
-                          width: 36,
+                          width: 56,
                           child: Text(
                             _formatDuration(total),
                             textAlign: TextAlign.end,
@@ -1033,6 +1037,8 @@ class _MushafPageView extends StatelessWidget {
     );
   }
 }
+
+
 
 
 
