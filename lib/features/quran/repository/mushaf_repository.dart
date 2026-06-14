@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:just_audio/just_audio.dart';
 import '../../../services/audio_manager_api.dart';
 import '../../../services/quran_data_service.dart';
@@ -36,9 +36,11 @@ class MushafRepository {
     );
   }
 
-  Future<Map<String, List<int>>> fetchVerseTimings(int surahNumber) async {
+  Future<Map<String, dynamic>> fetchVerseTimings(int surahNumber) async {
     final reciterId = _audioManager.currentReciterId;
-    if (reciterId == null) return {};
+    if (reciterId == null) {
+      return {'timings': <String, List<int>>{}, 'duration': 0};
+    }
     return _audioManager.fetchVerseTimings(
       int.tryParse(reciterId) ?? 0,
       surahNumber,

@@ -126,7 +126,7 @@ class AudioManager {
     }
   }
 
-  Future<Map<String, List<int>>> fetchVerseTimings(
+  Future<Map<String, dynamic>> fetchVerseTimings(
     int reciterId,
     int surahNumber,
   ) async {
@@ -137,9 +137,12 @@ class AudioManager {
       );
 
       final audioFiles = response.data['audio_files'] as List<dynamic>;
-      if (audioFiles.isEmpty) return {};
+      if (audioFiles.isEmpty) {
+        return {'timings': <String, List<int>>{}, 'duration': 0};
+      }
 
       final segments = audioFiles[0]['verse_timings'] as List<dynamic>;
+      final duration = audioFiles[0]['duration'] as int;
 
       final Map<String, List<int>> timings = {};
       for (final seg in segments) {
@@ -150,12 +153,12 @@ class AudioManager {
       }
 
       debugPrint(
-        'fetched ${timings.length} verses for reciter $reciterId surah $surahNumber',
+        'fetched ${timings.length} verses, duration=$duration for reciter $reciterId surah $surahNumber',
       );
-      return timings;
+      return {'timings': timings, 'duration': duration};
     } catch (e) {
       debugPrint('Error fetching timings: $e');
-      return {};
+      return {'timings': <String, List<int>>{}, 'duration': 0};
     }
   }
 

@@ -1,5 +1,6 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,7 +36,8 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     MushafDurationUpdated event,
     Emitter<MushafState> emit,
   ) {
-    emit(state.copyWith(totalDuration: event.duration));
+    debugPrint('DURATION: event=${event.duration.inMilliseconds}ms state.totalDuration=${state.totalDuration.inMilliseconds}ms');
+    emit(state.copyWith());
   }
 
   Future<void> _onPauseTapped(
@@ -107,8 +109,6 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
           playerState.processingState == ProcessingState.completed &&
           state.isPlaying &&
           !_isHandlingCompletion) {
-        // Position guard: only consider completion legitimate if
-        // we're near the end of the audio (filters false events on Windows)
         final timings = state.verseTimings;
         if (timings.isNotEmpty) {
           final maxEndMs = timings.values
@@ -136,6 +136,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     _durationSubscription?.cancel();
     _durationSubscription = repository.durationStream.listen((duration) {
       if (!isClosed && duration != null) {
+        debugPrint('DURATION_STREAM: ${duration.inMilliseconds}ms');
         add(MushafDurationUpdated(duration));
       }
     });
@@ -186,15 +187,21 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
       return;
     }
 
-    final timings = await repository.fetchVerseTimings(surahNumber);
-    emit(state.copyWith(verseTimings: timings));
+    final result = await repository.fetchVerseTimings(surahNumber);
+    final verseTimings = result['timings'] as Map<String, List<int>>;
+    final apiDuration = result['duration'] as int;
+    debugPrint('PLAY: surah=$surahNumber apiDuration=$apiDuration ms');
+    emit(state.copyWith(
+      verseTimings: verseTimings,
+      totalDuration: Duration(milliseconds: apiDuration),
+    ));
 
-    final seekToMs = timings[state.selectedVerseKey]?[0];
+    final seekToMs = verseTimings[state.selectedVerseKey]?[0];
 
     _positionSubscription?.cancel();
     _positionSubscription = repository.positionStream.listen((position) {
       if (!isClosed) {
-        add(MushafPositionUpdated(position: position, verseTimings: timings));
+        add(MushafPositionUpdated(position: position, verseTimings: verseTimings));
       }
     });
 
@@ -207,17 +214,12 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     MushafPositionUpdated event,
     Emitter<MushafState> emit,
   ) {
-    // Guard: skip stale events from old position subscription after auto-advance
     if (state.verseTimings.isNotEmpty &&
         event.verseTimings.isNotEmpty &&
         state.verseTimings.keys.first != event.verseTimings.keys.first) {
       return;
     }
 
-    // Early exit if no timings loaded yet.
-    // Do NOT reset isPlaying/isPaused here — the position stream
-    // continues to fire while paused and would corrupt the pause state,
-    // requiring a double-tap to resume.
     if (event.verseTimings.isEmpty) {
       if (state.isPlaying || state.isPaused) {
         return;
@@ -226,7 +228,6 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
       return;
     }
 
-    // Position-based completion fallback (for platforms where ProcessingState.completed is unreliable)
     final maxEndMs = event.verseTimings.values
         .expand((list) => list)
         .reduce((a, b) => a > b ? a : b);
@@ -341,19 +342,23 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     final firstVerseKey = '${event.surahNumber}:1';
     _positionSubscription?.cancel();
 
-    final timings = await repository.fetchVerseTimings(event.surahNumber);
-    final seekToMs = timings[firstVerseKey]?[0];
+    final result = await repository.fetchVerseTimings(event.surahNumber);
+    final verseTimings = result['timings'] as Map<String, List<int>>;
+    final apiDuration = result['duration'] as int;
+    debugPrint('AUTO_ADVANCE: surah=${event.surahNumber} apiDuration=$apiDuration ms');
+    final seekToMs = verseTimings[firstVerseKey]?[0];
 
     _positionSubscription = repository.positionStream.listen((position) {
       if (!isClosed) {
-        add(MushafPositionUpdated(position: position, verseTimings: timings));
+        add(MushafPositionUpdated(position: position, verseTimings: verseTimings));
       }
     });
 
     emit(
       state.copyWith(
         selectedVerseKey: firstVerseKey,
-        verseTimings: timings,
+        verseTimings: verseTimings,
+        totalDuration: Duration(milliseconds: apiDuration),
         isPlaying: true,
         isPaused: false,
         currentPosition: Duration.zero,
