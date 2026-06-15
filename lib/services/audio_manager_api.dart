@@ -1,5 +1,7 @@
 ﻿// ignore_for_file: unnecessary_brace_in_string_interps
 
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:al_medynah/model/reciters_model.dart';
 import 'package:dio/dio.dart';
@@ -35,6 +37,138 @@ class AudioManager {
   String? get currentVerseKey => _currentVerseKey;
   String? get currentReciterName => _currentReciterName;
   String? get currentServerUrl => _currentServerUrl;
+
+  Future<String> _cacheDir() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final cache = Directory('${dir.path}/.cache');
+    if (!cache.existsSync()) cache.createSync(recursive: true);
+    return cache.path;
+  }
+
+  Future<String> _timingsCacheDir(String reciterId) async {
+    final base = await _cacheDir();
+    final dir = Directory('$base/timings/$reciterId');
+    if (!dir.existsSync()) dir.createSync(recursive: true);
+    return dir.path;
+  }
+
+  Future<void> _cacheVerseTimings(
+    int reciterId,
+    int surahNumber,
+    Map<String, List<int>> timings,
+    int duration,
+  ) async {
+    try {
+      final dir = await _timingsCacheDir(reciterId.toString());
+      final file = File('$dir/$surahNumber.json');
+      final data = {
+        'duration': duration,
+        'timings': timings.map((k, v) => MapEntry(k, v)),
+      };
+      await file.writeAsString(jsonEncode(data));
+      debugPrint('cached timings for reciter $reciterId surah $surahNumber');
+    } catch (e) {
+      debugPrint('failed to cache timings: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>?> _loadCachedVerseTimings(
+    int reciterId,
+    int surahNumber,
+  ) async {
+    try {
+      final dir = await _timingsCacheDir(reciterId.toString());
+      final file = File('$dir/$surahNumber.json');
+      if (!file.existsSync()) return null;
+      final data = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+      final rawTimings = data['timings'] as Map<String, dynamic>;
+      final timings = rawTimings.map(
+        (k, v) => MapEntry(k, (v as List<dynamic>).cast<int>()),
+      );
+      final duration = data['duration'] as int;
+      debugPrint(
+        'loaded cached timings for reciter $reciterId surah $surahNumber',
+      );
+      return {'timings': timings, 'duration': duration};
+    } catch (e) {
+      debugPrint('failed to load cached timings: $e');
+      return null;
+    }
+  }
+
+  Future<void> _cacheReciters(List<RecitersModel> reciters) async {
+    try {
+      final dir = await _cacheDir();
+      final data = reciters
+          .map(
+            (r) => {
+              'id': r.id,
+              'nameArabic': r.nameArabic,
+              'serverUrl': r.serverUrl,
+              'rewaya': r.rewaya,
+            },
+          )
+          .toList();
+      await File('$dir/reciters.json').writeAsString(jsonEncode(data));
+    } catch (e) {
+      debugPrint('failed to cache reciters: $e');
+    }
+  }
+
+  Future<List<RecitersModel>> _loadCachedReciters() async {
+    try {
+      final dir = await _cacheDir();
+      final file = File('$dir/reciters.json');
+      if (!file.existsSync()) return [];
+      final data = jsonDecode(await file.readAsString()) as List<dynamic>;
+      return data
+          .map(
+            (r) => RecitersModel(
+              id: r['id'] as int,
+              nameArabic: r['nameArabic'] as String,
+              serverUrl: r['serverUrl'] as String,
+              rewaya: r['rewaya'] as String,
+            ),
+          )
+          .toList();
+    } catch (e) {
+      debugPrint('failed to load cached reciters: $e');
+      return [];
+    }
+  }
+
+  Future<void> _cacheAudioUrls(int reciterId) async {
+    try {
+      final dir = await _cacheDir();
+      final entries = _audioUrlsCache.entries
+          .where((e) => e.key.startsWith('$reciterId:'))
+          .toList();
+      if (entries.isEmpty) return;
+      final data = {for (final e in entries) e.key: e.value};
+      await File('$dir/audio_urls_$reciterId.json').writeAsString(
+        jsonEncode(data),
+      );
+    } catch (e) {
+      debugPrint('failed to cache audio URLs: $e');
+    }
+  }
+
+  Future<void> _loadCachedAudioUrls(int reciterId) async {
+    try {
+      final dir = await _cacheDir();
+      final file = File('$dir/audio_urls_$reciterId.json');
+      if (!file.existsSync()) return;
+      final data = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+      for (final e in data.entries) {
+        _audioUrlsCache[e.key] = e.value as String;
+      }
+      debugPrint(
+        'loaded ${data.length} cached audio URLs for reciter $reciterId',
+      );
+    } catch (e) {
+      debugPrint('failed to load cached audio URLs: $e');
+    }
+  }
 
   Future<List<RecitersModel>> fetchReciters() async {
     try {
@@ -73,15 +207,21 @@ class AudioManager {
         );
       }
 
+      _cacheReciters(result);
       return result;
     } catch (e) {
       debugPrint('Error fetching reciters: $e');
+      final cached = await _loadCachedReciters();
+      if (cached.isNotEmpty) return cached;
       return [];
     }
   }
 
   Future<String?> fetchAudioUrl(int reciterId, int surahNumber) async {
     try {
+      final cached = _audioUrlsCache['$reciterId:$surahNumber'];
+      if (cached != null) return cached;
+
       final response = await _dio.get(
         'https://api.qurancdn.com/api/qdc/audio/reciters/$reciterId/audio_files',
         queryParameters: {'chapter_number': surahNumber, 'segments': false},
@@ -91,15 +231,19 @@ class AudioManager {
       if (audioFiles.isEmpty) return null;
 
       final audioUrl = audioFiles[0]['audio_url'] as String?;
+      if (audioUrl != null) {
+        _audioUrlsCache['$reciterId:$surahNumber'] = audioUrl;
+        _cacheAudioUrls(reciterId);
+      }
       return audioUrl;
     } catch (e) {
       debugPrint('Error fetching audio url: $e');
-      return null;
+
+      await _loadCachedAudioUrls(reciterId);
+      return _audioUrlsCache['$reciterId:$surahNumber'];
     }
   }
 
-  /// Best-effort batch fetch of all surah audio URLs in a single API call.
-  /// If it fails, individual calls fall back to per-surah fetches.
   Future<void> _fetchAllAudioUrls(int reciterId) async {
     try {
       final response = await _dio.get(
@@ -120,9 +264,11 @@ class AudioManager {
           }
         }
       }
+      _cacheAudioUrls(reciterId);
       debugPrint('Cached ${_audioUrlsCache.length} URLs for reciter $reciterId');
     } catch (e) {
       debugPrint('Batch URL fetch failed (falling back to per-surah): $e');
+      await _loadCachedAudioUrls(reciterId);
     }
   }
 
@@ -130,6 +276,9 @@ class AudioManager {
     int reciterId,
     int surahNumber,
   ) async {
+    final cached = await _loadCachedVerseTimings(reciterId, surahNumber);
+    if (cached != null) return cached;
+
     try {
       final response = await _dio.get(
         'https://api.qurancdn.com/api/qdc/audio/reciters/$reciterId/audio_files',
@@ -155,9 +304,13 @@ class AudioManager {
       debugPrint(
         'fetched ${timings.length} verses, duration=$duration for reciter $reciterId surah $surahNumber',
       );
+
+      _cacheVerseTimings(reciterId, surahNumber, timings, duration);
       return {'timings': timings, 'duration': duration};
     } catch (e) {
       debugPrint('Error fetching timings: $e');
+      final fallback = await _loadCachedVerseTimings(reciterId, surahNumber);
+      if (fallback != null) return fallback;
       return {'timings': <String, List<int>>{}, 'duration': 0};
     }
   }
@@ -180,7 +333,6 @@ class AudioManager {
     return File(path).existsSync();
   }
 
-  /// Downloads a single surah, checking the cached URL first.
   Future<void> downloadSurah(
     String reciterId,
     int surahNumber,
@@ -218,8 +370,6 @@ class AudioManager {
     }
   }
 
-  /// Starts or resumes a download for the given reciter.
-  /// Returns the same Future if already running (no-op duplicate calls).
   Future<void> startDownload(RecitersModel reciter) async {
     final rid = reciter.id.toString();
     if (_downloadFutures.containsKey(rid)) {
@@ -244,8 +394,6 @@ class AudioManager {
 
     const total = 114;
 
-
-    // Count already-downloaded surahs (for resume support)
     int completed = 0;
     for (int s = 1; s <= total; s++) {
       if (await isSurahDownloaded(rid, s)) {
@@ -255,14 +403,12 @@ class AudioManager {
       }
     }
 
-    // Fetch all audio URLs in one batch call
     await _fetchAllAudioUrls(int.parse(rid));
 
     downloadProgress[rid] = completed / total;
     downloadingSurah[rid] = completed;
     downloadNotifier.value++;
 
-    // Download remaining surahs sequentially (one at a time)
     for (int surah = completed + 1; surah <= total; surah++) {
       downloadingSurah[rid] = surah;
       surahDownloadProgress[rid] = 0.0;
@@ -290,7 +436,27 @@ class AudioManager {
     downloadingSurah[rid] = null;
     surahDownloadProgress[rid] = 0.0;
     isDownloaded[rid] = true;
+    unawaited(_cacheAllTimings(int.parse(rid)));
     downloadNotifier.value++;
+  }
+
+  Future<void> _cacheAllTimings(int reciterId) async {
+    debugPrint('caching verse timings for all 114 surahs (reciter $reciterId)');
+    for (int s = 1; s <= 114; s++) {
+      final cached = await _loadCachedVerseTimings(reciterId, s);
+      if (cached != null) continue;
+      try {
+        final result = await fetchVerseTimings(reciterId, s);
+        final timings = result['timings'] as Map<String, List<int>>;
+        if (timings.isNotEmpty) {
+          debugPrint('cached surah $s timings for reciter $reciterId');
+        }
+      } catch (e) {
+        debugPrint('failed to cache surah $s timings: $e');
+      }
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+    debugPrint('finished caching timings for reciter $reciterId');
   }
 
   Future<void> deleteReciter(String reciterId) async {
@@ -304,6 +470,12 @@ class AudioManager {
     _downloadFutures.remove(reciterId);
     _audioUrlsCache.removeWhere((key, _) => key.startsWith('$reciterId:'));
     downloadNotifier.value++;
+
+    final cacheDir = await _cacheDir();
+    final timingsDir = Directory('$cacheDir/timings/$reciterId');
+    if (timingsDir.existsSync()) timingsDir.deleteSync(recursive: true);
+    final urlsFile = File('$cacheDir/audio_urls_$reciterId.json');
+    if (urlsFile.existsSync()) urlsFile.deleteSync();
   }
 
   Future<void> saveSelectedReciter(

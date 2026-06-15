@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 
 class TafseerService {
   static final TafseerService _instance = TafseerService._internal();
@@ -8,17 +11,25 @@ class TafseerService {
 
   final Dio _dio = Dio();
 
-  // ✅ الدالة الرئيسية
   Future<String?> fetchTafseer(String verseKey) async {
-    // ✅ نبدأ مباشرة بـ alquran.cloud — تفسير الميسر العربي مضمون 100%
-    final result = await _fetchMuyassarFromAlQuranCloud(verseKey);
-    if (result != null) return result;
+    final cached = await _loadCachedTafseer(verseKey);
+    if (cached != null) return cached;
 
-    // ✅ fallback: تفسير السعدي من qurancdn
-    return _fetchSaadiFromQuranCdn(verseKey);
+    final result = await _fetchMuyassarFromAlQuranCloud(verseKey);
+    if (result != null) {
+      await _cacheTafseer(verseKey, result);
+      return result;
+    }
+
+    final fallback = await _fetchSaadiFromQuranCdn(verseKey);
+    if (fallback != null) {
+      await _cacheTafseer(verseKey, fallback);
+      return fallback;
+    }
+
+    return null;
   }
 
-  // ✅ تفسير الميسر — مجمع الملك فهد — عربي واضح ومختصر
   Future<String?> _fetchMuyassarFromAlQuranCloud(String verseKey) async {
     try {
       final response = await _dio.get(
@@ -30,7 +41,7 @@ class TafseerService {
       if (text == null || text.isEmpty) return null;
 
       debugPrint(
-        '✅ تفسير الميسر لـ $verseKey: ${text.substring(0, text.length.clamp(0, 50))}...',
+        '????? ?????? ?? $verseKey: ${text.substring(0, text.length.clamp(0, 50))}...',
       );
       return text.trim();
     } catch (e) {
@@ -39,7 +50,6 @@ class TafseerService {
     }
   }
 
-  // ✅ fallback: تفسير السعدي من qurancdn (id: 164 عربي)
   Future<String?> _fetchSaadiFromQuranCdn(String verseKey) async {
     try {
       final response = await _dio.get(
@@ -71,5 +81,38 @@ class TafseerService {
         .replaceAll('&quot;', '"')
         .replaceAll(RegExp(r'\n{3,}'), '\n\n')
         .trim();
+  }
+
+  Future<String> _tafseerCacheDir() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final cache = Directory('${dir.path}/.cache/tafseer');
+    if (!cache.existsSync()) cache.createSync(recursive: true);
+    return cache.path;
+  }
+
+  Future<void> _cacheTafseer(String verseKey, String text) async {
+    try {
+      final dir = await _tafseerCacheDir();
+      final key = verseKey.replaceAll(':', '_');
+      await File('$dir/$key.json').writeAsString(
+        jsonEncode({'verseKey': verseKey, 'text': text}),
+      );
+    } catch (e) {
+      debugPrint('failed to cache tafseer: $e');
+    }
+  }
+
+  Future<String?> _loadCachedTafseer(String verseKey) async {
+    try {
+      final dir = await _tafseerCacheDir();
+      final key = verseKey.replaceAll(':', '_');
+      final file = File('$dir/$key.json');
+      if (!file.existsSync()) return null;
+      final data = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+      return data['text'] as String?;
+    } catch (e) {
+      debugPrint('failed to load cached tafseer: $e');
+      return null;
+    }
   }
 }

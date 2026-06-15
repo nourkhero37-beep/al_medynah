@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/services.dart';
@@ -7,6 +7,7 @@ import 'package:al_medynah/services/bookmark_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:al_medynah/model/quran_page_model.dart';
 import 'package:al_medynah/model/surah_model.dart';
 import 'package:al_medynah/services/audio_manager_api.dart';
 import 'package:path_provider/path_provider.dart';
@@ -562,7 +563,7 @@ class _MushafDrawer extends StatelessWidget {
   }
 }
 
-// ✅ مصحح: بدون isPlaying parameter وبدون buildWhen
+// âœ… Ù…ØµØ­Ø­: Ø¨Ø¯ÙˆÙ† isPlaying parameter ÙˆØ¨Ø¯ÙˆÙ† buildWhen
 class _AudioPlayerBar extends StatefulWidget {
   const _AudioPlayerBar();
 
@@ -708,7 +709,7 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                               ),
                               shape: BoxShape.circle,
                             ),
-                            // المصحح: state.isPlaying بدل widget.isPlaying
+                            // Ø§Ù„Ù…ØµØ­Ø­: state.isPlaying Ø¨Ø¯Ù„ widget.isPlaying
                             child: Icon(
                               (state.isPlaying && !state.isPaused)
                                   ? Icons.pause_rounded
@@ -772,7 +773,7 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
 
 class _MushafPageView extends StatelessWidget {
   final int page;
-  final Map<String, dynamic> pageData;
+  final QuranPage pageData;
   final String? selectedVerseKey;
   final double fontScale;
   final bool isDarkMode;
@@ -854,7 +855,7 @@ class _MushafPageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lines = pageData['lines'] as List<dynamic>? ?? [];
+    final lines = pageData.lines;
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isSpecialPage = page == 1 || page == 2;
@@ -879,8 +880,8 @@ class _MushafPageView extends StatelessWidget {
               children: [
                 if (isSpecialPage) SizedBox(height: screenHeight * 0.025),
                 ...lines.map<Widget>((line) {
-                  final words = line['words'] as List<dynamic>? ?? [];
-                  if (words.isEmpty) return const SizedBox();
+                  
+                  if (line.words.isEmpty) return const SizedBox();
 
                   return Padding(
                     padding: EdgeInsets.symmetric(
@@ -894,11 +895,11 @@ class _MushafPageView extends StatelessWidget {
                         child: Wrap(
                           alignment: WrapAlignment.center,
                           textDirection: TextDirection.rtl,
-                          children: words.map<Widget>((word) {
-                            final String char = word['char'] ?? '';
-                            final String font = word['font'] ?? 'QCF4_Hafs_01';
-                            final String type = word['type'] ?? 'word';
-                            final String? verseKey = word['verse_key'];
+                          children: line.words.map<Widget>((word) {
+                            final String char = word.char;
+                            final String font = word.font;
+                            final String type = word.type;
+                            final String? verseKey = word.verseKey;
 
                             if (char.isEmpty) return const SizedBox();
 

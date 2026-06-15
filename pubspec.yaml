@@ -1,4 +1,4 @@
-name: al_medynah
+﻿name: al_medynah
 description: "A new Flutter project."
 publish_to: 'none'
 
@@ -44,9 +44,9 @@ dev_dependencies:
 
 flutter_launcher_icons:
   android: true
-  image_path: "assets/images/app icon 2.png"
+  image_path: "assets/images/app icon.png"
   adaptive_icon_background: "#3E2A0F"
-  adaptive_icon_foreground: "assets/images/app icon 2.png"
+  adaptive_icon_foreground: "assets/images/app icon.png"
 
 flutter:
   uses-material-design: true

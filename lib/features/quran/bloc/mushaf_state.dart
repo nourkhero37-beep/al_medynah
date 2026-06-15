@@ -1,9 +1,11 @@
-import 'package:equatable/equatable.dart';
+﻿import 'package:equatable/equatable.dart';
+
+import 'package:al_medynah/model/quran_page_model.dart';
 
 class MushafState extends Equatable {
   final int currentPage;
   final String? selectedVerseKey;
-  final Map<int, Map<String, dynamic>> pagesCache;
+  final Map<int, QuranPage> pagesCache;
   final bool isPlaying;
   final bool isPaused;
   final Map<String, List<int>> verseTimings;
@@ -36,7 +38,7 @@ class MushafState extends Equatable {
   MushafState copyWith({
     int? currentPage,
     Object? selectedVerseKey = _sentinel,
-    Map<int, Map<String, dynamic>>? pagesCache,
+    Map<int, QuranPage>? pagesCache,
     bool? isPlaying,
     bool? isPaused,
     Map<String, List<int>>? verseTimings,
