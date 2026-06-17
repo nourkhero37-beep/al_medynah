@@ -1,8 +1,10 @@
-﻿import 'package:al_medynah/l10n/app_localizations.dart';
+﻿import 'dart:async';
+import 'package:al_medynah/l10n/app_localizations.dart';
 import 'package:al_medynah/services/audio_manager_api.dart';
 import 'package:al_medynah/screens/language_selection_page.dart';
 import 'package:al_medynah/screens/splash.dart';
 import 'package:al_medynah/services/locale_service.dart';
+import 'package:al_medynah/features/quran/tafseer/tafseer_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -14,6 +16,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting();
   await AudioManager().loadSelectedReciter();
+  unawaited(TafseerService().precacheAllTafseer());
   runApp(const Almedinah());
 }
 

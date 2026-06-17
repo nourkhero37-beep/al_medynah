@@ -1,8 +1,11 @@
+﻿import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../model/surah_model.dart';
 
 class TafseerService {
   static final TafseerService _instance = TafseerService._internal();
@@ -10,6 +13,11 @@ class TafseerService {
   TafseerService._internal();
 
   final Dio _dio = Dio();
+  bool _isPrecaching = false;
+  String? _cachedTafseerDir;
+
+  static const String _precacheProgressKey = 'tafseer_precache_progress';
+  static const int _precacheBatchSize = 10;
 
   Future<String?> fetchTafseer(String verseKey) async {
     final cached = await _loadCachedTafseer(verseKey);
@@ -84,10 +92,12 @@ class TafseerService {
   }
 
   Future<String> _tafseerCacheDir() async {
+    if (_cachedTafseerDir != null) return _cachedTafseerDir!;
     final dir = await getApplicationDocumentsDirectory();
     final cache = Directory('${dir.path}/.cache/tafseer');
     if (!cache.existsSync()) cache.createSync(recursive: true);
-    return cache.path;
+    _cachedTafseerDir = cache.path;
+    return _cachedTafseerDir!;
   }
 
   Future<void> _cacheTafseer(String verseKey, String text) async {
@@ -113,6 +123,38 @@ class TafseerService {
     } catch (e) {
       debugPrint('failed to load cached tafseer: $e');
       return null;
+    }
+  }
+
+  Future<void> precacheAllTafseer() async {
+    if (_isPrecaching) return;
+    _isPrecaching = true;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      int start = prefs.getInt(_precacheProgressKey) ?? 0;
+
+      if (start >= surahList.length) {
+        _isPrecaching = false;
+        return;
+      }
+
+      final end = (start + _precacheBatchSize).clamp(0, surahList.length);
+
+      for (int i = start; i < end; i++) {
+        final surah = surahList[i];
+        for (int ayah = 1; ayah <= surah.versesCount; ayah++) {
+          final verseKey = '${surah.id}:$ayah';
+          if (await _loadCachedTafseer(verseKey) != null) continue;
+          await fetchTafseer(verseKey);
+          await Future.delayed(const Duration(milliseconds: 150));
+        }
+        await prefs.setInt(_precacheProgressKey, i + 1);
+      }
+    } catch (e) {
+      debugPrint('precacheAllTafseer error: $e');
+    } finally {
+      _isPrecaching = false;
     }
   }
 }
