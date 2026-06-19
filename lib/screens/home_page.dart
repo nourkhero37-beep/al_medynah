@@ -1,4 +1,4 @@
-import 'package:al_medynah/features/quran/mushaf_screen.dart';
+﻿import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/features/quran/tafseer/tafseer_surah_list_screen.dart';
 import 'package:al_medynah/screens/ayah_list_page.dart';
 import 'package:al_medynah/screens/azkar_categories_screen.dart';
@@ -24,7 +24,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isDarkMode = false;
   int? _bookmarkPage;
 
   @override
@@ -85,365 +84,50 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final localeCode = AppLocalizations.of(context).localeCode;
-    final loc = AppLocalizations.of(context);
-    final gregorianStr = localeCode == 'ar' ? DateFormat.yMMMMEEEEd(localeCode).format(now) : _toWesternNumerals(DateFormat.yMMMMEEEEd(localeCode).format(now));
-    final hijriStr = localeCode == 'ar' ? _formatHijriDate(localeCode) : _toWesternNumerals(_formatHijriDate(localeCode));
-    final textScale = MediaQuery.of(context).size.width / 430;
-    final scale = textScale.clamp(0.75, 1.3);
+    return ValueListenableBuilder<bool>(
+      valueListenable: appDarkModeNotifier,
+      builder: (context, isDarkMode, _) {
+        final now = DateTime.now();
+        final localeCode = AppLocalizations.of(context).localeCode;
+        final loc = AppLocalizations.of(context);
+        final gregorianStr = localeCode == 'ar' ? DateFormat.yMMMMEEEEd(localeCode).format(now) : _toWesternNumerals(DateFormat.yMMMMEEEEd(localeCode).format(now));
+        final hijriStr = localeCode == 'ar' ? _formatHijriDate(localeCode) : _toWesternNumerals(_formatHijriDate(localeCode));
+        final textScale = MediaQuery.of(context).size.width / 430;
+        final scale = textScale.clamp(0.75, 1.3);
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/background2.png'),
-                fit: BoxFit.cover,
+        return Scaffold(
+          body: Stack(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/background2.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            ),
-          ),
 
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            color: isDarkMode
-                ? Colors.black.withValues(alpha: 0.75)
-                : Colors.black.withValues(alpha: 0.12),
-          ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                color: isDarkMode
+                    ? Colors.black.withValues(alpha: 0.75)
+                    : Colors.black.withValues(alpha: 0.12),
+              ),
 
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: isDarkMode
-                              ? const Color(0xFF2A2A2A)
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFF8B6914).withValues(alpha: 0.5)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: isDarkMode
-                                  ? Colors.white.withValues(alpha: 0.05)
-                                  : Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: IconButton(
-                          onPressed: () {
-                            setState(() => isDarkMode = !isDarkMode);
-                          },
-                          icon: Icon(
-                            isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                            color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFF795548),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: isDarkMode
-                              ? const Color(0xFF2A2A2A)
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFF8B6914).withValues(alpha: 0.5)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: isDarkMode
-                                  ? Colors.white.withValues(alpha: 0.05)
-                                  : Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: PopupMenuButton<String>(
-                          onSelected: (code) async {
-                            final newLocale = Locale(code);
-                            appLocaleNotifier.value = newLocale;
-                            await LocaleService.setLocale(newLocale);
-                          },
-                          itemBuilder: (ctx) => [
-                            PopupMenuItem(
-                              value: 'ar',
-                              child: Text(loc.tr('lang.arabic'), style: TextStyle(fontFamily: 'GE SS Two')),
-                            ),
-                            PopupMenuItem(
-                              value: 'en',
-                              child: Text(loc.tr('lang.english'), style: TextStyle(fontFamily: 'GE SS Two')),
-                            ),
-                            PopupMenuItem(
-                              value: 'tr',
-                              child: Text(loc.tr('lang.turkish'), style: TextStyle(fontFamily: 'GE SS Two')),
-                            ),
-                          ],
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  _currentLanguageName(loc),
-                                  style: TextStyle(
-                                    fontFamily: 'GE SS Two',
-                                    color: isDarkMode ? const Color(0xFF4DD0E1) : const Color(0xFF00BCD4),
-                                    fontSize: 14 * scale,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(width: 2),
-                                Icon(
-                                  Icons.arrow_drop_down,
-                                  color: isDarkMode
-                                      ? const Color(0xFFD4B88A)
-                                      : const Color(0xFF3E2A0F),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  Column(
-                    children: [
-                      Text(
-                        hijriStr,
-                        style: TextStyle(
-                          fontFamily: localeCode == 'ar' ? 'GE SS Two' : null,
-                          color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFF795548),
-                          fontSize: 20 * scale,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        gregorianStr,
-                        style: TextStyle(
-                          fontFamily: localeCode == 'ar' ? 'GE SS Two' : null,
-                          color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFF795548),
-                          fontSize: 16 * scale,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              AyahList(onBookmarkSaved: _loadBookmark),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: isDarkMode
-                            ? const Color(0xFF2A2A2A)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(28),
-                        border: Border.all(color: const Color(0xFF8B6914).withValues(alpha: 0.5)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: isDarkMode
-                                ? Colors.white.withValues(alpha: 0.05)
-                                : Colors.black.withValues(alpha: 0.08),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Image.asset('assets/images/logo.jpg', width: 120),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  if (_bookmarkPage != null)
-                    GestureDetector(
-                      onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => MushafScreen(
-                              initialPage: _bookmarkPage!,
-                              onBookmarkSaved: _loadBookmark,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDarkMode
-                              ? const Color(0xFF2A2A2A)
-                              : const Color(0xFF00BCD4),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isDarkMode
-                                ? const Color(0xFF8B6914).withValues(alpha: 0.5)
-                                : const Color(0xFF8B6914).withValues(alpha: 0.5),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.bookmark_rounded,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    loc.tr('home.bookmark.resume'),
-                                    style: TextStyle(
-                                      fontFamily: 'GE SS Two',
-                                      color: Colors.white,
-                                      fontSize: 14 * scale,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    '\u0627\u0644\u0635\u0641\u062D\u0629 $_bookmarkPage',
-                                    style: TextStyle(
-                                      fontFamily: 'GE SS Two',
-                                      color: Colors.white,
-                                      fontSize: 12 * scale,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () async {
-                                await BookmarkService().clearPageBookmark();
-                                setState(() => _bookmarkPage = null);
-                              },
-                              child: Icon(
-                                Icons.close_rounded,
-                                color: Colors.white.withValues(alpha: 0.7),
-                                size: 18,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  
-                  const SizedBox(height: 12),
-
-                  Expanded(
-                    child: GridView.builder(
-                      itemCount: gridItems.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 1.0,
-                          ),
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            switch (gridItems[index]['key']) {
-                              case 'tv':
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const TvScreen(),
-                                  ),
-                                );
-                              case 'reciters':
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const ReciterPage(),
-                                  ),
-                                );
-                              case 'tafseer':
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const TafseerSurahListScreen(),
-                                  ),
-                                );
-                              case 'azkar':
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const AzkarCategoriesScreen(),
-                                  ),
-                                );
-                              case 'qibla':
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const QiblaScreen(),
-                                  ),
-                                );
-                              case 'prayerTimes':
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const PrayerTimesScreen(),
-                                  ),
-                                );
-                              case 'hadith':
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const HadithLibraryScreen(),
-                                  ),
-                                );
-                              case 'namesOfAllah':
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const NamesOfAllahScreen(),
-                                  ),
-                                );
-                            }
-                          },
-                          child: Container(
+                          Container(
                             decoration: BoxDecoration(
                               color: isDarkMode
                                   ? const Color(0xFF2A2A2A)
                                   : Colors.white,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(14),
                               border: Border.all(color: const Color(0xFF8B6914).withValues(alpha: 0.5)),
                               boxShadow: [
                                 BoxShadow(
@@ -455,46 +139,367 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ],
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                            child: IconButton(
+                              onPressed: () {
+                                appDarkModeNotifier.value = !appDarkModeNotifier.value;
+                              },
+                              icon: Icon(
+                                isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                                color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFF795548),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: isDarkMode
+                                  ? const Color(0xFF2A2A2A)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: const Color(0xFF8B6914).withValues(alpha: 0.5)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: isDarkMode
+                                      ? Colors.white.withValues(alpha: 0.05)
+                                      : Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: PopupMenuButton<String>(
+                              onSelected: (code) async {
+                                final newLocale = Locale(code);
+                                appLocaleNotifier.value = newLocale;
+                                await LocaleService.setLocale(newLocale);
+                              },
+                              itemBuilder: (ctx) => [
+                                PopupMenuItem(
+                                  value: 'ar',
+                                  child: Text(loc.tr('lang.arabic'), style: TextStyle(fontFamily: 'GE SS Two')),
+                                ),
+                                PopupMenuItem(
+                                  value: 'en',
+                                  child: Text(loc.tr('lang.english'), style: TextStyle(fontFamily: 'GE SS Two')),
+                                ),
+                                PopupMenuItem(
+                                  value: 'tr',
+                                  child: Text(loc.tr('lang.turkish'), style: TextStyle(fontFamily: 'GE SS Two')),
+                                ),
+                              ],
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      _currentLanguageName(loc),
+                                      style: TextStyle(
+                                        fontFamily: 'GE SS Two',
+                                        color: isDarkMode ? const Color(0xFF4DD0E1) : const Color(0xFF00BCD4),
+                                        fontSize: 14 * scale,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Icon(
+                                      Icons.arrow_drop_down,
+                                      color: isDarkMode
+                                          ? const Color(0xFFD4B88A)
+                                          : const Color(0xFF3E2A0F),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 25),
+
+                      Column(
+                        children: [
+                          Text(
+                            hijriStr,
+                            style: TextStyle(
+                              fontFamily: localeCode == 'ar' ? 'GE SS Two' : null,
+                              color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFF795548),
+                              fontSize: 20 * scale,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            gregorianStr,
+                            style: TextStyle(
+                              fontFamily: localeCode == 'ar' ? 'GE SS Two' : null,
+                              color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFF795548),
+                              fontSize: 16 * scale,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 25),
+
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  AyahList(onBookmarkSaved: _loadBookmark),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: isDarkMode
+                                ? const Color(0xFF2A2A2A)
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(28),
+                            border: Border.all(color: const Color(0xFF8B6914).withValues(alpha: 0.5)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: isDarkMode
+                                    ? Colors.white.withValues(alpha: 0.05)
+                                    : Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset('assets/images/logo.jpg', width: 120),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      if (_bookmarkPage != null)
+                        GestureDetector(
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MushafScreen(
+                                  initialPage: _bookmarkPage!,
+                                  onBookmarkSaved: _loadBookmark,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDarkMode
+                                  ? const Color(0xFF2A2A2A)
+                                  : const Color(0xFF00BCD4),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isDarkMode
+                                    ? const Color(0xFF8B6914).withValues(alpha: 0.5)
+                                    : const Color(0xFF8B6914).withValues(alpha: 0.5),
+                              ),
+                            ),
+                            child: Row(
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.asset(
-                                    gridItems[index]['image']!,
-                                    height: 45,
-                                    width: 45,
-                                    fit: BoxFit.cover,
+                                const Icon(
+                                  Icons.bookmark_rounded,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        loc.tr('home.bookmark.resume'),
+                                        style: TextStyle(
+                                          fontFamily: 'GE SS Two',
+                                          color: Colors.white,
+                                          fontSize: 14 * scale,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        '\u0627\u0644\u0635\u0641\u062D\u0629 ',
+                                        style: TextStyle(
+                                          fontFamily: 'GE SS Two',
+                                          color: Colors.white,
+                                          fontSize: 12 * scale,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  loc.tr(
-                                    'home.grid.${gridItems[index]['key']}',
-                                  ),
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontFamily: 'GE SS Two',
-                                    color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFFFF9800),
-                                    fontSize: 15 * scale,
-                                    fontWeight: FontWeight.bold,
+                                GestureDetector(
+                                  onTap: () async {
+                                    await BookmarkService().clearPageBookmark();
+                                    setState(() => _bookmarkPage = null);
+                                  },
+                                  child: Icon(
+                                    Icons.close_rounded,
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                    size: 18,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+
+                      
+                      const SizedBox(height: 12),
+
+                      Expanded(
+                        child: GridView.builder(
+                          itemCount: gridItems.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: 1.0,
+                              ),
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              onTap: () {
+                                switch (gridItems[index]['key']) {
+                                  case 'tv':
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const TvScreen(),
+                                      ),
+                                    );
+                                  case 'reciters':
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const ReciterPage(),
+                                      ),
+                                    );
+                                  case 'tafseer':
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const TafseerSurahListScreen(),
+                                      ),
+                                    );
+                                  case 'azkar':
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const AzkarCategoriesScreen(),
+                                      ),
+                                    );
+                                  case 'qibla':
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const QiblaScreen(),
+                                      ),
+                                    );
+                                  case 'prayerTimes':
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const PrayerTimesScreen(),
+                                      ),
+                                    );
+                                  case 'hadith':
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const HadithLibraryScreen(),
+                                      ),
+                                    );
+                                  case 'namesOfAllah':
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const NamesOfAllahScreen(),
+                                      ),
+                                    );
+                                }
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? const Color(0xFF2A2A2A)
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: const Color(0xFF8B6914).withValues(alpha: 0.5)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: isDarkMode
+                                          ? Colors.white.withValues(alpha: 0.05)
+                                          : Colors.black.withValues(alpha: 0.08),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.asset(
+                                        gridItems[index]['image']!,
+                                        height: 45,
+                                        width: 45,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      loc.tr(
+                                        'home.grid.${gridItems[index]['key']!}',
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontFamily: 'GE SS Two',
+                                        color: isDarkMode ? const Color(0xFFD4B88A) : const Color(0xFFFF9800),
+                                        fontSize: 15 * scale,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
+

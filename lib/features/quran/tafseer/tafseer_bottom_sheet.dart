@@ -5,6 +5,7 @@ import 'package:al_medynah/features/quran/tafseer/tafseer_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:al_medynah/model/surah_model.dart';
+import 'package:al_medynah/main.dart';
 
 class TafseerBottomSheet extends StatefulWidget {
   final String verseKey;
@@ -202,10 +203,12 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = appDarkModeNotifier.value;
+
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -215,7 +218,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.3),
+              color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -249,7 +252,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                       ),
                     ),
                     Text(
-                      'سورة $_surahName — آية $_currentAyahNumber',
+                      '\u0633\u0648\u0631\u0629 $_surahName \u2014 \u0622\u064A\u0629 $_currentAyahNumber',
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
@@ -282,15 +285,15 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.wifi_off_rounded,
                           size: 48,
-                          color: Colors.grey,
+                          color: isDark ? Colors.white38 : Colors.grey,
                         ),
                         const SizedBox(height: 12),
                         Text(
                           AppLocalizations.of(context).tr('tafseer.error.load'),
-                          style: TextStyle(color: darkBrown, fontSize: 15),
+                          style: TextStyle(color: isDark ? Colors.white70 : darkBrown, fontSize: 15),
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
@@ -354,7 +357,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                                 ),
                                 const Spacer(),
                                 Text(
-                                  'سورة $_surahName — الآية $_currentAyahNumber',
+                                  '\u0633\u0648\u0631\u0629 $_surahName \u2014 \u0627\u0644\u0622\u064A\u0629 $_currentAyahNumber',
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontFamily: 'GE SS Two',
@@ -390,9 +393,9 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                           Text(
                             _tafseerText ?? '',
                             textAlign: TextAlign.justify,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
-                              color: darkBrown,
+                              color: isDark ? Colors.white70 : darkBrown,
                               height: 2.0,
                             ),
                           ),
@@ -404,7 +407,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
           Container(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
               border: Border(
                 top: BorderSide(color: tealColor.withValues(alpha: 0.2), width: 1),
               ),
@@ -456,11 +459,11 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                   ),
                   child: Center(
                     child: Text(
-                      '$_currentAyahNumber',
-                      style: const TextStyle(
+                      '',
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF2493B4),
+                        color: isDark ? const Color(0xFF4DD0E1) : const Color(0xFF2493B4),
                       ),
                     ),
                   ),
@@ -508,3 +511,9 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
     );
   }
 }
+
+
+
+
+
+

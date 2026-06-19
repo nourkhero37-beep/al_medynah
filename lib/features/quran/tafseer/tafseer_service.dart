@@ -48,9 +48,7 @@ class TafseerService {
       final text = response.data['data']?['text'] as String?;
       if (text == null || text.isEmpty) return null;
 
-      debugPrint(
-        '????? ?????? ?? $verseKey: ${text.substring(0, text.length.clamp(0, 50))}...',
-      );
+      // debugPrint removed (was flooding log)
       return text.trim();
     } catch (e) {
       debugPrint('alquran.cloud muyassar failed: $e');

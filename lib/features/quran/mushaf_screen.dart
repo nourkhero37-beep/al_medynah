@@ -17,6 +17,7 @@ import 'bloc/mushaf_bloc.dart';
 import 'bloc/mushaf_event.dart';
 import 'bloc/mushaf_state.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
+import 'package:al_medynah/main.dart';
 
 class MushafScreen extends StatelessWidget {
   final int initialPage;
@@ -66,16 +67,30 @@ class _MushafViewState extends State<_MushafView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey _pageCaptureKey = GlobalKey();
   Map<String, int> _verseToPage = {};
+  void Function()? _darkModeListener;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: widget.initialPage - 1);
     _loadVersePageMap();
+    _darkModeListener = () {
+      if (mounted) {
+        context.read<MushafBloc>().add(
+          MushafDarkModeToggled(appDarkModeNotifier.value),
+        );
+      }
+    };
+    appDarkModeNotifier.addListener(_darkModeListener!);
+    context.read<MushafBloc>().add(MushafDarkModeToggled(appDarkModeNotifier.value));
   }
+
 
   @override
   void dispose() {
+    if (_darkModeListener != null) {
+      appDarkModeNotifier.removeListener(_darkModeListener!);
+    }
     _pageController.dispose();
     super.dispose();
   }
@@ -517,6 +532,7 @@ class _MushafDrawer extends StatelessWidget {
                             context.read<MushafBloc>().add(
                               MushafDarkModeToggled(newMode),
                             );
+                            appDarkModeNotifier.value = newMode;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -1044,6 +1060,9 @@ class _MushafPageView extends StatelessWidget {
     );
   }
 }
+
+
+
 
 
 

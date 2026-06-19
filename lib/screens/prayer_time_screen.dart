@@ -2,6 +2,7 @@
 import 'package:adhan/adhan.dart';
 import 'package:flutter/material.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
+import 'package:al_medynah/main.dart';
 
 class PrayerTimesScreen extends StatefulWidget {
   const PrayerTimesScreen({super.key});
@@ -21,21 +22,19 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
   late Timer _timer;
   DateTime _now = DateTime.now();
 
-  // أسماء الصلوات بالعربي
   final List<Map<String, dynamic>> _prayerNames = [
-    {'name': 'الفجر', 'icon': Icons.brightness_3_rounded},
-    {'name': 'الشروق', 'icon': Icons.wb_twilight_rounded},
-    {'name': 'الظهر', 'icon': Icons.wb_sunny_rounded},
-    {'name': 'العصر', 'icon': Icons.cloud_rounded},
-    {'name': 'المغرب', 'icon': Icons.nights_stay_rounded},
-    {'name': 'العشاء', 'icon': Icons.dark_mode_rounded},
+    {'name': '\u0627\u0644\u0641\u062C\u0631', 'icon': Icons.brightness_3_rounded},
+    {'name': '\u0627\u0644\u0634\u0631\u0648\u0642', 'icon': Icons.wb_twilight_rounded},
+    {'name': '\u0627\u0644\u0638\u0647\u0631', 'icon': Icons.wb_sunny_rounded},
+    {'name': '\u0627\u0644\u0639\u0635\u0631', 'icon': Icons.cloud_rounded},
+    {'name': '\u0627\u0644\u0645\u063A\u0631\u0628', 'icon': Icons.nights_stay_rounded},
+    {'name': '\u0627\u0644\u0639\u0634\u0627\u0621', 'icon': Icons.dark_mode_rounded},
   ];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadPrayerTimes());
-    // تحديث الوقت كل ثانية
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() => _now = DateTime.now());
     });
@@ -119,7 +118,6 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         name: AppLocalizations.of(context).tr('prayer.region.northAmerica'),
       );
     }
-    // Europe or fallback
     final p = CalculationMethod.muslim_world_league.getParameters();
     p.madhab = Madhab.shafi;
     if (offset >= const Duration(hours: 0) &&
@@ -146,7 +144,6 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     ];
   }
 
-  // الصلاة الحالية أو القادمة
   int _getCurrentPrayerIndex() {
     if (_prayerTimes == null) return -1;
     final prayer = _prayerTimes!.currentPrayerByDateTime(_now);
@@ -189,7 +186,6 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     }
   }
 
-  // الوقت المتبقي للصلاة القادمة
   String _getTimeRemaining() {
     if (_prayerTimes == null) return '';
     final nextPrayer = _prayerTimes!.nextPrayerByDateTime(_now);
@@ -200,13 +196,10 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     if (diff.isNegative) return '';
 
     final hours = diff.inHours;
-    final minutes = diff.inMinutes.remainder(60);
-    final seconds = diff.inSeconds.remainder(60);
-
     if (hours > 0) {
-      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+      return '::';
     }
-    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    return ':';
   }
 
   String _formatTime(DateTime time) {
@@ -222,87 +215,90 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: tealColor,
-          elevation: 0,
-          centerTitle: true,
-          title: Text(
-            AppLocalizations.of(context).tr('prayer.appBar.title'),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'GE SS Two',
-            ),
-          ),
-          iconTheme: const IconThemeData(color: Colors.white),
-          actions: [
-            IconButton(
-              onPressed: _loadPrayerTimes,
-              icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-            ),
-          ],
-        ),
-        body: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: tealColor),
-              )
-            : _errorMessage != null
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.location_off_rounded,
-                      size: 64,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _errorMessage!,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: tealDark.withValues(alpha: 0.7),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: tealColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                      ),
-                      onPressed: _loadPrayerTimes,
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: Text(AppLocalizations.of(context).tr('prayer.retry')),
-                    ),
-                  ],
-                ),
-              )
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    // كارد الوقت المتبقي
-                    _buildNextPrayerCard(),
-                    const SizedBox(height: 16),
-                    // قائمة الصلوات
-                    ..._buildPrayerCards(),
-                  ],
+    return ValueListenableBuilder<bool>(
+      valueListenable: appDarkModeNotifier,
+      builder: (context, isDark, _) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Scaffold(
+            backgroundColor: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+            appBar: AppBar(
+              backgroundColor: isDark ? const Color(0xFF1A1A2E) : tealColor,
+              elevation: 0,
+              centerTitle: true,
+              title: Text(
+                AppLocalizations.of(context).tr('prayer.appBar.title'),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'GE SS Two',
                 ),
               ),
-      ),
+              iconTheme: const IconThemeData(color: Colors.white),
+              actions: [
+                IconButton(
+                  onPressed: _loadPrayerTimes,
+                  icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                ),
+              ],
+            ),
+            body: _isLoading
+                ? Center(
+                    child: CircularProgressIndicator(color: isDark ? const Color(0xFFD4B88A) : tealColor),
+                  )
+                : _errorMessage != null
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.location_off_rounded,
+                          size: 64,
+                          color: isDark ? Colors.white38 : Colors.grey,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          _errorMessage!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: isDark ? Colors.white54 : tealDark.withValues(alpha: 0.7),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: tealColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                          ),
+                          onPressed: _loadPrayerTimes,
+                          icon: const Icon(Icons.refresh_rounded),
+                          label: Text(AppLocalizations.of(context).tr('prayer.retry')),
+                        ),
+                      ],
+                    ),
+                  )
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        _buildNextPrayerCard(),
+                        const SizedBox(height: 16),
+                        ..._buildPrayerCards(isDark),
+                      ],
+                    ),
+                  ),
+          ),
+        );
+      },
     );
   }
 
@@ -331,7 +327,6 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
       ),
       child: Column(
         children: [
-          // الموقع
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -348,7 +343,6 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          // الوقت الحالي
           Text(
             _formatTime(_now),
             style: const TextStyle(
@@ -359,13 +353,11 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          // الصلاة القادمة
           Text(
             AppLocalizations.of(context).tr('prayer.next', {'name': nextName}),
             style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 4),
-          // الوقت المتبقي
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(
@@ -387,7 +379,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     );
   }
 
-  List<Widget> _buildPrayerCards() {
+  List<Widget> _buildPrayerCards(bool isDark) {
     final times = _getPrayerTimesList();
     final currentIndex = _getCurrentPrayerIndex();
     final nextIndex = _getNextPrayerIndex();
@@ -396,6 +388,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
       final isCurrent = index == currentIndex;
       final isNext = index == nextIndex;
       final time = times[index];
+      final defaultCardColor = isDark ? const Color(0xFF333333) : Colors.white;
 
       return Container(
         margin: const EdgeInsets.only(bottom: 10),
@@ -405,14 +398,16 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               ? tealColor
               : isNext
               ? tealColor.withValues(alpha: 0.15)
-              : Colors.white,
+              : defaultCardColor,
           borderRadius: BorderRadius.circular(16),
           border: isNext
               ? Border.all(color: tealColor.withValues(alpha: 0.5), width: 1.5)
               : null,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.06),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -420,31 +415,28 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         ),
         child: Row(
           children: [
-            // الوقت
             Text(
               _formatTime(time),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: isCurrent ? Colors.white : tealDark,
+                color: isCurrent ? Colors.white : (isDark ? const Color(0xFFD4B88A) : tealDark),
               ),
             ),
 
             const Spacer(),
 
-            // اسم الصلاة
             Text(
               _prayerNames[index]['name'],
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: isCurrent ? Colors.white : tealDark,
+                color: isCurrent ? Colors.white : (isDark ? Colors.white70 : tealDark),
               ),
             ),
 
             const SizedBox(width: 12),
 
-            // الأيقونة
             Container(
               width: 40,
               height: 40,
@@ -461,7 +453,6 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
               ),
             ),
 
-            // علامة الصلاة الحالية
             if (isCurrent) ...[
               const SizedBox(width: 8),
               Container(
@@ -505,5 +496,3 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     });
   }
 }
-
-

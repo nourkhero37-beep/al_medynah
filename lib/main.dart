@@ -8,15 +8,27 @@ import 'package:al_medynah/features/quran/tafseer/tafseer_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final ValueNotifier<Locale> appLocaleNotifier =
     ValueNotifier(const Locale('ar'));
+
+final ValueNotifier<bool> appDarkModeNotifier = ValueNotifier(false);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting();
   await AudioManager().loadSelectedReciter();
   unawaited(TafseerService().precacheAllTafseer());
+
+  final prefs = await SharedPreferences.getInstance();
+  final savedDarkMode = prefs.getBool('global_dark_mode') ?? false;
+  appDarkModeNotifier.value = savedDarkMode;
+  appDarkModeNotifier.addListener(() async {
+    final p = await SharedPreferences.getInstance();
+    await p.setBool('global_dark_mode', appDarkModeNotifier.value);
+  });
+
   runApp(const Almedinah());
 }
 

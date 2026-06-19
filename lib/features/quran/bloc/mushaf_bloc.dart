@@ -1,9 +1,10 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:al_medynah/main.dart';
 import '../repository/mushaf_repository.dart';
 import 'mushaf_event.dart';
 import 'mushaf_state.dart';
@@ -86,7 +87,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
   ) async {
     final prefs = await SharedPreferences.getInstance();
     final savedColor = prefs.getInt('quran_text_color') ?? 0xDD000000;
-    final savedDarkMode = prefs.getBool('quran_dark_mode') ?? false;
+    final savedDarkMode = appDarkModeNotifier.value;
 
     emit(
       state.copyWith(

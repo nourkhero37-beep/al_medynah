@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
+import 'package:al_medynah/main.dart';
 
 class QiblaScreen extends StatefulWidget {
   const QiblaScreen({super.key});
@@ -43,158 +44,138 @@ class _QiblaScreenState extends State<QiblaScreen> {
 
   Future<void> _initSensors() async {
     try {
-      final permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        final granted = await Geolocator.requestPermission();
-        if (granted == LocationPermission.denied ||
-            granted == LocationPermission.deniedForever) {
+      final perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        final req = await Geolocator.requestPermission();
+        if (req == LocationPermission.denied || req == LocationPermission.deniedForever) {
           setState(() {
-            _errorMessage =
-                AppLocalizations.of(context).tr('qibla.error.location');
+            _errorMessage = AppLocalizations.of(context).tr('qibla.error.location');
             _isLoading = false;
           });
           return;
         }
       }
 
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
 
-      _calculateQibla(position.latitude, position.longitude);
-      _locationName = '°، °';
+      _qiblaAngle = _calculateQiblaDirection(pos.latitude, pos.longitude);
+      _locationName = ', ';
+
+      _accelSub = accelerometerEventStream().listen((e) {
+        _ax = e.x;
+        _ay = e.y;
+        _az = e.z;
+      });
+
+      _magnetoSub = magnetometerEventStream().listen((e) {
+        final mx = e.x;
+        final my = e.y;
+        final mz = e.z;
+
+        final phi = atan2(-_ay, -_az);
+        final theta = atan2(-_ax * cos(phi) + _az * sin(phi), _ay * sin(phi) + _az * cos(phi));
+
+        final bx = mx * cos(theta) + my * sin(phi) * sin(theta) + mz * cos(phi) * sin(theta);
+        final by = my * cos(phi) - mz * sin(phi);
+
+        final heading = atan2(-by, bx) * 180 / pi;
+        if (mounted) {
+          setState(() => _deviceHeading = (heading + 360) % 360);
+        }
+      });
 
       setState(() => _isLoading = false);
-
-      _accelSub = accelerometerEventStream().listen((event) {
-        _ax = event.x;
-        _ay = event.y;
-        _az = event.z;
-      });
-
-      _magnetoSub = magnetometerEventStream().listen((event) {
-        final heading = _computeHeading(
-          _ax,
-          _ay,
-          _az,
-          event.x,
-          event.y,
-          event.z,
-        );
-        if (mounted) setState(() => _deviceHeading = heading);
-      });
     } catch (e) {
       setState(() {
-        _errorMessage =
-            AppLocalizations.of(context).tr('qibla.error.sensor');
+        _errorMessage = AppLocalizations.of(context).tr('qibla.error.sensors');
         _isLoading = false;
       });
     }
   }
 
-  void _calculateQibla(double lat, double lon) {
+  double _calculateQiblaDirection(double lat, double lon) {
+    final dLon = (mekkaLon - lon) * pi / 180;
     final lat1 = lat * pi / 180;
-    final lon1 = lon * pi / 180;
     final lat2 = mekkaLat * pi / 180;
-    final lon2 = mekkaLon * pi / 180;
 
-    final x = sin(lon2 - lon1) * cos(lat2);
-    final y = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1);
-
-    var angle = atan2(x, y) * 180 / pi;
-    if (angle < 0) angle += 360;
-    _qiblaAngle = angle;
+    final y = sin(dLon) * cos(lat2);
+    final x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
+    final bearing = atan2(y, x) * 180 / pi;
+    return (bearing + 360) % 360;
   }
 
-  double _computeHeading(
-    double ax,
-    double ay,
-    double az,
-    double mx,
-    double my,
-    double mz,
-  ) {
-    if (az.abs() < 0.001 && ay.abs() < 0.001) return _deviceHeading;
-
-    final roll = atan2(ay, az);
-    final pitch = atan2(-ax, ay * sin(roll) + az * cos(roll));
-
-    final mx2 = mx * cos(pitch) + mz * sin(pitch);
-    final my2 =
-        mx * sin(roll) * sin(pitch) +
-        my * cos(roll) -
-        mz * sin(roll) * cos(pitch);
-
-    var heading = atan2(-my2, mx2) * 180 / pi;
-    if (heading < 0) heading += 360;
-    return heading;
-  }
-
-  double get _effectiveAngle {
-    var angle = _qiblaAngle - _deviceHeading;
-    if (angle < 0) angle += 360;
-    if (angle >= 360) angle -= 360;
-    return angle;
-  }
+  double get _effectiveAngle => (_qiblaAngle - _deviceHeading + 360) % 360;
 
   String _directionLabel(double angle) {
-    if (angle >= 315 || angle < 45) return AppLocalizations.of(context).tr('qibla.north');
-    if (angle >= 45 && angle < 135) return AppLocalizations.of(context).tr('qibla.east');
-    if (angle >= 135 && angle < 225) return AppLocalizations.of(context).tr('qibla.south');
-    return AppLocalizations.of(context).tr('qibla.west');
+    if (angle >= 337.5 || angle < 22.5) return AppLocalizations.of(context).tr('qibla.north');
+    if (angle < 67.5) return AppLocalizations.of(context).tr('qibla.northEast');
+    if (angle < 112.5) return AppLocalizations.of(context).tr('qibla.east');
+    if (angle < 157.5) return AppLocalizations.of(context).tr('qibla.southEast');
+    if (angle < 202.5) return AppLocalizations.of(context).tr('qibla.south');
+    if (angle < 247.5) return AppLocalizations.of(context).tr('qibla.southWest');
+    if (angle < 292.5) return AppLocalizations.of(context).tr('qibla.west');
+    return AppLocalizations.of(context).tr('qibla.northWest');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: tealColor,
-          elevation: 0,
-          centerTitle: true,
-          title: Text(
-            AppLocalizations.of(context).tr('qibla.appBar.title'),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'GE SS Two',
+    return ValueListenableBuilder<bool>(
+      valueListenable: appDarkModeNotifier,
+      builder: (context, isDark, _) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Scaffold(
+            backgroundColor: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+            appBar: AppBar(
+              backgroundColor: isDark ? const Color(0xFF1A1A2E) : tealColor,
+              elevation: 0,
+              centerTitle: true,
+              title: Text(
+                AppLocalizations.of(context).tr('qibla.appBar.title'),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'GE SS Two',
+                ),
+              ),
+              iconTheme: const IconThemeData(color: Colors.white),
             ),
+            body: _isLoading
+                ? Center(
+                    child: CircularProgressIndicator(color: isDark ? const Color(0xFFD4B88A) : tealColor),
+                  )
+                : _errorMessage != null
+                ? _buildError(isDark)
+                : _buildCompass(isDark),
           ),
-          iconTheme: const IconThemeData(color: Colors.white),
-        ),
-        body: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: tealColor),
-              )
-            : _errorMessage != null
-            ? _buildError()
-            : _buildCompass(),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildError() {
+  Widget _buildError(bool isDark) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.location_off_rounded,
               size: 64,
-              color: Colors.grey,
+              color: isDark ? Colors.white38 : Colors.grey,
             ),
             const SizedBox(height: 16),
             Text(
               _errorMessage!,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15, color: tealDark.withValues(alpha: 0.7)),
+              style: TextStyle(
+                fontSize: 15,
+                color: isDark ? Colors.white54 : tealDark.withValues(alpha: 0.7),
+              ),
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
@@ -225,7 +206,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
     );
   }
 
-  Widget _buildCompass() {
+  Widget _buildCompass(bool isDark) {
     return Column(
       children: [
         Expanded(
@@ -235,7 +216,11 @@ class _QiblaScreenState extends State<QiblaScreen> {
               children: [
                 Text(
                   AppLocalizations.of(context).tr('qibla.heading'),
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? const Color(0xFFD4B88A) : null,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Stack(
@@ -266,7 +251,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                       child: Text(
                         AppLocalizations.of(context).tr('qibla.south'),
                         style: TextStyle(
-                          color: tealDark.withValues(alpha: 0.4),
+                          color: isDark ? Colors.white38 : tealDark.withValues(alpha: 0.4),
                           fontSize: 12,
                         ),
                       ),
@@ -275,7 +260,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  '°',
+                  '${(_effectiveAngle).toStringAsFixed(0)}\u00B0',
                   style: const TextStyle(
                     color: tealColor,
                     fontSize: 42,
@@ -286,7 +271,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                 Text(
                   _directionLabel(_qiblaAngle),
                   style: TextStyle(
-                    color: tealDark.withValues(alpha: 0.6),
+                    color: isDark ? Colors.white54 : tealDark.withValues(alpha: 0.6),
                     fontSize: 16,
                   ),
                 ),
@@ -294,16 +279,16 @@ class _QiblaScreenState extends State<QiblaScreen> {
             ),
           ),
         ),
-        _buildLocationInfo(),
+        _buildLocationInfo(isDark),
       ],
     );
   }
 
-  Widget _buildLocationInfo() {
+  Widget _buildLocationInfo(bool isDark) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF333333) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
@@ -324,7 +309,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                   Text(
                     AppLocalizations.of(context).tr('qibla.location'),
                     style: TextStyle(
-                      color: tealDark,
+                      color: isDark ? const Color(0xFFD4B88A) : tealDark,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -350,8 +335,8 @@ class _QiblaScreenState extends State<QiblaScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _infoChip(AppLocalizations.of(context).tr('qibla.deviceHeading'), '°'),
-                  _infoChip(AppLocalizations.of(context).tr('qibla.heading'), '°'),
+                  _infoChip(AppLocalizations.of(context).tr('qibla.deviceHeading'), '${_deviceHeading.toStringAsFixed(0)}\u00B0', isDark),
+                  _infoChip(AppLocalizations.of(context).tr('qibla.heading'), '${_qiblaAngle.toStringAsFixed(0)}\u00B0', isDark),
                 ],
               ),
             ],
@@ -361,18 +346,21 @@ class _QiblaScreenState extends State<QiblaScreen> {
     );
   }
 
-  Widget _infoChip(String label, String value) {
+  Widget _infoChip(String label, String value, bool isDark) {
     return Column(
       children: [
         Text(
           label,
-          style: TextStyle(color: tealDark.withValues(alpha: 0.5), fontSize: 12),
+          style: TextStyle(
+            color: isDark ? Colors.white38 : tealDark.withValues(alpha: 0.5),
+            fontSize: 12,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(
-            color: tealDark,
+          style: TextStyle(
+            color: isDark ? const Color(0xFFD4B88A) : tealDark,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -514,7 +502,3 @@ class _QiblaCompassPainter extends CustomPainter {
   bool shouldRepaint(covariant _QiblaCompassPainter oldDelegate) =>
       oldDelegate.effectiveAngleRad != effectiveAngleRad;
 }
-
-
-
-

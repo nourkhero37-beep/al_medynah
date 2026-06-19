@@ -2,6 +2,7 @@
 import 'package:al_medynah/services/audio_manager_api.dart';
 import 'package:flutter/material.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
+import 'package:al_medynah/main.dart';
 
 class ReciterPage extends StatefulWidget {
   const ReciterPage({super.key});
@@ -136,229 +137,242 @@ class _RecitersScreenState extends State<ReciterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF2493B4),
-          elevation: 0,
-          centerTitle: true,
-          title: Text(
-            AppLocalizations.of(context).tr('reciter.appBar.title'),
-            style: const TextStyle(
-              fontFamily: 'GE SS Two',
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+    return ValueListenableBuilder<bool>(
+      valueListenable: appDarkModeNotifier,
+      builder: (context, isDark, _) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Scaffold(
+            backgroundColor: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+            appBar: AppBar(
+              backgroundColor: isDark ? const Color(0xFF1A1A2E) : const Color(0xFF2493B4),
+              elevation: 0,
+              centerTitle: true,
+              title: Text(
+                AppLocalizations.of(context).tr('reciter.appBar.title'),
+                style: const TextStyle(
+                  fontFamily: 'GE SS Two',
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              iconTheme: const IconThemeData(color: Colors.white),
             ),
-          ),
-          iconTheme: const IconThemeData(color: Colors.white),
-        ),
-        body: _isLoadingReciters
-            ? const Center(child: CircularProgressIndicator())
-            : _reciters.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.wifi_off, size: 48, color: Colors.grey),
-                        const SizedBox(height: 12),
-                        Text(AppLocalizations.of(context).tr('reciter.error.load')),
-                        const SizedBox(height: 12),
-                        ElevatedButton(
-                          onPressed: _init,
-                          child: Text(AppLocalizations.of(context).tr('reciter.retry')),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: _reciters.length,
-                    itemBuilder: (context, index) {
-                      final reciter = _reciters[index];
-                      final rid = reciter.id.toString();
-                      final isDownloaded = _audioManager.isDownloaded[rid] ?? false;
-                      final isSelected = _selectedReciterId == rid;
-                      final progress = _audioManager.downloadProgress[rid];
-                      final isDownloading = progress != null;
-
-                      return Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
+            body: _isLoadingReciters
+                ? Center(child: CircularProgressIndicator(color: goldColor))
+                : _reciters.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.wifi_off, size: 48, color: isDark ? Colors.white38 : Colors.grey),
+                            const SizedBox(height: 12),
+                            Text(
+                              AppLocalizations.of(context).tr('reciter.error.load'),
+                              style: TextStyle(color: isDark ? Colors.white70 : null),
                             ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 42,
-                                  height: 42,
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? const Color(0xFF2493B4).withValues(alpha: 0.15)
-                                        : Colors.grey.withValues(alpha: 0.1),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.record_voice_over_rounded,
-                                    color: isSelected
-                                        ? const Color(0xFF2493B4)
-                                        : Colors.grey,
-                                    size: 22,
-                                  ),
+                            const SizedBox(height: 12),
+                            ElevatedButton(
+                              onPressed: _init,
+                              child: Text(AppLocalizations.of(context).tr('reciter.retry')),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: _reciters.length,
+                        itemBuilder: (context, index) {
+                          final reciter = _reciters[index];
+                          final rid = reciter.id.toString();
+                          final isDownloaded = _audioManager.isDownloaded[rid] ?? false;
+                          final isSelected = _selectedReciterId == rid;
+                          final progress = _audioManager.downloadProgress[rid];
+                          final isDownloading = progress != null;
+
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
                                 ),
-                                const SizedBox(width: 14),
-                                Expanded(
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 42,
+                                      height: 42,
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? const Color(0xFF2493B4).withValues(alpha: 0.15)
+                                            : isDark
+                                                ? Colors.white.withValues(alpha: 0.1)
+                                                : Colors.grey.withValues(alpha: 0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.record_voice_over_rounded,
+                                        color: isSelected
+                                            ? const Color(0xFF2493B4)
+                                            : isDark ? Colors.white54 : Colors.grey,
+                                        size: 22,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 14),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            reciter.nameArabic,
+                                            textDirection: TextDirection.rtl,
+                                            style: TextStyle(
+                                              fontFamily: 'GE SS Two',
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold,
+                                              color: isDark ? const Color(0xFF4DD0E1) : const Color(0xFF1E7FA0),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 3,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: goldColor.withValues(alpha: 0.15),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  reciter.rewaya,
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    color: isDark ? const Color(0xFFD4B88A) : darkBrown,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (isSelected) ...[
+                                                const SizedBox(width: 6),
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 3,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFF2493B4).withValues(alpha: 0.15),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                  child: Text(
+                                                    AppLocalizations.of(context).tr('reciter.badge.selected'),
+                                                    style: const TextStyle(
+                                                      fontSize: 11,
+                                                      color: Color(0xFF2493B4),
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (!isDownloaded && !isDownloading)
+                                          IconButton(
+                                            onPressed: () => _download(reciter),
+                                            icon: const Icon(
+                                              Icons.download_rounded,
+                                              color: Color(0xFF2E86AB),
+                                            ),
+                                            tooltip: AppLocalizations.of(context).tr('reciter.action.download'),
+                                          )
+                                        else if (isDownloading)
+                                          const SizedBox(
+                                            width: 32,
+                                            height: 32,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 3,
+                                              color: goldColor,
+                                            ),
+                                          )
+                                        else ...[
+                                          if (!isSelected)
+                                            IconButton(
+                                              onPressed: () => _select(reciter),
+                                              icon: const Icon(
+                                                Icons.check_circle_outline_rounded,
+                                                color: Colors.green,
+                                              ),
+                                              tooltip: AppLocalizations.of(context).tr('reciter.action.select'),
+                                            ),
+                                          IconButton(
+                                            onPressed: () => _showDeleteDialog(reciter),
+                                            icon: const Icon(
+                                              Icons.delete_outline_rounded,
+                                              color: Colors.red,
+                                            ),
+                                            tooltip: AppLocalizations.of(context).tr('reciter.delete'),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              if (isDownloading)
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text(
-                                        reciter.nameArabic,
-                                        textDirection: TextDirection.rtl,
-                                        style: const TextStyle(
-                                          fontFamily: 'GE SS Two',
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF1E7FA0),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: LinearProgressIndicator(
+                                          value: _audioManager.surahDownloadProgress[rid],
+                                          backgroundColor: Colors.grey.withValues(alpha: 0.2),
+                                          color: goldColor,
+                                          minHeight: 6,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 3,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: goldColor.withValues(alpha: 0.15),
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            child: Text(
-                                              reciter.rewaya,
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                color: darkBrown,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                          if (isSelected) ...[
-                                            const SizedBox(width: 6),
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 3,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFF2493B4).withValues(alpha: 0.15),
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              child: Text(
-                                                AppLocalizations.of(context).tr('reciter.badge.selected'),
-                                                style: const TextStyle(
-                                                  fontSize: 11,
-                                                  color: Color(0xFF2493B4),
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ],
+                                      Text(
+                                        AppLocalizations.of(context).tr('reciter.progress', {
+                                          'completed': '',
+                                          'percent': '',
+                                        }),
+                                        style: TextStyle(color: isDark ? Colors.white70 : null),
                                       ),
                                     ],
                                   ),
                                 ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (!isDownloaded && !isDownloading)
-                                      IconButton(
-                                        onPressed: () => _download(reciter),
-                                        icon: const Icon(
-                                          Icons.download_rounded,
-                                          color: Color(0xFF2E86AB),
-                                        ),
-                                        tooltip: AppLocalizations.of(context).tr('reciter.action.download'),
-                                      )
-                                    else if (isDownloading)
-                                      const SizedBox(
-                                        width: 32,
-                                        height: 32,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 3,
-                                          color: goldColor,
-                                        ),
-                                      )
-                                    else ...[
-                                      if (!isSelected)
-                                        IconButton(
-                                          onPressed: () => _select(reciter),
-                                          icon: const Icon(
-                                            Icons.check_circle_outline_rounded,
-                                            color: Colors.green,
-                                          ),
-                                          tooltip: AppLocalizations.of(context).tr('reciter.action.select'),
-                                        ),
-                                      IconButton(
-                                        onPressed: () => _showDeleteDialog(reciter),
-                                        icon: const Icon(
-                                          Icons.delete_outline_rounded,
-                                          color: Colors.red,
-                                        ),
-                                        tooltip: AppLocalizations.of(context).tr('reciter.delete'),
-                                      ),
-                                    ],
-                                  ],
+
+                              if (index < _reciters.length - 1)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                  ),
+                                  child: Divider(
+                                    height: 1,
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.1)
+                                        : Colors.grey.withValues(alpha: 0.3),
+                                  ),
                                 ),
-                              ],
-                            ),
-                          ),
-
-                          if (isDownloading)
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: LinearProgressIndicator(
-                                      value: _audioManager.surahDownloadProgress[rid],
-                                      backgroundColor: Colors.grey.withValues(alpha: 0.2),
-                                      color: goldColor,
-                                      minHeight: 6,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    AppLocalizations.of(context).tr('reciter.progress', {
-                                      'completed': '${_audioManager.downloadingSurah[rid] ?? 0}',
-                                      'percent': '${((_audioManager.downloadProgress[rid] ?? 0) * 100).toInt()}',
-                                    }),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                          if (index < _reciters.length - 1)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                              ),
-                              child: Divider(
-                                height: 1,
-                                color: Colors.grey.withValues(alpha: 0.3),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-      ),
+                            ],
+                          );
+                        },
+                      ),
+          ),
+        );
+      },
     );
   }
 }
