@@ -1,4 +1,4 @@
-﻿import 'package:al_medynah/features/quran/mushaf_screen.dart';
+import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
 import 'package:al_medynah/main.dart';
 import 'package:al_medynah/model/surah_model.dart';
@@ -84,8 +84,8 @@ class _AyahListState extends State<AyahList> {
                   'text': '',
                 };
               }
-              versesMap[verseKey]!['text'] =
-                  ' '.trim();
+              versesMap[verseKey]!['text'] +=
+                  '${word['text']} ';
             }
           }
         }

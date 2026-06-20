@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/services.dart';
@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:al_medynah/model/quran_page_model.dart';
+import 'package:al_medynah/model/reciters_model.dart';
 import 'package:al_medynah/model/surah_model.dart';
 import 'package:al_medynah/services/audio_manager_api.dart';
 import 'package:path_provider/path_provider.dart';
@@ -579,7 +580,7 @@ class _MushafDrawer extends StatelessWidget {
   }
 }
 
-// âœ… Ù…ØµØ­Ø­: Ø¨Ø¯ÙˆÙ† isPlaying parameter ÙˆØ¨Ø¯ÙˆÙ† buildWhen
+// ✅ مصحح: بدون isPlaying parameter وبدون buildWhen
 class _AudioPlayerBar extends StatefulWidget {
   const _AudioPlayerBar();
 
@@ -596,6 +597,161 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
       return '${h.toString().padLeft(2, '0')}:$m:$s';
     }
     return '$m:$s';
+  }
+
+  Future<void> _showReciterSheet() async {
+    final tr = AppLocalizations.of(context).tr;
+    final audioManager = AudioManager();
+    final currentId = audioManager.currentReciterId;
+
+    await showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (ctx) {
+        return FutureBuilder<List<RecitersModel>>(
+          future: AudioManager().fetchReciters(),
+          builder: (ctx, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox(
+                height: 200,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return SizedBox(
+                height: 200,
+                child: Center(child: Text(tr('reciter.error.load'))),
+              );
+            }
+
+            final reciters = snapshot.data!;
+
+            return DraggableScrollableSheet(
+              initialChildSize: 0.6,
+              minChildSize: 0.4,
+              maxChildSize: 0.85,
+              expand: false,
+              builder: (ctx, scrollController) {
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                      child: Row(
+                        children: [
+                          Text(
+                            tr('mushaf.reciter.select'),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'GE SS Two',
+                            ),
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Navigator.pop(ctx),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Expanded(
+                      child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: reciters.length,
+                        itemBuilder: (ctx, index) {
+                          final reciter = reciters[index];
+                          final rid = reciter.id.toString();
+                          final isSelected = rid == currentId;
+
+                          return ListTile(
+                            leading: Icon(
+                              isSelected
+                                  ? Icons.radio_button_checked
+                                  : Icons.radio_button_unchecked,
+                              color: isSelected ? const Color(0xFF2493B4) : null,
+                            ),
+                            title: Text(
+                              reciter.nameArabic,
+                              style: TextStyle(
+                                fontFamily: 'GE SS Two',
+                                fontWeight: isSelected ? FontWeight.bold : null,
+                                color: isSelected ? const Color(0xFF2493B4) : null,
+                              ),
+                            ),
+                            subtitle: Text(reciter.rewaya),
+                            trailing: isSelected
+                                ? Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF2493B4).withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      tr('reciter.badge.selected'),
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: Color(0xFF2493B4),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  )
+                                : null,
+                            onTap: () async {
+                              await audioManager.saveSelectedReciter(
+                                rid,
+                                reciter.serverUrl,
+                                reciter.nameArabic,
+                              );
+                              if (ctx.mounted) {
+                                setState(() {});
+                                Navigator.pop(ctx);
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildReciterRow() {
+    final name = AudioManager().currentReciterName;
+    if (name == null) return const SizedBox.shrink();
+
+    return GestureDetector(
+      onTap: _showReciterSheet,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Row(
+          children: [
+            Icon(Icons.record_voice_over_rounded, size: 14, color: Colors.white54),
+            const SizedBox(width: 4),
+            Text(
+              name,
+              style: const TextStyle(
+                color: Colors.white54,
+                fontSize: 11,
+                fontFamily: 'GE SS Two',
+              ),
+            ),
+            const Spacer(),
+            Icon(Icons.expand_more_rounded, size: 16, color: Colors.white38),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -650,6 +806,7 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    _buildReciterRow(),
                     SliderTheme(
                       data: SliderThemeData(
                         trackHeight: 2.5,
@@ -725,7 +882,7 @@ class _AudioPlayerBarState extends State<_AudioPlayerBar> {
                               ),
                               shape: BoxShape.circle,
                             ),
-                            // Ø§Ù„Ù…ØµØ­Ø­: state.isPlaying Ø¨Ø¯Ù„ widget.isPlaying
+                            // المصحح: state.isPlaying بدل widget.isPlaying
                             child: Icon(
                               (state.isPlaying && !state.isPaused)
                                   ? Icons.pause_rounded

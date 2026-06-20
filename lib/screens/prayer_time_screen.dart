@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:adhan/adhan.dart';
 import 'package:flutter/material.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
@@ -196,10 +196,15 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     if (diff.isNegative) return '';
 
     final hours = diff.inHours;
+    final minutes = diff.inMinutes.remainder(60);
+    final seconds = diff.inSeconds.remainder(60);
     if (hours > 0) {
-      return '::';
+      return '${hours}h ${minutes}m';
     }
-    return ':';
+    if (minutes > 0) {
+      return '${minutes}m ${seconds}s';
+    }
+    return '${seconds}s';
   }
 
   String _formatTime(DateTime time) {
@@ -496,3 +501,4 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     });
   }
 }
+

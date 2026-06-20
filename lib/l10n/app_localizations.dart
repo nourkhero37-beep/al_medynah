@@ -82,6 +82,11 @@ class AppLocalizations {
       'qibla.south': 'S',
       'qibla.east': 'E',
       'qibla.west': 'W',
+      'qibla.northEast': 'NE',
+      'qibla.southEast': 'SE',
+      'qibla.southWest': 'SW',
+      'qibla.northWest': 'NW',
+      'qibla.openSettings': 'Open Settings',
 
       'qsearch.appBar.title': 'Search in Quran',
       'qsearch.hint': 'Search for an ayah...',
@@ -183,6 +188,7 @@ class AppLocalizations {
       'mushaf.longpress.play': 'Play',
       'mushaf.longpress.changeColor': 'Change Color',
       'mushaf.colorPicker.title': 'Choose Text Color',
+      'mushaf.reciter.select': 'Select Reciter',
 
       'audio.error.noUrl': 'Audio link not found for surah {number}',
 
@@ -259,6 +265,11 @@ class AppLocalizations {
       'qibla.south': '\u062C\u0646\u0648\u0628',
       'qibla.east': '\u0634\u0631\u0642',
       'qibla.west': '\u063A\u0631\u0628',
+      'qibla.northEast': '\u0634\u0645\u0627\u0644 \u0634\u0631\u0642',
+      'qibla.southEast': '\u062C\u0646\u0648\u0628 \u0634\u0631\u0642',
+      'qibla.southWest': '\u062C\u0646\u0648\u0628 \u063A\u0631\u0628',
+      'qibla.northWest': '\u0634\u0645\u0627\u0644 \u063A\u0631\u0628',
+      'qibla.openSettings': '\u0641\u062A\u062D \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A',
 
       'qsearch.appBar.title': '\u0627\u0644\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0642\u0631\u0622\u0646',
       'qsearch.hint': '\u0627\u0628\u062D\u062B \u0639\u0646 \u0622\u064A\u0629...',
@@ -345,6 +356,7 @@ class AppLocalizations {
       'mushaf.longpress.play': '\u062A\u0634\u063A\u064A\u0644',
       'mushaf.longpress.changeColor': '\u062A\u063A\u064A\u064A\u0631 \u0627\u0644\u0644\u0648\u0646',
       'mushaf.colorPicker.title': '\u0627\u062E\u062A\u064A\u0627\u0631 \u0644\u0648\u0646 \u0627\u0644\u0646\u0635',
+      'mushaf.reciter.select': '\u0627\u062E\u062A\u064A\u0627\u0631 \u0627\u0644\u0642\u0627\u0631\u0626',
 
       'tafseer.appBar.title': '\u062A\u0641\u0633\u064A\u0631 \u0627\u0644\u0642\u0631\u0622\u0646 \u0627\u0644\u0643\u0631\u064A\u0645',
       'tafseer.appBar.subtitle': '\u062A\u0641\u0633\u064A\u0631 \u0627\u0644\u0645\u064A\u0633\u0631 \u2022 {count} \u0622\u064A\u0629',
@@ -435,6 +447,11 @@ class AppLocalizations {
       'qibla.south': 'G',
       'qibla.east': 'D',
       'qibla.west': 'B',
+      'qibla.northEast': 'KD',
+      'qibla.southEast': 'GD',
+      'qibla.southWest': 'GB',
+      'qibla.northWest': 'KB',
+      'qibla.openSettings': 'Ayarlar\u0131 A\u00E7',
 
       'qsearch.appBar.title': 'Kur\'an\'da Ara',
       'qsearch.hint': 'Ayet ara...',
@@ -521,6 +538,7 @@ class AppLocalizations {
       'mushaf.longpress.play': 'Oynat',
       'mushaf.longpress.changeColor': 'Rengi De\u011Fi\u015Ftir',
       'mushaf.colorPicker.title': 'Metin Rengi Se\u00E7',
+      'mushaf.reciter.select': 'Okuyucu Se\u00E7',
 
       'tafseer.appBar.title': 'Kur\'\u00E2n-\u0131 Ker\u00EEm Tefsiri',
       'tafseer.appBar.subtitle': 'Tefsir-i M\u00fcyesser \u2022 {count} Ayet',

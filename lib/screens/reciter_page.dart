@@ -1,4 +1,4 @@
-﻿import 'package:al_medynah/model/reciters_model.dart';
+import 'package:al_medynah/model/reciters_model.dart';
 import 'package:al_medynah/services/audio_manager_api.dart';
 import 'package:flutter/material.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
@@ -345,8 +345,8 @@ class _RecitersScreenState extends State<ReciterPage> {
                                       const SizedBox(height: 4),
                                       Text(
                                         AppLocalizations.of(context).tr('reciter.progress', {
-                                          'completed': '',
-                                          'percent': '',
+                                          'completed': '${_audioManager.downloadingSurah[rid] ?? ''}',
+                                          'percent': '${((_audioManager.surahDownloadProgress[rid] ?? 0) * 100).toInt()}',
                                         }),
                                         style: TextStyle(color: isDark ? Colors.white70 : null),
                                       ),

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
 import 'package:al_medynah/main.dart';
@@ -60,8 +60,8 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                   'text': '',
                 };
               }
-              versesMap[verseKey]!['text'] =
-                  ' '.trim();
+              versesMap[verseKey]!['text'] +=
+                  '${word['text']} ';
             }
           }
         }

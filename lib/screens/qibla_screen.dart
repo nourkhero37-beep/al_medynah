@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -21,8 +21,11 @@ class _QiblaScreenState extends State<QiblaScreen> {
 
   bool _isLoading = true;
   String? _errorMessage;
+  bool _isLocationError = false;
   double _qiblaAngle = 0;
   double _deviceHeading = 0;
+  double _filteredHeading = 0;
+  bool _hasHeading = false;
   String _locationName = '';
 
   double _ax = 0, _ay = 0, _az = 0;
@@ -44,16 +47,27 @@ class _QiblaScreenState extends State<QiblaScreen> {
 
   Future<void> _initSensors() async {
     try {
-      final perm = await Geolocator.checkPermission();
+      LocationPermission perm = await Geolocator.checkPermission();
       if (perm == LocationPermission.denied) {
-        final req = await Geolocator.requestPermission();
-        if (req == LocationPermission.denied || req == LocationPermission.deniedForever) {
-          setState(() {
-            _errorMessage = AppLocalizations.of(context).tr('qibla.error.location');
-            _isLoading = false;
-          });
-          return;
-        }
+        perm = await Geolocator.requestPermission();
+      }
+
+      if (perm == LocationPermission.deniedForever) {
+        setState(() {
+          _errorMessage = AppLocalizations.of(context).tr('qibla.error.location');
+          _isLocationError = true;
+          _isLoading = false;
+        });
+        return;
+      }
+
+      if (perm == LocationPermission.denied) {
+        setState(() {
+          _errorMessage = AppLocalizations.of(context).tr('qibla.error.location');
+          _isLocationError = false;
+          _isLoading = false;
+        });
+        return;
       }
 
       final pos = await Geolocator.getCurrentPosition(
@@ -61,7 +75,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
       );
 
       _qiblaAngle = _calculateQiblaDirection(pos.latitude, pos.longitude);
-      _locationName = ', ';
+      _locationName = '${pos.latitude.toStringAsFixed(2)}\u00B0, ${pos.longitude.toStringAsFixed(2)}\u00B0';
 
       _accelSub = accelerometerEventStream().listen((e) {
         _ax = e.x;
@@ -75,24 +89,47 @@ class _QiblaScreenState extends State<QiblaScreen> {
         final mz = e.z;
 
         final phi = atan2(-_ay, -_az);
-        final theta = atan2(-_ax * cos(phi) + _az * sin(phi), _ay * sin(phi) + _az * cos(phi));
+        final sinPhi = sin(phi);
+        final cosPhi = cos(phi);
+        final theta = atan2(-_ax * cosPhi + _az * sinPhi, _ay * sinPhi + _az * cosPhi);
+        final sinTheta = sin(theta);
+        final cosTheta = cos(theta);
 
-        final bx = mx * cos(theta) + my * sin(phi) * sin(theta) + mz * cos(phi) * sin(theta);
-        final by = my * cos(phi) - mz * sin(phi);
+        final bx = mx * cosTheta + my * sinPhi * sinTheta + mz * cosPhi * sinTheta;
+        final by = my * cosPhi - mz * sinPhi;
 
         final heading = atan2(-by, bx) * 180 / pi;
+        final newHeading = (heading + 360) % 360;
+
+        if (!_hasHeading) {
+          _filteredHeading = newHeading;
+          _hasHeading = true;
+        } else {
+          double diff = newHeading - _filteredHeading;
+          if (diff > 180) diff -= 360;
+          if (diff < -180) diff += 360;
+          _filteredHeading += 0.20 * diff;
+          if (_filteredHeading < 0) _filteredHeading += 360;
+          if (_filteredHeading >= 360) _filteredHeading -= 360;
+        }
+
         if (mounted) {
-          setState(() => _deviceHeading = (heading + 360) % 360);
+          setState(() => _deviceHeading = _filteredHeading);
         }
       });
 
       setState(() => _isLoading = false);
     } catch (e) {
       setState(() {
-        _errorMessage = AppLocalizations.of(context).tr('qibla.error.sensors');
+        _errorMessage = AppLocalizations.of(context).tr('qibla.error.sensor');
+        _isLocationError = false;
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _openAppSettings() async {
+    await Geolocator.openAppSettings();
   }
 
   double _calculateQiblaDirection(double lat, double lon) {
@@ -164,7 +201,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.location_off_rounded,
+              _isLocationError ? Icons.settings_rounded : Icons.location_off_rounded,
               size: 64,
               color: isDark ? Colors.white38 : Colors.grey,
             ),
@@ -178,28 +215,48 @@ class _QiblaScreenState extends State<QiblaScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: tealColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            if (_isLocationError)
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: tealColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
+                onPressed: _openAppSettings,
+                icon: const Icon(Icons.open_in_new_rounded),
+                label: Text(AppLocalizations.of(context).tr('qibla.openSettings')),
+              )
+            else ...[
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: tealColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
                 ),
+                onPressed: () {
+                  setState(() {
+                    _isLoading = true;
+                    _errorMessage = null;
+                    _isLocationError = false;
+                  });
+                  _initSensors();
+                },
+                icon: const Icon(Icons.refresh_rounded),
+                label: Text(AppLocalizations.of(context).tr('qibla.retry')),
               ),
-              onPressed: () {
-                setState(() {
-                  _isLoading = true;
-                  _errorMessage = null;
-                });
-                _initSensors();
-              },
-              icon: const Icon(Icons.refresh_rounded),
-              label: Text(AppLocalizations.of(context).tr('qibla.retry')),
-            ),
+            ],
           ],
         ),
       ),
