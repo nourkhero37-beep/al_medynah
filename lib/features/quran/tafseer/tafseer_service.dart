@@ -13,6 +13,7 @@ class TafseerService {
   TafseerService._internal();
 
   final Dio _dio = Dio();
+  final Map<String, String> _inMemoryCache = {};
   bool _isPrecaching = false;
   String? _cachedTafseerDir;
 
@@ -36,6 +37,14 @@ class TafseerService {
     }
 
     return null;
+  }
+
+  Future<String?> fetchTafseerCached(int surahId, int ayahNumber) async {
+    final key = '$surahId:$ayahNumber';
+    if (_inMemoryCache.containsKey(key)) return _inMemoryCache[key];
+    final text = await fetchTafseer(key);
+    if (text != null) _inMemoryCache[key] = text;
+    return text;
   }
 
   Future<String?> _fetchMuyassarFromAlQuranCloud(String verseKey) async {
@@ -156,3 +165,4 @@ class TafseerService {
     }
   }
 }
+

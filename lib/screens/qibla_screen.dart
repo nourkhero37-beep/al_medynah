@@ -1,10 +1,11 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
 import 'package:al_medynah/main.dart';
+import 'package:al_medynah/services/qibla_service.dart';
 
 class QiblaScreen extends StatefulWidget {
   const QiblaScreen({super.key});
@@ -16,8 +17,6 @@ class QiblaScreen extends StatefulWidget {
 class _QiblaScreenState extends State<QiblaScreen> {
   static const Color tealColor = Color(0xFF2493B4);
   static const Color tealDark = Color(0xFF1E7FA0);
-  static const double mekkaLat = 21.4225;
-  static const double mekkaLon = 39.8262;
 
   bool _isLoading = true;
   String? _errorMessage;
@@ -80,7 +79,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
         ),
       );
 
-      _qiblaAngle = _calculateQiblaDirection(pos.latitude, pos.longitude);
+      _qiblaAngle = QiblaService.calculateQiblaDirection(pos.latitude, pos.longitude);
       _locationName =
           '${pos.latitude.toStringAsFixed(2)}\u00B0, ${pos.longitude.toStringAsFixed(2)}\u00B0';
 
@@ -91,45 +90,26 @@ class _QiblaScreenState extends State<QiblaScreen> {
       });
 
       _magnetoSub = magnetometerEventStream().listen((e) {
-        final mx = e.x;
-        final my = e.y;
-        final mz = e.z;
-
-        final phi = atan2(-_ay, -_az);
-        final sinPhi = sin(phi);
-        final cosPhi = cos(phi);
-        final theta = atan2(
-          -_ax * cosPhi + _az * sinPhi,
-          _ay * sinPhi + _az * cosPhi,
+        final newHeading = QiblaService.computeHeading(
+          ax: _ax,
+          ay: _ay,
+          az: _az,
+          mx: e.x,
+          my: e.y,
+          mz: e.z,
         );
-        final sinTheta = sin(theta);
-        final cosTheta = cos(theta);
-
-        final bx =
-            mx * cosTheta + my * sinPhi * sinTheta + mz * cosPhi * sinTheta;
-        final by = my * cosPhi - mz * sinPhi;
-
-        // ✅ مصحح: -atan2(by, bx) هو الصح للـ heading
-        final heading = -atan2(by, bx) * 180 / pi;
-        final newHeading = (heading + 360) % 360;
 
         if (!_hasHeading) {
           _filteredHeading = newHeading;
           _hasHeading = true;
         } else {
-          double diff = newHeading - _filteredHeading;
-          if (diff > 180) diff -= 360;
-          if (diff < -180) diff += 360;
-          _filteredHeading += 0.20 * diff;
-          if (_filteredHeading < 0) _filteredHeading += 360;
-          if (_filteredHeading >= 360) _filteredHeading -= 360;
+          _filteredHeading = QiblaService.filterHeading(newHeading, _filteredHeading);
         }
 
         if (mounted) {
           setState(() => _deviceHeading = _filteredHeading);
         }
       });
-
       setState(() => _isLoading = false);
     } catch (e) {
       setState(() {
@@ -144,19 +124,8 @@ class _QiblaScreenState extends State<QiblaScreen> {
     await Geolocator.openAppSettings();
   }
 
-  double _calculateQiblaDirection(double lat, double lon) {
-    final dLon = (mekkaLon - lon) * pi / 180;
-    final lat1 = lat * pi / 180;
-    final lat2 = mekkaLat * pi / 180;
-
-    final y = sin(dLon) * cos(lat2);
-    final x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
-    final bearing = atan2(y, x) * 180 / pi;
-    return (bearing + 360) % 360;
-  }
-
   // ✅ مصحح: qiblaAngle - deviceHeading هو الصح
-  double get _effectiveAngle => (_qiblaAngle - _deviceHeading + 180) % 360;
+  double get _effectiveAngle => QiblaService.effectiveAngle(_qiblaAngle, _deviceHeading);
 
   String _directionLabel(double angle) {
     if (angle >= 337.5 || angle < 22.5) {
@@ -535,7 +504,7 @@ class _QiblaCompassPainter extends CustomPainter {
       const Color(0xFF1E7FA0).withValues(alpha: 0.4),
     );
 
-    // ✅ سهم القبلة
+    // âœ… Ø³Ù‡Ù… Ø§Ù„Ù‚Ø¨Ù„Ø©
     canvas.save();
     canvas.translate(center.dx, center.dy);
     canvas.rotate(effectiveAngleRad);
@@ -560,7 +529,7 @@ class _QiblaCompassPainter extends CustomPainter {
     path.close();
     canvas.drawPath(path, arrowPaint);
 
-    // ✅ ذيل السهم
+    // âœ… Ø°ÙŠÙ„ Ø§Ù„Ø³Ù‡Ù…
     final tailPath = Path();
     tailPath.moveTo(0, radius * 0.22);
     tailPath.lineTo(-8, radius * 0.10);
@@ -610,3 +579,4 @@ class _QiblaCompassPainter extends CustomPainter {
   bool shouldRepaint(covariant _QiblaCompassPainter oldDelegate) =>
       oldDelegate.effectiveAngleRad != effectiveAngleRad;
 }
+

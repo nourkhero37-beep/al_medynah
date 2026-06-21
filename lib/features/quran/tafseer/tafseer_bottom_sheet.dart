@@ -3,7 +3,7 @@
 
 import 'package:al_medynah/features/quran/tafseer/tafseer_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
+import 'package:al_medynah/features/quran/tafseer/tafseer_tts_manager.dart';
 import 'package:al_medynah/model/surah_model.dart';
 import 'package:al_medynah/main.dart';
 
@@ -40,72 +40,15 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
   late int _currentSurahId;
   late int _currentAyahNumber;
 
-  final FlutterTts _tts = FlutterTts();
-  bool _isSpeaking = false;
-  bool _isPaused = false;
+  late final TafseerTtsManager _ttsManager;
 
   @override
   void initState() {
     super.initState();
     _currentVerseKey = widget.verseKey;
     _parseVerseKey(_currentVerseKey);
-    _initTts();
+    _ttsManager = TafseerTtsManager(onStateChanged: () { if (mounted) setState(() {}); })..init();
     _loadTafseer();
-  }
-
-  Future<void> _initTts() async {
-    await _tts.setLanguage('ar-SA');
-    await _tts.setSpeechRate(0.45);
-    await _tts.setVolume(1.0);
-    await _tts.setPitch(1.0);
-
-    final voices = await _tts.getVoices as List?;
-    if (voices != null) {
-      debugPrint('Available voices: $voices');
-
-      final arabicMaleVoice = voices.firstWhere((v) {
-        final name = (v['name'] as String? ?? '').toLowerCase();
-        final locale = (v['locale'] as String? ?? '').toLowerCase();
-        final gender = (v['gender'] as String? ?? '').toLowerCase();
-        return (locale.contains('ar')) &&
-            (gender.contains('male') || name.contains('male'));
-      }, orElse: () => null);
-
-      if (arabicMaleVoice != null) {
-        await _tts.setVoice({
-          'name': arabicMaleVoice['name'],
-          'locale': arabicMaleVoice['locale'],
-        });
-        debugPrint('Selected voice: ${arabicMaleVoice['name']}');
-      } else {
-        debugPrint('No male Arabic voice found, lowering pitch');
-        await _tts.setPitch(0.75);
-      }
-    }
-
-    _tts.setStartHandler(() {
-      if (mounted) setState(() => _isSpeaking = true);
-    });
-    _tts.setCompletionHandler(() {
-      if (mounted)
-        setState(() {
-          _isSpeaking = false;
-          _isPaused = false;
-        });
-    });
-    _tts.setCancelHandler(() {
-      if (mounted)
-        setState(() {
-          _isSpeaking = false;
-          _isPaused = false;
-        });
-    });
-    _tts.setPauseHandler(() {
-      if (mounted) setState(() => _isPaused = true);
-    });
-    _tts.setContinueHandler(() {
-      if (mounted) setState(() => _isPaused = false);
-    });
   }
 
   void _parseVerseKey(String verseKey) {
@@ -115,7 +58,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
   }
 
   Future<void> _loadTafseer() async {
-    await _stopSpeaking();
+    await _ttsManager.stop();
 
     setState(() {
       _isLoading = true;
@@ -133,27 +76,6 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
     });
   }
 
-  Future<void> _toggleSpeech() async {
-    if (_tafseerText == null) return;
-
-    if (_isSpeaking && !_isPaused) {
-      await _tts.pause();
-    } else if (_isPaused) {
-      await _tts.speak(_tafseerText!);
-    } else {
-      await _tts.speak(_tafseerText!);
-    }
-  }
-
-  Future<void> _stopSpeaking() async {
-    await _tts.stop();
-    if (mounted) {
-      setState(() {
-        _isSpeaking = false;
-        _isPaused = false;
-      });
-    }
-  }
 
   void _goToPrevious() {
     if (_currentAyahNumber <= 1) return;
@@ -197,7 +119,7 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
 
   @override
   void dispose() {
-    _tts.stop();
+    _ttsManager.dispose();
     super.dispose();
   }
 
@@ -333,22 +255,22 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
                             child: Row(
                               children: [
                                 GestureDetector(
-                                  onTap: _toggleSpeech,
+                                  onTap: () => _ttsManager.toggleSpeech(_tafseerText),
                                   child: Container(
                                     width: 38,
                                     height: 38,
                                     decoration: BoxDecoration(
-                                      color: _isSpeaking
+                                      color: _ttsManager.isSpeaking
                                           ? const Color(0xFF2493B4)
                                           : const Color(0xFF2493B4)
                                               .withValues(alpha: 0.15),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
-                                      _isSpeaking && !_isPaused
+                                      _ttsManager.isSpeaking && !_ttsManager.isPaused
                                           ? Icons.pause_rounded
                                           : Icons.volume_up_rounded,
-                                      color: _isSpeaking
+                                      color: _ttsManager.isSpeaking
                                           ? Colors.white
                                           : const Color(0xFF2493B4),
                                       size: 20,
@@ -511,6 +433,8 @@ class _TafseerBottomSheetState extends State<TafseerBottomSheet> {
     );
   }
 }
+
+
 
 
 

@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
 import 'package:al_medynah/main.dart';
-import 'package:al_medynah/model/surah_model.dart';
-import 'package:al_medynah/services/quran_data_service.dart';
+import 'package:al_medynah/services/quran_search_service.dart';
 
 class QuranSearchScreen extends StatefulWidget {
   final VoidCallback? onBookmarkSaved;
@@ -22,9 +21,6 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
   bool _isLoading = false;
 
 
-  String _removeDiacritics(String text) {
-    return text.replaceAll(RegExp(r'[\u064B-\u065F\u0670]'), '');
-  }
 
   Future<void> _search(String query) async {
     if (query.trim().isEmpty) {
@@ -37,68 +33,10 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
       _results = [];
     });
 
-    final List<Map<String, dynamic>> results = [];
-    final Set<String> addedVerses = {};
-
-    for (int page = 1; page <= 604; page++) {
-      try {
-        final data = await QuranDataService().loadPage(page);
-        final lines = data['lines'] as List<dynamic>? ?? [];
-
-        final Map<String, Map<String, dynamic>> versesMap = {};
-
-        for (final line in lines) {
-          final words = line['words'] as List<dynamic>? ?? [];
-          for (final word in words) {
-            final type = word['type'] ?? '';
-            final verseKey = word['verse_key'] ?? '';
-            if (type == 'word' && verseKey.isNotEmpty) {
-              if (!versesMap.containsKey(verseKey)) {
-                versesMap[verseKey] = {
-                  'verse_key': verseKey,
-                  'page': page,
-                  'text': '',
-                };
-              }
-              versesMap[verseKey]!['text'] +=
-                  '${word['text']} ';
-            }
-          }
-        }
-
-        for (final verse in versesMap.values) {
-          final verseText = verse['text'] as String;
-          final verseKey = verse['verse_key'] as String;
-
-          if (!addedVerses.contains(verseKey) &&
-              _removeDiacritics(
-                verseText,
-              ).contains(_removeDiacritics(query.trim()))) {
-            results.add(verse);
-            addedVerses.add(verseKey);
-          }
-        }
-      } catch (_) {}
-    }
-
-    // Search surah names
-    final queryTrimmed = query.trim();
-    final cleanQuery = _removeDiacritics(queryTrimmed);
-    final surahResults = surahList.where((s) {
-      return _removeDiacritics(s.nameArabic).contains(cleanQuery) ||
-          s.nameEnglish.toLowerCase().contains(queryTrimmed.toLowerCase()) ||
-          s.id.toString() == queryTrimmed;
-    }).map((s) {
-      return {
-        'type': 'surah',
-        'surah_id': s.id,
-        'name_arabic': s.nameArabic,
-        'name_english': s.nameEnglish,
-        'page': s.pageNumber,
-      };
-    }).toList();
-
-    results.addAll(surahResults);
+    final results = await QuranSearchService.searchAll(
+      query: query,
+      surahsFirst: false,
+    );
 
     setState(() {
       _results = results;
@@ -394,3 +332,5 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
     );
   }
 }
+
+

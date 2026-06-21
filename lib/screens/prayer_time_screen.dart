@@ -1,8 +1,9 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:adhan/adhan.dart';
 import 'package:flutter/material.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
 import 'package:al_medynah/main.dart';
+import 'package:al_medynah/services/prayer_time_service.dart';
 
 class PrayerTimesScreen extends StatefulWidget {
   const PrayerTimesScreen({super.key});
@@ -54,7 +55,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
 
     try {
       final offset = DateTime.now().timeZoneOffset;
-      final region = _regionFromTimezone(offset);
+      final region = PrayerTimeService.regionFromTimezone(offset, AppLocalizations.of(context).tr);
 
       final coordinates = Coordinates(region.latitude, region.longitude);
       final params = region.params;
@@ -75,148 +76,11 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     }
   }
 
-  ({
-    double latitude,
-    double longitude,
-    CalculationParameters params,
-    String name,
-  })
-  _regionFromTimezone(Duration offset) {
-    if (offset == const Duration(hours: 2)) {
-      final p = CalculationMethod.egyptian.getParameters();
-      p.madhab = Madhab.shafi;
-      return (latitude: 30.0444, longitude: 31.2357, params: p, name: AppLocalizations.of(context).tr('prayer.region.egypt'));
-    }
-    if (offset == const Duration(hours: 3)) {
-      final p = CalculationMethod.turkey.getParameters();
-      p.madhab = Madhab.shafi;
-      return (latitude: 41.0082, longitude: 28.9784, params: p, name: AppLocalizations.of(context).tr('prayer.region.turkey'));
-    }
-    if (offset == const Duration(hours: 4)) {
-      final p = CalculationMethod.umm_al_qura.getParameters();
-      p.madhab = Madhab.shafi;
-      return (latitude: 24.4539, longitude: 54.3773, params: p, name: AppLocalizations.of(context).tr('prayer.region.gulf'));
-    }
-    if (offset == const Duration(hours: 5)) {
-      final p = CalculationMethod.karachi.getParameters();
-      p.madhab = Madhab.hanafi;
-      return (
-        latitude: 33.6844,
-        longitude: 73.0479,
-        params: p,
-        name: AppLocalizations.of(context).tr('prayer.region.pakistan'),
-      );
-    }
-    if (offset >= const Duration(hours: -10) &&
-        offset <= const Duration(hours: -5)) {
-      final p = CalculationMethod.north_america.getParameters();
-      p.madhab = Madhab.shafi;
-      return (
-        latitude: 40.7128,
-        longitude: -74.0060,
-        params: p,
-        name: AppLocalizations.of(context).tr('prayer.region.northAmerica'),
-      );
-    }
-    final p = CalculationMethod.muslim_world_league.getParameters();
-    p.madhab = Madhab.shafi;
-    if (offset >= const Duration(hours: 0) &&
-        offset <= const Duration(hours: 2)) {
-      return (latitude: 51.5074, longitude: -0.1278, params: p, name: AppLocalizations.of(context).tr('prayer.region.europe'));
-    }
-    return (
-      latitude: 21.4225,
-      longitude: 39.8262,
-      params: p,
-      name: AppLocalizations.of(context).tr('prayer.region.other'),
-    );
-  }
 
-  List<DateTime> _getPrayerTimesList() {
-    if (_prayerTimes == null) return [];
-    return [
-      _prayerTimes!.fajr,
-      _prayerTimes!.sunrise,
-      _prayerTimes!.dhuhr,
-      _prayerTimes!.asr,
-      _prayerTimes!.maghrib,
-      _prayerTimes!.isha,
-    ];
-  }
 
-  int _getCurrentPrayerIndex() {
-    if (_prayerTimes == null) return -1;
-    final prayer = _prayerTimes!.currentPrayerByDateTime(_now);
-    switch (prayer) {
-      case Prayer.fajr:
-        return 0;
-      case Prayer.sunrise:
-        return 1;
-      case Prayer.dhuhr:
-        return 2;
-      case Prayer.asr:
-        return 3;
-      case Prayer.maghrib:
-        return 4;
-      case Prayer.isha:
-        return 5;
-      default:
-        return -1;
-    }
-  }
 
-  int _getNextPrayerIndex() {
-    if (_prayerTimes == null) return -1;
-    final prayer = _prayerTimes!.nextPrayerByDateTime(_now);
-    switch (prayer) {
-      case Prayer.fajr:
-        return 0;
-      case Prayer.sunrise:
-        return 1;
-      case Prayer.dhuhr:
-        return 2;
-      case Prayer.asr:
-        return 3;
-      case Prayer.maghrib:
-        return 4;
-      case Prayer.isha:
-        return 5;
-      default:
-        return -1;
-    }
-  }
 
-  String _getTimeRemaining() {
-    if (_prayerTimes == null) return '';
-    final nextPrayer = _prayerTimes!.nextPrayerByDateTime(_now);
-    final nextTime = _prayerTimes!.timeForPrayer(nextPrayer);
-    if (nextTime == null) return '';
 
-    final diff = nextTime.difference(_now);
-    if (diff.isNegative) return '';
-
-    final hours = diff.inHours;
-    final minutes = diff.inMinutes.remainder(60);
-    final seconds = diff.inSeconds.remainder(60);
-    if (hours > 0) {
-      return '${hours}h ${minutes}m';
-    }
-    if (minutes > 0) {
-      return '${minutes}m ${seconds}s';
-    }
-    return '${seconds}s';
-  }
-
-  String _formatTime(DateTime time) {
-    final hour = time.hour > 12
-        ? time.hour - 12
-        : time.hour == 0
-        ? 12
-        : time.hour;
-    final minute = time.minute.toString().padLeft(2, '0');
-    final period = time.hour >= 12 ? AppLocalizations.of(context).tr('prayer.pm') : AppLocalizations.of(context).tr('prayer.am');
-    return '$hour:$minute $period';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -308,8 +172,8 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
   }
 
   Widget _buildNextPrayerCard() {
-    final nextIndex = _getNextPrayerIndex();
-    final timeRemaining = _getTimeRemaining();
+    final nextIndex = PrayerTimeService.getNextPrayerIndex(_prayerTimes!, _now);
+    final timeRemaining = PrayerTimeService.getTimeRemaining(_prayerTimes!, _now);
     final nextName = nextIndex >= 0 ? _prayerNames[nextIndex]['name'] : '';
 
     return Container(
@@ -349,7 +213,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            _formatTime(_now),
+            PrayerTimeService.formatTime(_now, AppLocalizations.of(context).tr),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 42,
@@ -385,9 +249,9 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
   }
 
   List<Widget> _buildPrayerCards(bool isDark) {
-    final times = _getPrayerTimesList();
-    final currentIndex = _getCurrentPrayerIndex();
-    final nextIndex = _getNextPrayerIndex();
+    final times = PrayerTimeService.getPrayerTimesList(_prayerTimes!);
+    final currentIndex = PrayerTimeService.getCurrentPrayerIndex(_prayerTimes!, _now);
+    final nextIndex = PrayerTimeService.getNextPrayerIndex(_prayerTimes!, _now);
 
     return List.generate(_prayerNames.length, (index) {
       final isCurrent = index == currentIndex;
@@ -421,7 +285,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         child: Row(
           children: [
             Text(
-              _formatTime(time),
+              PrayerTimeService.formatTime(time, AppLocalizations.of(context).tr),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

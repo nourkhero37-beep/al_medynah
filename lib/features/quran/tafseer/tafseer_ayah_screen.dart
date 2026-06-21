@@ -228,3 +228,4 @@ class _TafseerAyahScreenState extends State<TafseerAyahScreen> {
     );
   }
 }
+

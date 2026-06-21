@@ -12,9 +12,9 @@ import 'package:al_medynah/l10n/app_localizations.dart';
 import 'package:al_medynah/main.dart';
 import 'package:al_medynah/services/bookmark_service.dart';
 import 'package:al_medynah/services/locale_service.dart';
+import 'package:al_medynah/services/home_page_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' hide TextDirection;
-import 'package:hijri/hijri_calendar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,39 +37,8 @@ class _HomePageState extends State<HomePage> {
     if (mounted) setState(() => _bookmarkPage = page);
   }
 
-  String _toWesternNumerals(String s) {
-    return String.fromCharCodes(s.codeUnits.map((code) {
-      if (code >= 0x0660 && code <= 0x0669) {
-        return code - 0x0660 + 48;
-      }
-      if (code >= 0x06F0 && code <= 0x06F9) {
-        return code - 0x06F0 + 48;
-      }
-      return code;
-    }));
-  }
 
-  String _formatHijriDate(String localeCode) {
-    final locale = switch (localeCode) {
-      'ar' => 'ar',
-      _ => 'en',
-    };
-    HijriCalendar.setLocal(locale);
-    return HijriCalendar.fromDate(DateTime.now()).fullDate();
-  }
 
-  String _currentLanguageName(AppLocalizations loc) {
-    switch (appLocaleNotifier.value.languageCode) {
-      case 'ar':
-        return loc.tr('lang.arabic');
-      case 'en':
-        return loc.tr('lang.english');
-      case 'tr':
-        return loc.tr('lang.turkish');
-      default:
-        return loc.tr('lang.arabic');
-    }
-  }
 
   final List<Map<String, String>> gridItems = [
     {'key': 'tv', 'image': 'assets/images/tv.png'},
@@ -90,8 +59,8 @@ class _HomePageState extends State<HomePage> {
         final now = DateTime.now();
         final localeCode = AppLocalizations.of(context).localeCode;
         final loc = AppLocalizations.of(context);
-        final gregorianStr = localeCode == 'ar' ? DateFormat.yMMMMEEEEd(localeCode).format(now) : _toWesternNumerals(DateFormat.yMMMMEEEEd(localeCode).format(now));
-        final hijriStr = localeCode == 'ar' ? _formatHijriDate(localeCode) : _toWesternNumerals(_formatHijriDate(localeCode));
+        final gregorianStr = localeCode == 'ar' ? DateFormat.yMMMMEEEEd(localeCode).format(now) : HomePageHelper.toWesternNumerals(DateFormat.yMMMMEEEEd(localeCode).format(now));
+        final hijriStr = localeCode == 'ar' ? HomePageHelper.formatHijriDate(localeCode) : HomePageHelper.toWesternNumerals(HomePageHelper.formatHijriDate(localeCode));
         final textScale = MediaQuery.of(context).size.width / 430;
         final scale = textScale.clamp(0.75, 1.3);
 
@@ -195,7 +164,7 @@ class _HomePageState extends State<HomePage> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      _currentLanguageName(loc),
+                                      HomePageHelper.currentLanguageName(loc, appLocaleNotifier.value),
                                       style: TextStyle(
                                         fontFamily: 'GE SS Two',
                                         color: isDarkMode ? const Color(0xFF4DD0E1) : const Color(0xFF00BCD4),

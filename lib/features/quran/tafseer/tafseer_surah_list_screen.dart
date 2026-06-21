@@ -3,6 +3,7 @@ import 'package:al_medynah/model/surah_model.dart';
 import 'tafseer_ayah_screen.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
 import 'package:al_medynah/main.dart';
+import 'package:al_medynah/services/surah_search_helper.dart';
 
 class TafseerSurahListScreen extends StatefulWidget {
   const TafseerSurahListScreen({super.key});
@@ -20,15 +21,7 @@ class _TafseerSurahListScreenState extends State<TafseerSurahListScreen> {
 
   void _onSearch(String query) {
     setState(() {
-      if (query.isEmpty) {
-        _filteredList = surahList;
-      } else {
-        _filteredList = surahList.where((s) {
-          return s.nameArabic.contains(query) ||
-              s.nameEnglish.toLowerCase().contains(query.toLowerCase()) ||
-              s.id.toString() == query;
-        }).toList();
-      }
+      _filteredList = SurahSearchHelper.filter(surahList, query);
     });
   }
 

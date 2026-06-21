@@ -1,8 +1,8 @@
-import 'package:al_medynah/features/quran/mushaf_screen.dart';
+﻿import 'package:al_medynah/features/quran/mushaf_screen.dart';
 import 'package:al_medynah/l10n/app_localizations.dart';
 import 'package:al_medynah/main.dart';
 import 'package:al_medynah/model/surah_model.dart';
-import 'package:al_medynah/services/quran_data_service.dart';
+import 'package:al_medynah/services/quran_search_service.dart';
 import 'package:flutter/material.dart';
 
 class AyahList extends StatefulWidget {
@@ -21,25 +21,9 @@ class _AyahListState extends State<AyahList> {
   List<Map<String, dynamic>> _results = [];
   bool _isSearching = false;
 
-  String _removeDiacritics(String text) {
-    return text.replaceAll(RegExp(r'[\u064B-\u065F\u0670]'), '');
-  }
-
-  Map<String, dynamic> _surahToMap(SurahModel s) {
-    return {
-      'type': 'surah',
-      'surah_id': s.id,
-      'name_arabic': s.nameArabic,
-      'name_english': s.nameEnglish,
-      'page': s.pageNumber,
-      'verses_count': s.versesCount,
-      'revelation_type': s.revelationType,
-    };
-  }
-
   void _filterSurahs(String query) {
     if (query.trim().isEmpty) {
-      _results = surahList.map((s) => _surahToMap(s)).toList();
+      _results = surahList.map((s) => QuranSearchService.surahToMap(s)).toList();
       return;
     }
     final q = query.trim();
@@ -49,7 +33,7 @@ class _AyahListState extends State<AyahList> {
               s.nameEnglish.toLowerCase().contains(q.toLowerCase()) ||
               s.id.toString() == q;
         })
-        .map((s) => _surahToMap(s))
+        .map((s) => QuranSearchService.surahToMap(s))
         .toList();
   }
 
@@ -61,57 +45,8 @@ class _AyahListState extends State<AyahList> {
     if (query.trim().isEmpty) return;
     setState(() => _isSearching = true);
 
-    final q = query.trim();
-    final cleanQuery = _removeDiacritics(q);
-    final List<Map<String, dynamic>> verseResults = [];
-
-    for (int page = 1; page <= 604; page++) {
-      try {
-        final data = await QuranDataService().loadPage(page);
-        final lines = data['lines'] as List<dynamic>? ?? [];
-        final Map<String, Map<String, dynamic>> versesMap = {};
-
-        for (final line in lines) {
-          final words = line['words'] as List<dynamic>? ?? [];
-          for (final word in words) {
-            final type = word['type'] ?? '';
-            final verseKey = word['verse_key'] ?? '';
-            if (type == 'word' && verseKey.isNotEmpty) {
-              if (!versesMap.containsKey(verseKey)) {
-                versesMap[verseKey] = {
-                  'verse_key': verseKey,
-                  'page': page,
-                  'text': '',
-                };
-              }
-              versesMap[verseKey]!['text'] +=
-                  '${word['text']} ';
-            }
-          }
-        }
-
-        for (final verse in versesMap.values) {
-          final verseText = verse['text'] as String;
-          if (_removeDiacritics(verseText).contains(cleanQuery)) {
-            verseResults.add({
-              'type': 'verse',
-              'verse_key': verse['verse_key'],
-              'page': verse['page'],
-              'text': verse['text'],
-            });
-          }
-        }
-      } catch (_) {}
-    }
-
-    final surahResults = surahList
-        .where((s) {
-          return _removeDiacritics(s.nameArabic).contains(cleanQuery) ||
-              s.nameEnglish.toLowerCase().contains(q.toLowerCase()) ||
-              s.id.toString() == q;
-        })
-        .map((s) => _surahToMap(s))
-        .toList();
+    final verseResults = await QuranSearchService.searchVerses(query);
+    final surahResults = QuranSearchService.searchSurahs(query);
 
     setState(() {
       _results = [...surahResults, ...verseResults];
@@ -493,3 +428,5 @@ class _AyahListState extends State<AyahList> {
     );
   }
 }
+
+
